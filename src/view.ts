@@ -1,4 +1,6 @@
 import { teardown } from "./lifecycle.js";
+import { render } from "./render.js";
+import { Expression, get, skipEqual, watch } from "./signals.js";
 
 export type ViewBoundaryOwner = (first: Node, last: Node) => void;
 export type ViewSetBoundaryFn = (first: Node | undefined, last: Node | undefined) => void;
@@ -66,4 +68,33 @@ export class View {
 			range.extractContents();
 		}
 	}
+}
+
+export function nest(expr: Expression<(() => unknown) | undefined>): View {
+	return new View((setBoundary, self) => {
+		watch(expr, value => {
+			const view = render(value?.());
+			const parent = self.parent;
+			if (parent) {
+				parent.insertBefore(view.take(), self.first);
+				self.detach();
+			}
+			setBoundary(view.first, view.last);
+			view.setBoundaryOwner(setBoundary);
+		});
+	});
+}
+
+type Falsy = null | undefined | false | 0 | 0n | "";
+
+export function when<T>(expr: Expression<T | Falsy>, truthy: (value: T) => unknown, falsy?: () => unknown) {
+	const getValue = skipEqual(expr);
+	return nest(() => {
+		const value = getValue();
+		if (value) {
+			return () => truthy(value);
+		} else {
+			return falsy;
+		}
+	});
 }

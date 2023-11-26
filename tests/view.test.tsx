@@ -107,4 +107,7 @@ await test("view", async ctx => {
 		notStrictEqual(view.first.parentNode, parent);
 	});
 
+	// TODO: nest()
+	// TODO: when()
+
 });

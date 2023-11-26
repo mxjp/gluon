@@ -1,7 +1,7 @@
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
 
-import { batch, capture, lazy, sig, skip, teardown, trigger, watch } from "@mxjp/gluon";
+import { batch, branch, capture, lazy, sig, skip, skipEqual, teardown, trigger, watch } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
@@ -166,6 +166,110 @@ await test("signals", async ctx => {
 
 			signal.value = 2;
 			assertEvents(events, ["?2", "+2"]);
+		});
+
+		await ctx.test("branch", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+
+			watch(() => {
+				switch (signal.value) {
+					case 2:
+						deepStrictEqual(branch(), []);
+						break;
+
+						case 3:
+							deepStrictEqual(branch(
+								() => "a",
+								() => "b",
+							), ["a", "b"]);
+							break;
+
+						case 4:
+							deepStrictEqual(branch(
+								() => {
+									skip();
+									return "a";
+								},
+								() => "b",
+							), ["a", "b"]);
+							break;
+
+						case 5:
+							deepStrictEqual(branch(
+								() => "a",
+								() => {
+									skip();
+									return "b";
+								},
+							), ["a", "b"]);
+							break;
+
+						case 6:
+							deepStrictEqual(branch(
+								() => {
+									skip();
+									return "a";
+								},
+								() => {
+									skip();
+									return "b";
+								},
+							), ["a", "b"]);
+							break;
+				}
+				return signal.value;
+			}, value => {
+				events.push(value);
+			});
+
+			assertEvents(events, [1]);
+
+			signal.value++;
+			assertEvents(events, []);
+
+			signal.value++;
+			assertEvents(events, [3]);
+
+			signal.value++;
+			assertEvents(events, [4]);
+
+			signal.value++;
+			assertEvents(events, [5]);
+
+			signal.value++;
+			assertEvents(events, []);
+
+			signal.value++;
+			assertEvents(events, [7]);
+		});
+
+		await ctx.test("branch inert", () => {
+			deepStrictEqual(branch(), []);
+			deepStrictEqual(branch(() => {
+				skip();
+				return 42;
+			}, () => "test"), [42, "test"]);
+			deepStrictEqual(branch(() => 42, () => "test"), [42, "test"]);
+		});
+
+		await ctx.test("skip equal", () => {
+			const events: unknown[] = [];
+			const signal = sig(1, false);
+			watch(signal, value => {
+				events.push(`r${value}`);
+			});
+			watch(skipEqual(signal), value => {
+				events.push(`e${value}`);
+			});
+
+			assertEvents(events, ["r1", "e1"]);
+			signal.value = 2;
+			assertEvents(events, ["r2", "e2"]);
+			signal.value = 2;
+			assertEvents(events, ["r2"]);
+			signal.value = 3;
+			assertEvents(events, ["r3", "e3"]);
 		});
 
 		await ctx.test("access cycles", () => {

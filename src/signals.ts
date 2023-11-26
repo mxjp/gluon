@@ -97,6 +97,7 @@ export function sig<T>(value: T, equals?: SignalEqualsFn<T> | boolean): Signal<T
 }
 
 export type Expression<T> = T | Signal<T> | (() => T);
+export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
 
 export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 	if (expr instanceof Signal || typeof expr === "function") {
@@ -187,6 +188,48 @@ export function skip(): void {
 	if (SKIP_STACK.length > 0) {
 		SKIP_STACK[SKIP_STACK.length - 1] = true;
 	}
+}
+
+export function unskip(): void {
+	if (SKIP_STACK.length > 0) {
+		SKIP_STACK[SKIP_STACK.length - 1] = false;
+	}
+}
+
+export function skipEqual<T>(expr: Expression<T>): () => T {
+	let previous: T | undefined = undefined;
+	return () => {
+		const value = get(expr);
+		if (previous === value) {
+			skip();
+		} else {
+			previous = value;
+		}
+		return value;
+	};
+}
+
+type BranchResults<T extends readonly (() => unknown)[]> = {
+	-readonly [P in keyof T]: ExpressionResult<T[P]>;
+};
+
+export function branch<T extends readonly (() => unknown)[]>(...inputs: T): BranchResults<T> {
+	const results = [] as BranchResults<T>;
+	let skips = 0;
+	for (let i = 0; i < inputs.length; i++) {
+		SKIP_STACK.push(false);
+		try {
+			results.push(get(inputs[i]));
+		} finally {
+			if (SKIP_STACK.pop()) {
+				skips++;
+			}
+		}
+	}
+	if (skips === inputs.length) {
+		skip();
+	}
+	return results;
 }
 
 function createStackProxy(stack: Dependant[][]): [access: () => void, proxy: Dependant] {

@@ -17,6 +17,7 @@ for (const key of [
 	"Range",
 	"Node",
 	"DocumentFragment",
+	"HTMLDivElement",
 	"CustomEvent",
 	"MouseEvent",
 ]) {

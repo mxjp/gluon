@@ -16,6 +16,9 @@ await test("jsx-runtime", async ctx => {
 		const events: any[] = [];
 		const elem = <div
 			$click={event => {
+				// Don't remove, only for testing the type:
+				const _: MouseEvent = event;
+
 				events.push(event);
 			}}
 			$custom-event={(event: CustomEvent) => {
@@ -33,6 +36,9 @@ await test("jsx-runtime", async ctx => {
 		const events: any[] = [];
 		const elem = <div
 			$$click={event => {
+				// Don't remove, only for testing the type:
+				const _: MouseEvent = event;
+
 				events.push(event);
 			}}
 			$$custom-event={(event: CustomEvent) => {
@@ -61,6 +67,13 @@ await test("jsx-runtime", async ctx => {
 
 	await ctx.test("api types", () => {
 		const elem = <div />;
+
+		// Don't remove, only for testing the type:
+		const _1: HTMLElement = elem;
+		const _2: SVGElement = elem;
+		const _3: MathMLElement = elem;
+
+		strictEqual(elem instanceof HTMLDivElement, true);
 		elem.classList.add("foo");
 		elem.click();
 	});

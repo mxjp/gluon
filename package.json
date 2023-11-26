@@ -1,4 +1,31 @@
 {
 	"name": "@mxjp/gluon",
-	"version": "1.0.0"
+	"version": "1.0.0",
+	"main": "./dist/es/index.js",
+	"exports": {
+		".": "./dist/es/index.js",
+		"./jsx-runtime": "./dist/es/jsx-runtime.js"
+	},
+	"type": "module",
+	"scripts": {
+		"build": "concurrently npm:build:es npm:build:types && npm run build:tests",
+		"build:es": "tsc -p tsconfig-es.json",
+		"build:types": "tsc -p tsconfig-types.json",
+		"build:tests": "tsc -p tests/tsconfig.json",
+
+		"start": "concurrently npm:start:*",
+		"start:es": "tsc -p tsconfig-es.json -w",
+		"start:types": "tsc -p tsconfig-types.json -w",
+		"start:tests": "tsc -p tests/tsconfig.json -w",
+
+		"test": "node --test ./tests_out"
+	},
+	"devDependencies": {
+		"@mxjp/gluon": "file:.",
+		"@types/jsdom": "^21.1.6",
+		"@types/node": "^20.9.4",
+		"concurrently": "^8.2.2",
+		"jsdom": "^22.1.0",
+		"typescript": "^5.3.2"
+	}
 }

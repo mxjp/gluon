@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": ".",
+		"outDir": "../tests_out",
+		"jsx": "react-jsx",
+		"jsxImportSource": "@mxjp/gluon"
+	},
+	"include": [
+		"."
+	]
+}

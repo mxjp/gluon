@@ -1,0 +1,160 @@
+import { extract, inject } from "./context.js";
+import { createText } from "./render.js";
+import { Expression, watch } from "./signals.js";
+import { View } from "./view.js";
+
+export const HTML = "http://www.w3.org/1999/xhtml";
+export const SVG = "http://www.w3.org/2000/svg";
+export const MATHML = "http://www.w3.org/1998/Math/MathML";
+export const XMLNS = Symbol("namespace");
+
+export function useNamespace<T>(ns: string, fn: () => T) {
+	return inject([XMLNS, ns], fn);
+}
+
+function appendContent(parent: Node, content: unknown) {
+	if (content === null || content === undefined) {
+		return;
+	}
+	if (Array.isArray(content)) {
+		for (let i = 0; i < content.length; i++) {
+			appendContent(parent, content[i]);
+		}
+	} else if (content instanceof Node) {
+		parent.appendChild(content);
+	} else if (content instanceof View) {
+		parent.appendChild(content.take());
+	} else {
+		parent.appendChild(createText(content));
+	}
+}
+
+type EventAttributes = {
+	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
+};
+
+type SpecialAttributes = {
+	class?: Expression<string> | {
+		[K in string]?: Expression<boolean>;
+	};
+	style?: Expression<string> | {
+		[K in keyof CSSStyleDeclaration]?: Expression<CSSStyleDeclaration[K]>;
+	};
+};
+
+type OtherAttributes = {
+	[K in Exclude<string, keyof EventAttributes>]: Expression<unknown>;
+};
+
+export type Attributes = EventAttributes & SpecialAttributes & OtherAttributes;
+
+function isProp(obj: object, name: string): boolean {
+	if (name in obj) {
+		while (obj) {
+			const desc = Object.getOwnPropertyDescriptor(obj, name);
+			if (desc) {
+				return Boolean(desc.writable || desc.set);
+			}
+			obj = Object.getPrototypeOf(obj);
+		}
+	}
+	return false;
+}
+
+function setAttr(elem: Element, name: string, value: unknown, prop: boolean): void {
+	if (prop) {
+		(elem as Record<string, any>)[name] = value;
+	} else if (value === null || value === undefined) {
+		elem.removeAttribute(name);
+	} else {
+		elem.setAttribute(name, value as string);
+	}
+}
+
+export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): HTMLElementTagNameMap[K];
+export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): SVGElementTagNameMap[K];
+export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): MathMLElementTagNameMap[K];
+export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): E;
+
+export function createElement(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): Element {
+	const ns = (extract(XMLNS) as string);
+	const elem = ns === undefined
+		? document.createElement(tagName)
+		: document.createElementNS(ns, tagName) as HTMLElement | SVGElement | MathMLElement;
+
+	attrs: for (const name in attrs) {
+		if (jsx && name === "children") {
+			continue attrs;
+		}
+		const value = attrs[name as keyof Attributes];
+		if (name.startsWith("$")) {
+			const capture = name.startsWith("$$");
+			const event = name.slice(capture ? 2 : 1);
+			elem.addEventListener(event, value as (event: Event) => void, { capture });
+		} else {
+			switch (name) {
+				case "style":
+					if (value !== null && typeof value === "object") {
+						for (const prop in value) {
+							if (prop.startsWith("--")) {
+								watch(value[prop as never], value => {
+									elem.style.setProperty(prop, value);
+								});
+							} else {
+								watch(value[prop as never], value => {
+									elem.style[prop as never] = value;
+								});
+							}
+						}
+						continue attrs;
+					}
+					break;
+
+				case "class":
+					if (value !== null && typeof value === "object") {
+						for (const name in value) {
+							watch(value[name as never], enabled => {
+								elem.classList.toggle(name, enabled);
+							});
+						}
+						continue attrs;
+					}
+					break;
+			}
+
+			const prop = isProp(elem, name);
+			watch(value, value => setAttr(elem, name, value, prop));
+		}
+	}
+
+	appendContent(elem, content);
+	return elem;
+}
+
+export function e<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
+export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes): HTMLElementTagNameMap[K];
+export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, content: unknown[]): HTMLElementTagNameMap[K];
+export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[]): HTMLElementTagNameMap[K];
+
+export function e<K extends keyof SVGElementTagNameMap>(tagName: K): SVGElementTagNameMap[K];
+export function e<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes): SVGElementTagNameMap[K];
+export function e<K extends keyof SVGElementTagNameMap>(tagName: K, content: unknown[]): SVGElementTagNameMap[K];
+export function e<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[]): SVGElementTagNameMap[K];
+
+export function e<K extends keyof MathMLElementTagNameMap>(tagName: K): MathMLElementTagNameMap[K];
+export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes): MathMLElementTagNameMap[K];
+export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, content: unknown[]): MathMLElementTagNameMap[K];
+export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[]): MathMLElementTagNameMap[K];
+
+export function e<E extends Element>(tagName: string): E;
+export function e<E extends Element>(tagName: string, attrs: Attributes): E;
+export function e<E extends Element>(tagName: string, content: unknown[]): E;
+export function e<E extends Element>(tagName: string, attrs: Attributes, content: unknown[]): E;
+
+export function e(tagName: string, attrs?: unknown, content?: unknown[]): Element {
+	if (Array.isArray(attrs)) {
+		return createElement(tagName, {}, attrs, false);
+	} else {
+		return createElement(tagName, attrs as Attributes ?? {}, content ?? [], false);
+	}
+}

@@ -18,7 +18,7 @@
 		"start:types": "tsc -p tsconfig-types.json -w",
 		"start:tests": "tsc -p tests/tsconfig.json -w",
 
-		"test": "node --test ./tests_out"
+		"test": "node --enable-source-maps --test ./tests_out"
 	},
 	"devDependencies": {
 		"@mxjp/gluon": "file:.",

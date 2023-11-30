@@ -3,12 +3,34 @@ import { createText } from "./render.js";
 import { Expression, watch } from "./signals.js";
 import { View } from "./view.js";
 
+/**
+ * Namespace URI for HTML elements.
+ */
 export const HTML = "http://www.w3.org/1999/xhtml";
+
+/**
+ * Namespace URI for SVG elements.
+ */
 export const SVG = "http://www.w3.org/2000/svg";
+
+/**
+ * Namespace URI for MathML elements.
+ */
 export const MATHML = "http://www.w3.org/1998/Math/MathML";
+
+/**
+ * Key for {@link useNamespace setting} the namespace URI for newly created elements.
+ */
 export const XMLNS = Symbol("namespace");
 
-export function useNamespace<T>(ns: string, fn: () => T) {
+/**
+ * Run a function while using the specified namespace URI.
+ *
+ * @param ns The namespace URI to use.
+ * @param fn The function to run.
+ * @returns The function's return value.
+ */
+export function useNamespace<T>(ns: string, fn: () => T): T {
 	return inject([XMLNS, ns], fn);
 }
 
@@ -46,6 +68,9 @@ type OtherAttributes = {
 	[K in Exclude<string, keyof EventAttributes>]: Expression<unknown>;
 };
 
+/**
+ * Represents an object with element attributes.
+ */
 export type Attributes = EventAttributes & SpecialAttributes & OtherAttributes;
 
 function isProp(obj: object, name: string): boolean {
@@ -71,11 +96,19 @@ function setAttr(elem: Element, name: string, value: unknown, prop: boolean): vo
 	}
 }
 
+/**
+ * Create an element.
+ *
+ * @param tagName The tag name.
+ * @param attrs The attributes to set.
+ * @param content The content to append.
+ * @param jsx True if the element is created by the jsx runtime.
+ * @returns The element.
+ */
 export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): HTMLElementTagNameMap[K];
 export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): SVGElementTagNameMap[K];
 export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): MathMLElementTagNameMap[K];
 export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): E;
-
 export function createElement(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): Element {
 	const ns = (extract(XMLNS) as string);
 	const elem = ns === undefined
@@ -131,26 +164,30 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 	return elem;
 }
 
+/**
+ * Create an element.
+ *
+ * @param tagName The tag name.
+ * @param attrs The attributes to set.
+ * @param content The content to append.
+ * @returns The element.
+ */
 export function e<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
 export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes): HTMLElementTagNameMap[K];
 export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, content: unknown[]): HTMLElementTagNameMap[K];
 export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[]): HTMLElementTagNameMap[K];
-
 export function e<K extends keyof SVGElementTagNameMap>(tagName: K): SVGElementTagNameMap[K];
 export function e<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes): SVGElementTagNameMap[K];
 export function e<K extends keyof SVGElementTagNameMap>(tagName: K, content: unknown[]): SVGElementTagNameMap[K];
 export function e<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[]): SVGElementTagNameMap[K];
-
 export function e<K extends keyof MathMLElementTagNameMap>(tagName: K): MathMLElementTagNameMap[K];
 export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes): MathMLElementTagNameMap[K];
 export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, content: unknown[]): MathMLElementTagNameMap[K];
 export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[]): MathMLElementTagNameMap[K];
-
 export function e<E extends Element>(tagName: string): E;
 export function e<E extends Element>(tagName: string, attrs: Attributes): E;
 export function e<E extends Element>(tagName: string, content: unknown[]): E;
 export function e<E extends Element>(tagName: string, attrs: Attributes, content: unknown[]): E;
-
 export function e(tagName: string, attrs?: unknown, content?: unknown[]): Element {
 	if (Array.isArray(attrs)) {
 		return createElement(tagName, {}, attrs, false);

@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"rootDir": ".",
 		"outDir": "../tests_out",
+		"sourceMap": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "@mxjp/gluon"
 	},

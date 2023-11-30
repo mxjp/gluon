@@ -1,7 +1,12 @@
 import { Expression, watch } from "./signals.js";
 import { View } from "./view.js";
 
-export function createText(expr: Expression<unknown>) {
+/**
+ * Create a text node that displays the result of an expression.
+ *
+ * Null and undefined are displayed as an empty string.
+ */
+export function createText(expr: Expression<unknown>): Text {
 	const text = document.createTextNode("");
 	watch(expr, value => {
 		text.textContent = String(value ?? "");
@@ -9,7 +14,24 @@ export function createText(expr: Expression<unknown>) {
 	return text;
 }
 
+/**
+ * Render arbitrary content.
+ *
+ * Supported content types are:
+ * + Null and undefined (not displayed).
+ * + Arbitrarily nested Arrays of content.
+ * + DOM nodes (document fragments will result in undefined behavior).
+ * + {@link View Views}.
+ * + Anything created with gluons jsx runtime.
+ * + Anything else is displayed as text.
+ *
+ * @param content The content to render.
+ * @returns A view instance.
+ */
 export function render(content: unknown): View {
+	if (content instanceof View) {
+		return content;
+	}
 	return new View((setBoundary, self) => {
 		if (Array.isArray(content)) {
 			const flat = content.flat(Infinity);
@@ -61,6 +83,13 @@ export function render(content: unknown): View {
 	});
 }
 
+/**
+ * Render arbitrary content and append it to the specified parent.
+ *
+ * @param parent The parent node.
+ * @param content The content to render. See {@link render} for supported types.
+ * @returns The view instance.
+ */
 export function mount(parent: Node, content: unknown): View {
 	const view = render(content);
 	parent.appendChild(view.take());

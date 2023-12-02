@@ -227,9 +227,16 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 		let cycle = 0;
 
 		let value: T;
-		const runExpr = expr instanceof Signal
-			? () => { value = expr.value }
-			: () => { value = (expr as () => T)() };
+		let runExpr: () => void;
+		if (expr instanceof Signal) {
+			runExpr = () => {
+				value = expr.value;
+			};
+		} else {
+			runExpr = () => {
+				value = (expr as () => T)();
+			};
+		}
 
 		const runFn = () => fn(value);
 

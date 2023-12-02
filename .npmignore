@@ -1,0 +1,10 @@
+/.github
+/assets
+/scripts
+/tests
+/.editorconfig
+/.gitignore
+/package-lock.json
+/README_NPM.md
+/rollup*
+/tsconfig*

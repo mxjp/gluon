@@ -1,12 +1,24 @@
 {
 	"name": "@mxjp/gluon",
+	"description": "Tiny signal based rendering library",
+	"homepage": "https://github.com/mxjp/gluon",
+	"keywords": [
+		"reactive",
+		"ui",
+		"context",
+		"declarative",
+		"signals",
+		"jsx",
+		"web-components"
+	],
+	"license": "MIT",
 	"version": "1.0.0",
+	"type": "module",
 	"main": "./dist/es/index.js",
 	"exports": {
 		".": "./dist/es/index.js",
 		"./jsx-runtime": "./dist/es/jsx-runtime.js"
 	},
-	"type": "module",
 	"scripts": {
 		"build": "concurrently npm:build:es npm:build:types && concurrently npm:build:bundles npm:build:tests",
 		"build:es": "tsc -p tsconfig-es.json",
@@ -17,7 +29,8 @@
 		"start:es": "tsc -p tsconfig-es.json -w",
 		"start:types": "tsc -p tsconfig-types.json -w",
 		"start:tests": "tsc -p tests/tsconfig.json -w",
-		"test": "node --enable-source-maps --test ./tests_out"
+		"test": "node --enable-source-maps --test ./tests_out",
+		"prepack": "npm run build && npm test && node scripts/prepack.js"
 	},
 	"devDependencies": {
 		"@mxjp/gluon": "file:.",

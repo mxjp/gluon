@@ -2,6 +2,7 @@
 /assets
 /scripts
 /tests
+/tests_out
 /.editorconfig
 /.gitignore
 /package-lock.json

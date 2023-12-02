@@ -1,4 +1,4 @@
-import { uniqueId } from "./ids";
+import { uniqueId } from "./ids.js";
 
 /**
  * Create a CSS module like stylesheet with unique prefixed class names.

@@ -698,7 +698,8 @@ class ExampleComponent extends HTMLElement {
 
 
 # Security
-Gluon itself does not provide any method of rendering HTML directly and is therefore safe from XSS vulnerabilities unless you manually render HTML or set the **innerHTML** property.
+Gluon itself does not provide any method of rendering HTML directly and is therefore safe from XSS vulnerabilities unless you manually render HTML or set the **innerHTML** property. This also means that any external input should never be used as attribute name.
+
 ```tsx
 import { mount } from "@mxjp/gluon";
 

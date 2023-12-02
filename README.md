@@ -698,7 +698,7 @@ class ExampleComponent extends HTMLElement {
 
 
 # Security
-Gluon itself does not provide any method of rendering HTML directly and is therefore safe from XSS vulnerabilities unless you manually render HTML.
+Gluon itself does not provide any method of rendering HTML directly and is therefore safe from XSS vulnerabilities unless you manually render HTML or set the **innerHTML** property.
 ```tsx
 import { mount } from "@mxjp/gluon";
 
@@ -713,7 +713,8 @@ mount(
 );
 
 // To unsafely render HTML, this would be needed:
-const el = <div />;
-el.innerHTML = dangerous;
-mount(document.body, el);
+mount(
+  document.body,
+  <div innerHTML={dangerous} />,
+);
 ```

@@ -2,6 +2,11 @@ import { defineConfig } from "rollup";
 import terser from "@rollup/plugin-terser";
 import prettier from "rollup-plugin-prettier";
 import { gzipSync } from "node:zlib";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const license = await readFile(join(fileURLToPath(import.meta.url), "../LICENSE"), "utf-8");
 
 export default defineConfig({
 	input: "./dist/es/index.js",
@@ -27,7 +32,8 @@ export default defineConfig({
 			format: "es",
 			sourcemap: true,
 			plugins: [
-				terser(),
+				terser({
+				}),
 				{
 					writeBundle(_options, bundle) {
 						const compressed = gzipSync(bundle["gluon.min.js"].code);
@@ -35,6 +41,11 @@ export default defineConfig({
 					},
 				},
 			],
+		},
+	],
+	plugins: [
+		{
+			banner: `/*!\n${license}*/`,
 		},
 	],
 });

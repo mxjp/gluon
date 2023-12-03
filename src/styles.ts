@@ -14,7 +14,7 @@ export function stylesheet(css: string, options?: CSSStyleSheetInit): [map: Reco
 	const prefix = `gluon_${uniqueId()}_`;
 	for (const rule of sheet.cssRules) {
 		if (rule instanceof CSSStyleRule) {
-			rule.selectorText = rule.selectorText.replace(/ /gi, (_, name) => {
+			rule.selectorText = rule.selectorText.replace(/\.([a-z_-]+)/gi, (_, name) => {
 				const prefixed = prefix + name;
 				map[name] = prefixed;
 				return `.${prefixed}`;

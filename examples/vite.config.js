@@ -2,9 +2,6 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
 	root: "./src",
-	resolve: {
-		extensions: [],
-	},
 	base: "/gluon",
 	build: {
 		outDir: "../dist",

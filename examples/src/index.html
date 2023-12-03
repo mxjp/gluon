@@ -5,6 +5,104 @@
 		<meta name="viewport" content="width=device-width">
 		<title>gluon! examples</title>
 		<script type="module" src="./main.tsx"></script>
+		<style>
+			:root {
+				font-size: 1rem;
+				font-family: monospace;
+				color-scheme: dark;
+
+				--bg: rgb(16, 16, 16);
+				--fg: white;
+				--fg-secondary: rgb(120, 120, 120);
+				--accent: rgb(0, 214, 96);
+				--accent-lit: rgb(0, 255, 115);
+				--accent-border: 2px dashed var(--accent);
+				--layout-border: 1px dashed rgb(84, 84, 84);
+				--control-padding: .2rem .4rem;
+				--control-radius: .2rem;
+			}
+
+			body {
+				margin: 0;
+				background-color: var(--bg);
+				color: var(--fg);
+			}
+
+			h1 {
+				margin-block: 0;
+				font-size: 1.8rem;
+				font-weight: 600;
+			}
+
+			h2 {
+				margin-block: 0;
+				font-size: 1.3rem;
+				font-weight: 600;
+			}
+
+			b {
+				font-weight: 600;
+			}
+
+			a {
+				color: var(--accent);
+				text-decoration: none;
+				cursor: pointer;
+				outline: none;
+			}
+
+			a:hover,
+			a:focus-visible {
+				text-decoration: underline;
+			}
+
+			button {
+				font-family: inherit;
+				font-size: inherit;
+				background-color: var(--accent);
+				color: black;
+				font-weight: 600;
+				text-align: center;
+
+				padding: var(--control-padding);
+				border: none;
+				border-radius: var(--control-radius);
+
+				outline: none;
+				cursor: pointer;
+			}
+
+			button:focus-visible,
+			button:hover:not(:active) {
+				background-color: var(--accent-lit);
+			}
+
+			input[type=text] {
+				font-family: inherit;
+				font-size: inherit;
+				font-weight: inherit;
+
+				background-color: rgb(65, 65, 65);
+				color: white;
+
+				padding: var(--control-padding);
+				border: none;
+				border-radius: var(--control-radius);
+
+				outline: none;
+				cursor: text;
+			}
+
+			ul {
+				display: flex;
+				flex-direction: column;
+				row-gap: .5rem;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+		</style>
 	</head>
 	<body></body>
 </html>

@@ -7,6 +7,7 @@ This is a tiny signal based rendering library that aims to be usable with widely
 + [Installation](#installation)
   + [JSX Setup](#jsx-setup)
   + [Basic Usage](#basic-usage)
+  + [Examples](#examples)
 + [Reactivity](#reactivity)
 + [Rendering](#rendering)
   + [Attributes](#attributes)
@@ -69,6 +70,10 @@ mount(document.body, <h1>Hello World!</h1>);
 // Or without jsx:
 mount(document.body, e("h1", ["Hello World!"]));
 ```
+
+## Examples
+There are a bunch of examples in the repositories [examples](./examples/) directory.<br>
+You can also [view them in your browser](https://mxjp.github.io/gluon/).
 
 <br>
 

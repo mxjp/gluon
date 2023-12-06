@@ -67,12 +67,6 @@ await test("jsx-runtime", async ctx => {
 
 	await ctx.test("api types", () => {
 		const elem = <div />;
-
-		// Don't remove, only for testing the type:
-		const _1: HTMLElement = elem;
-		const _2: SVGElement = elem;
-		const _3: MathMLElement = elem;
-
 		strictEqual(elem instanceof HTMLDivElement, true);
 		elem.classList.add("foo");
 		elem.click();

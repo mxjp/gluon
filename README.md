@@ -230,35 +230,41 @@ mount(
 ### Views
 Views are sequences of one or more nodes that change over time. They can be used to render collections or conditional content.
 
-#### `when, <When>`
-The **when** function creates a view that renders conditional content or optional fallback content.
+For every view type, there also is a "component" for use with JSX. All the view examples below show both versions.
+
+#### `<When>`
+Render conditional content or optional fallback content.
 
 Note, that content is recreated if the expression result is not strictly equal to the last one. To keep content alive when the condition is falsy, use [show](#show) instead.
 ```tsx
-import { mount, when, sig } from "@mxjp/gluon";
+import { mount, when, When, sig } from "@mxjp/gluon";
 
 const message = sig(null);
 
 mount(
   document.body,
-  <div>
+  <>
     {when(message, message => <>
       <h1>{message}</h1>
     </>, () => <>
       No message to render.
     </>)}
-  </div>,
+
+    <When value={message} else={() => <>No message to render.</>}>
+      {message => <h1>{message}</h1>}
+    </When>
+  </>,
 );
 ```
 
-#### `nest`
-The **nest** function renders content using a function returned from an expression.
+#### `<Nest>`
+Render content using a function returned from an expression.
 
 Note, that content is recreated every time the expression is rerun.
 
 For simple conditional content, prefer using [when](#when).
 ```tsx
-import { mount, nest, sig } from "@mxjp/gluon";
+import { mount, nest, Nest, sig } from "@mxjp/gluon";
 
 const message = sig({
   type: "foo",
@@ -267,27 +273,36 @@ const message = sig({
 
 mount(
   document.body,
-  <div>
+  <>
     {nest(() => {
       const current = message.value;
       switch (current.type) {
         case "foo": return () => (<h1>{current.text}</h1>);
         case "bar": ...;
-        case "baz": ...;
       }
     })}
-  </div>,
+
+    <Nest>
+      {() => {
+        const current = message.value;
+        switch (current.type) {
+          case "foo": return () => (<h1>{current.text}</h1>);
+          case "bar": ...;
+        }
+      }}
+    </Nest>
+  </>,
 );
 ```
 
-#### `map`
-The **map** function creates a view that renders content for each unique value in an iterable.
+#### `<Map>`
+Render content for each unique value in an iterable.
 
 Items are rendered in iteration order and duplicates are silently ignored.
 
 The **index** parameter is a function that can be used to reactively get the current index.
 ```tsx
-import { mount, map, sig } from "@mxjp/gluon";
+import { mount, map, Map, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
@@ -297,6 +312,10 @@ mount(
     {map(items, (value, index) => <>
       <li>{() => index() + 1}: {value}</li>;
     </>)}
+
+    <Map each={items}>
+      {(value, index) => <li>{() => index() + 1}: {value}</li>}
+    </Map>
   </ul>
 );
 ```
@@ -306,7 +325,7 @@ The **iter** function creates a view that renders content for each index in an i
 
 Items are rendered in iteration order.
 ```tsx
-import { mount, iter, sig } from "@mxjp/gluon";
+import { mount, iter, Iter, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
@@ -316,6 +335,10 @@ mount(
     {iter(items, (value, index) => <>
       <li>{index + 1}: {value}</li>
     </>)}
+
+    <Iter each={items}>
+      {(value, index) => <li>{index + 1}: {value}</li>}
+    </Iter>
   </ul>
 );
 ```
@@ -326,15 +349,19 @@ The **show** function creates a view that shows rendered content if an expressio
 Note, that content is not disposed when hidden. To conditionally render content, use [when](#when) or [nest](#nest) instead.
 
 ```tsx
-import { mount, show, sig } from "@mxjp/gluon";
+import { mount, show, Show, sig } from "@mxjp/gluon";
 
 const showMessage = sig(false);
 
 mount(
   document.body,
-  <div>
+  <>
     {show(showMessage, <>Hello World!</>)}
-  </div>
+
+    <Show when={showMessage}>
+      Hello World!
+    </Show>
+  </>
 );
 ```
 
@@ -349,17 +376,17 @@ const content = movable(<>Hello World!</>);
 
 mount(
   document.body,
-  <div>
+  <>
     {content.move()}
-  </div>
+  </>
 );
 
 // Move "content" into a new place:
 mount(
   document.body,
-  <div>
+  <>
     {content.move()}
-  </div>
+  </>
 );
 
 // Detach "content" from it's previous place:
@@ -393,7 +420,7 @@ By default, elements are created as HTML elements. This works fine for most case
 
 The namespace URI for new elements can be set via [contexts](#context).
 ```tsx
-import { mount, useNamespace, SVG } from "@mxjp/gluon";
+import { mount, useNamespace, UseNamespace, SVG } from "@mxjp/gluon";
 
 mount(
   document.body,
@@ -401,6 +428,10 @@ mount(
     {useNamespace(SVG, () => {
       return <svg version="1.1" viewBox="0 0 100 100">...</svg>;
     })}
+
+    <UseNamespace uri={SVG}>
+      {() => <svg version="1.1" viewBox="0 0 100 100">...</svg>}
+    </UseNamespace>
   </div>,
 );
 ```

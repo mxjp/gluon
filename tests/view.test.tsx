@@ -3,7 +3,7 @@ import "./env.js";
 import test from "node:test";
 import { notStrictEqual, strictEqual, throws } from "node:assert";
 
-import { View, capture, iter, map, nest, render, movable, sig, teardown, watch, when, show } from "@mxjp/gluon";
+import { View, capture, iter, map, nest, render, movable, sig, teardown, watch, when, show, mount } from "@mxjp/gluon";
 import { TestView, assertEvents, boundaryEvents, testView, text } from "./common.js";
 
 await test("view", async ctx => {
@@ -105,6 +105,24 @@ await test("view", async ctx => {
 		strictEqual(view.first.parentNode instanceof DocumentFragment, true);
 		strictEqual(view.first.parentNode, view.last.parentNode);
 		notStrictEqual(view.first.parentNode, parent);
+	});
+
+	await ctx.test("mount", async () => {
+		const root = <div />;
+		strictEqual(text(root), "");
+		let view!: View;
+		const signal = sig(1);
+		const dispose = capture(() => {
+			view = mount(root, () => `test${signal.value}`);
+		});
+		strictEqual(text(root), "test1");
+		signal.value = 2;
+		strictEqual(text(root), "test2");
+		dispose();
+		strictEqual(text(root), "");
+		strictEqual(text(view.take()), "test2");
+		signal.value = 3;
+		strictEqual(text(view.take()), "test2");
 	});
 
 	await ctx.test("nest", async ctx => {

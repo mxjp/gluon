@@ -1,0 +1,14 @@
+
+.timer {
+	font-size: 3rem;
+}
+
+.punct {
+	color: var(--accent);
+}
+
+.ms {
+	font-size: max(.5em, 1rem);
+	position: relative;
+	color: var(--fg-secondary);
+}

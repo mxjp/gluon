@@ -1,16 +1,7 @@
-import { stylesheet } from "@mxjp/gluon";
+import classes from "./row.module.css";
 
-const [classes] = stylesheet(`
-	.row {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		column-gap: .5rem;
-	}
-`);
-
-export function row(content: unknown) {
+export function Row(props: { children?: unknown }) {
 	return <div class={classes.row}>
-		{content}
+		{props.children}
 	</div>;
 }

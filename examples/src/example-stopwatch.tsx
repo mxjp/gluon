@@ -1,22 +1,8 @@
-import { Expression, get, iter, lazy, sig, stylesheet, teardown, when } from "@mxjp/gluon";
-import { button } from "./components/button";
-import { row } from "./components/row";
+import { Expression, Iter, When, get, lazy, sig, teardown } from "@mxjp/gluon";
+import { Button } from "./components/button";
+import { Row } from "./components/row";
 
-const [classes] = stylesheet(`
-	.timer {
-		font-size: 3rem;
-	}
-
-	.punct {
-		color: var(--accent);
-	}
-
-	.ms {
-		font-size: max(.5em, 1rem);
-		position: relative;
-		color: var(--fg-secondary);
-	}
-`);
+import classes from "./example-stopwatch.module.css";
 
 export function example() {
 	const timer = createTimer();
@@ -24,46 +10,56 @@ export function example() {
 		<div>A proper stopwatch that doesn't drift over time. This example also demonstrates how state and logic can be separated from it's representation.</div>
 
 		<div class={classes.timer}>
-			{timeText(timer.elapsed)}
+			<Time value={timer.elapsed} />
 		</div>
 
-		{row(<>
-			{when(timer.running, () => <>
-				{button("Stop", timer.stop)}
-				{button("Lap", timer.lap)}
-			</>, () => <>
-				{button("Start", timer.start)}
-				{button("Reset", timer.reset)}
-			</>)}
-		</>)}
+		<Row>
+			<When
+				value={timer.running}
+				children={() => <>
+					<Button action={timer.stop}>Stop</Button>
+					<Button action={timer.lap}>Lap</Button>
+				</>}
+				else={() => <>
+					<Button action={timer.start}>Start</Button>
+					<Button action={timer.reset}>Reset</Button>
+				</>}
+			/>
+		</Row>
 
 		<ul>
-			{iter(timer.laps, (lap, index) => {
-				return <li>
-					Lap {index + 1}: {timeText(lap.lap)}
-				</li>;
-			})}
+			<Iter each={timer.laps}>
+				{(lap, index) => (
+					<li>
+						Lap {index + 1}: <Time value={lap.lap} />
+					</li>
+				)}
+			</Iter>
 		</ul>
 	</>;
 }
 
-function timeText(elapsed: Expression<number>, sub = true) {
+function Time(props: {
+	value: Expression<number>
+}) {
 	return <>
-		{when(() => {
-			const hours = Math.floor(get(elapsed) / 1000 / 60 / 60);
+		<When value={() => {
+			const hours = Math.floor(get(props.value) / 1000 / 60 / 60);
 			if (hours > 0) {
 				return String(hours);
 			}
-		}, hours => <>
-			{hours}
-			<span class={classes.punct}>:</span>
-		</>)}
-		{() => String(Math.floor(get(elapsed) / 1000 / 60) % 60)}
+		}}>
+			{hours => <>
+				{hours}
+				<span class={classes.punct}>:</span>
+			</>}
+		</When>
+		{() => String(Math.floor(get(props.value) / 1000 / 60) % 60)}
 		<span class={classes.punct}>:</span>
-		{() => String(Math.floor(get(elapsed) / 1000) % 60).padStart(2, "0")}
+		{() => String(Math.floor(get(props.value) / 1000) % 60).padStart(2, "0")}
 		<span class={classes.ms}>
 			<span class={classes.punct}>.</span>
-			{() => String(Math.floor(get(elapsed)) % 1000).padStart(3, "0")}
+			{() => String(Math.floor(get(props.value)) % 1000).padStart(3, "0")}
 		</span>
 	</>;
 }

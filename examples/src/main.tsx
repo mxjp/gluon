@@ -1,51 +1,17 @@
-import { iter, mount, nest, sig, stylesheet, when } from "@mxjp/gluon";
-import { loadingMessage } from "./components/loading-message";
-import { column } from "./components/column";
+import { Iter, Nest, When, mount, sig } from "@mxjp/gluon";
+import { Column } from "./components/column";
+
+import classes from "./main.module.css";
 
 await new Promise(resolve => {
 	window.addEventListener("DOMContentLoaded", resolve);
 });
 
-const examples: string[] = [
+const exampleNames: string[] = [
 	"counter",
 	"stopwatch",
+	"movable",
 ];
-
-const [classes] = stylesheet(`
-	.app {
-		min-height: 100dvh;
-		display: grid;
-		grid-template-columns: minmax(auto, 20rem) 1fr;
-	}
-
-	.area:not(:last-child) {
-		border-right: var(--layout-border);
-	}
-
-	.area {
-		position: relative;
-		overflow: auto;
-	}
-
-	.menu {
-		display: flex;
-		flex-direction: column;
-		row-gap: 1rem;
-	}
-
-	.menuItems {
-		display: flex;
-		flex-direction: column;
-		row-gap: .5rem;
-	}
-
-	.menu,
-	.view {
-		width: 100%;
-		position: absolute;
-		padding: 1rem;
-	}
-`);
 
 const route = sig(location.hash.slice(1));
 window.addEventListener("hashchange", () => {
@@ -56,25 +22,24 @@ interface ExampleModule {
 	example(): unknown;
 }
 
-function exampleView(name: string) {
+function ExampleView(props: { name: string }) {
 	const module = sig<ExampleModule | null>(null);
-	import(`./example-${name}.tsx`).then(instance => {
+	import(`./example-${props.name}.tsx`).then(instance => {
 		module.value = instance;
 	});
-	return column(<>
-		<h1>{name}</h1>
+
+	return <Column>
+		<h1>{props.name}</h1>
 		<a
-			href={`https://github.com/mxjp/gluon/blob/main/examples/src/example-${name}.tsx`}
+			href={`https://github.com/mxjp/gluon/blob/main/examples/src/example-${props.name}.tsx`}
 			target="_blank"
 			referrerpolicy="no-referrer"
 		>view source</a>
 
-		{when(module, module => {
-			return module.example();
-		}, () => {
-			return loadingMessage(`Loading example module...`);
-		})}
-	</>);
+		<When value={module}>
+			{module => <module.example />}
+		</When>
+	</Column>;
 }
 
 mount(
@@ -84,20 +49,24 @@ mount(
 			<div class={classes.menu}>
 				<h1>gluon! examples</h1>
 				<div class={classes.menuItems}>
-					{iter(examples, name => {
-						return <a href={`#${name}`}>{name}</a>;
-					})}
+					<Iter each={exampleNames}>
+						{name => (
+							<a href={`#${name}`}>{name}</a>
+						)}
+					</Iter>
 				</div>
 			</div>
 		</div>
 		<div class={classes.area}>
 			<div class={classes.view}>
-				{nest(() => {
-					const name = route.value;
-					if (examples.includes(name)) {
-						return () => exampleView(name);
-					}
-				})}
+				<Nest>
+					{() => {
+						const name = route.value;
+						if (exampleNames.includes(name)) {
+							return () => <ExampleView name={name} />;
+						}
+					}}
+				</Nest>
 			</div>
 		</div>
 	</div>,

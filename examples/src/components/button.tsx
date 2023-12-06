@@ -1,10 +1,13 @@
 
-export function button(content: unknown, action: () => void) {
+export function Button(props: {
+	children?: unknown;
+	action: () => void;
+}) {
 	return <button $click={event => {
 		event.stopPropagation();
 		event.preventDefault();
-		action();
+		props.action();
 	}}>
-		{content}
+		{props.children}
 	</button>;
 }

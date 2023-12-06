@@ -1,15 +1,7 @@
-import { stylesheet } from "@mxjp/gluon";
+import classes from "./column.module.css";
 
-const [classes] = stylesheet(`
-	.column {
-		display: flex;
-		flex-direction: column;
-		row-gap: 1rem;
-	}
-`);
-
-export function column(content: unknown) {
+export function Column(props: { children?: unknown }) {
 	return <div class={classes.column}>
-		{content}
+		{props.children}
 	</div>;
 }

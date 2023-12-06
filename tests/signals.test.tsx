@@ -1,7 +1,7 @@
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
 
-import { batch, capture, lazy, sig, teardown, trigger, watch } from "@mxjp/gluon";
+import { batch, capture, lazy, memo, sig, teardown, trigger, watch } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
@@ -227,6 +227,24 @@ await test("signals", async ctx => {
 			assertEvents(events, ["a", "b", 2]);
 		});
 
+	});
+
+	await ctx.test("memo", async () => {
+		const events: unknown[] = [];
+		const signal = sig(1);
+
+		watch(memo(() => {
+			events.push("e");
+			return signal.value;
+		}), value => {
+			events.push(value);
+		});
+
+		assertEvents(events, ["e", 1]);
+		signal.value = 2;
+		assertEvents(events, ["e", 2]);
+		signal.notify();
+		assertEvents(events, ["e"]);
 	});
 
 	await ctx.test("lazy", async ctx => {

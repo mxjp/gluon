@@ -171,6 +171,25 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
  * @param attrs The attributes to set.
  * @param content The content to append.
  * @returns The element.
+ *
+ * @example
+ * ```ts
+ * import { mount, e } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   // Element with content only:
+ *   e("div", [
+ *     // Element with attributes only:
+ *     e("div", { class: "example" }),
+ *
+ *     // Element with attributes and content:
+ *     e("div", { class: "example" }, [
+ *       "Hello World!",
+ *     ]),
+ *   ]),
+ * );
+ * ```
  */
 export function e<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
 export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes): HTMLElementTagNameMap[K];

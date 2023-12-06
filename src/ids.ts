@@ -6,10 +6,10 @@ const NEXT = Symbol.for("gluon:next_id");
  *
  * @returns The unique id.
  */
-export function uniqueId(): number {
+export function uniqueId(): string {
 	const id = (globalThis as any)[NEXT] ?? 0;
 	(globalThis as any)[NEXT] = id + 1;
-	return id;
+	return `gluon_${id}`;
 }
 
 /**
@@ -18,6 +18,6 @@ export function uniqueId(): number {
  * @param fn The function to run.
  * @returns The function's return value.
  */
-export function useUniqueId<T>(fn: (id: number) => T): T {
+export function useUniqueId<T>(fn: (id: string) => T): T {
 	return fn(uniqueId());
 }

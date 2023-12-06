@@ -1,6 +1,6 @@
 import { render } from "./render.js";
 import { TeardownHook, capture, teardown } from "./lifecycle.js";
-import { Expression, Signal, get, sig, skipEqual, watch } from "./signals.js";
+import { Expression, Signal, memo, get, sig, watch } from "./signals.js";
 
 /**
  * A function that is called when the view boundary may have been changed.
@@ -167,19 +167,19 @@ type Falsy = null | undefined | false | 0 | 0n | "";
 /**
  * Create a view that renders conditional content.
  *
- * @param expr The expression.
- * @param truthy A function to create content if the expression result is truthy.
- * @param falsy An optional function to create content if the expression is falsy.
+ * @param value The expression to evaluate.
+ * @param thenFn A function to create content if the value is truthy.
+ * @param elseFn An optional function to create content if the value is falsy.
  * @returns The view.
  */
-export function when<T>(expr: Expression<T | Falsy>, truthy: (value: T) => unknown, falsy?: () => unknown): View {
-	const getValue = skipEqual(expr);
+export function when<T>(value: Expression<T | Falsy>, thenFn: (value: T) => unknown, elseFn?: () => unknown): View {
+	const getValue = memo(value);
 	return nest(() => {
 		const value = getValue();
 		if (value) {
-			return () => truthy(value);
+			return () => thenFn(value);
 		} else {
-			return falsy;
+			return elseFn;
 		}
 	});
 }
@@ -202,7 +202,7 @@ export interface MapContentFn<T> {
  * Content instances are keyed by value.
  *
  * @param expr The expression.
- * @param content The function to create content for a specific value.
+ * @param content A function to create content for a specific value.
  * @returns The view.
  */
 export function map<T>(expr: Expression<Iterable<T>>, content: MapContentFn<T>): View {
@@ -289,7 +289,6 @@ export function map<T>(expr: Expression<Iterable<T>>, content: MapContentFn<T>):
 
 						const currentIndex = instances.indexOf(instance, index);
 						if (currentIndex < 0) {
-							// TODO: Check if performance is better when detaching is skipped here:
 							detach(instances.splice(index, instances.length - index, instance));
 							const next = last.nextSibling;
 							if (next) {
@@ -344,7 +343,7 @@ export interface IterContentFn<T> {
  * Content instances are keyed by index and value.
  *
  * @param expr The expression.
- * @param content The function to create content for a specific index and value.
+ * @param content A function to create content for a specific index and value.
  * @returns The view.
  */
 export function iter<T>(expr: Expression<Iterable<T>>, content: (value: T, index: number) => unknown): View {
@@ -477,7 +476,7 @@ export function movable(content: unknown) {
  */
 export function show(expr: Expression<boolean>, content: unknown): View {
 	const inner = render(content);
-	const show = skipEqual(() => Boolean(get(expr)));
+	const show = memo(() => Boolean(get(expr)));
 	return nest(() => {
 		return show()
 			? () => inner

@@ -28,7 +28,6 @@ This is a tiny signal based rendering library that aims to be usable with widely
     + [Fragments & Arrays](#fragments--arrays)
   + [Namespaces](#namespaces)
   + [Components](#components)
-  + [Stylesheets](#stylesheets)
 + [Lifecycle](#lifecycle)
 + [Context](#context)
 + [Performance](#performance)
@@ -199,7 +198,7 @@ mount(
 ## Content
 
 ### Text
-Expressions (static values, signals and functions) are rendered as text content.
+Expressions (static values, signals and functions) are rendered as text content. Null and undefined are not displayed.
 ```tsx
 import { mount } from "@mxjp/gluon";
 
@@ -231,7 +230,7 @@ mount(
 ### Views
 Views are sequences of one or more nodes that change over time. They can be used to render collections or conditional content.
 
-#### `when`
+#### `when, <When>`
 The **when** function creates a view that renders conditional content or optional fallback content.
 
 Note, that content is recreated if the expression result is not strictly equal to the last one. To keep content alive when the condition is falsy, use [show](#show) instead.
@@ -243,11 +242,11 @@ const message = sig(null);
 mount(
   document.body,
   <div>
-    {when(message, message => {
-      return <h1>{message}</h1>;
-    }, () => {
-      return "No message to render.";
-    })}
+    {when(message, message => <>
+      <h1>{message}</h1>
+    </>, () => <>
+      No message to render.
+    </>)}
   </div>,
 );
 ```
@@ -295,11 +294,9 @@ const items = sig(["foo", "bar", "bar", "baz"]);
 mount(
   document.body,
   <ul>
-    {map(items, (value, index) => {
-      return <li>
-        {() => index() + 1}: {value}
-      </li>;
-    })}
+    {map(items, (value, index) => <>
+      <li>{() => index() + 1}: {value}</li>;
+    </>)}
   </ul>
 );
 ```
@@ -316,11 +313,9 @@ const items = sig(["foo", "bar", "bar", "baz"]);
 mount(
   document.body,
   <ul>
-    {iter(items, (value, index) => {
-      return <li>
-        {index + 1}: {value}
-      </li>;
-    })}
+    {iter(items, (value, index) => <>
+      <li>{index + 1}: {value}</li>
+    </>)}
   </ul>
 );
 ```
@@ -338,7 +333,7 @@ const showMessage = sig(false);
 mount(
   document.body,
   <div>
-    {show(showMessage, "Hello World!")}
+    {show(showMessage, <>Hello World!</>)}
   </div>
 );
 ```
@@ -350,7 +345,7 @@ Note, that content is detached from it's previous place when moved.
 ```tsx
 import { mount, movable } from "@mxjp/gluon";
 
-const content = movable("Hello World!");
+const content = movable(<>Hello World!</>);
 
 mount(
   document.body,
@@ -369,22 +364,6 @@ mount(
 
 // Detach "content" from it's previous place:
 content.detach();
-```
-
-### Hidden Content
-The values **null** and **undefined** are not rendered. However an HTML comment is created so that views without any content are able to keep track of their position and boundary in the DOM tree.
-```tsx
-import { mount } from "@mxjp/gluon";
-
-mount(
-  document.body,
-  <div>
-    {null}
-    {undefined}
-    {() => null}
-    ...
-  </div>,
-);
 ```
 
 ### Fragments & Arrays
@@ -427,16 +406,18 @@ mount(
 ```
 
 ## Components
-Gluon has no special component system. Instead components are just functions that return content and take arbitrary inputs, but can still use [lifecycle hooks](#lifecycle).
+Gluon has no special component system. Instead components are just functions that return content and take arbitrary inputs. When used with JSX syntax, functions are called with the properties object as the first parameter.
 ```tsx
 import { mount, Signal } from "@mxjp/gluon";
 
-function textInput(text: Signal<string>) {
+function TextInput(props: {
+  text: Signal<string>,
+}) {
   return <input
     type="text"
-    value={text}
+    value={props.text}
     $input={event => {
-      text.value = event.target.value;
+      props.text.value = event.target.value;
     }}
   />;
 }
@@ -445,7 +426,7 @@ const text = sig("");
 mount(
   document.body,
   <>
-    {textInput(text)}
+    <TextInput text={text} />
     You typed <b>{text}</b>.
   </>,
 );
@@ -453,43 +434,26 @@ mount(
 
 To accept both static and reactive inputs, the **get** function can be used to evaluate expressions.
 ```tsx
-import { mount, get, stylesheet, Expression } from "@mxjp/gluon";
+import { mount, get, Expression } from "@mxjp/gluon";
 
-const [classes] = stylesheet(`
-  .error { color: red; }
-  .info { color: blue; }
-`);
+import classes from "./example.module.css";
 
-function hint(variant: Expression<"error" | "info">, content: unknown) {
-  return <div class={() => classes[get(variant)]}>
-    {content}
+function Hint(props: {
+  variant: Expression<"error" | "info">,
+  children: unknown,
+}) {
+  return <div class={() => classes[get(props.variant)]}>
+    {props.children}
   </div>;
 }
 
 mount(
   document.body,
   <>
-    {hint("error", "Hello World!")}
-    {hint(() => "info", "Hello World!")}
-    {hint(someSignal, "Hello World!")}
+    <Hint variant="error">Hello World!</Hint>
+    <Hint variant={() => "info"}>Hello World!</Hint>
+    <Hint variant={someSignal}>Hello World!</Hint>
   </>,
-);
-```
-
-## Stylesheets
-The **stylesheet** function can be used to create a global stylesheet with unique class names.
-```tsx
-import { stylesheet } from "@mxjp/gluon";
-
-const [classes] = stylesheet(`
-  .example {
-    color: red;
-  }
-`);
-
-mount(
-  document.body,
-  <div class={classes.example}>Hello World!</div>,
 );
 ```
 

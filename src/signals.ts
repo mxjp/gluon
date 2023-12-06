@@ -22,11 +22,6 @@ interface Batch {
 }
 
 /**
- * Internal stack where the last item indicates if the current update should be skipped. This may be empty.
- */
-const SKIP_STACK: boolean[] = [];
-
-/**
  * Internal stack where the last item is the current batch. This may be empty.
  */
 const BATCH_STACK: Batch[] = [];
@@ -122,7 +117,7 @@ export class Signal<T> {
 	 * Create a new signal.
 	 *
 	 * @param value The initial value.
-	 * @param equals True to skip updates when an assigned value is strictly equal to the previous one or a function to determine of the values are equal.
+	 * @param equals True to skip updates when an assigned value is strictly equal to the previous one or a function to determine of the values are equal. Default is true.
 	 */
 	constructor(value: T, equals: SignalEqualsFn<T> | boolean = true) {
 		this.#value = value;
@@ -141,6 +136,19 @@ export class Signal<T> {
 
 	/**
 	 * Set the current value.
+	 *
+	 * @example
+	 * ```tsx
+	 * import { sig, watch } from "@mxjp/gluon";
+	 *
+	 * const count = sig(0);
+	 *
+	 * watch(count, count => {
+	 *   console.log("Count:", count);
+	 * });
+	 *
+	 * count.value++;
+	 * ```
 	 */
 	set value(value: T) {
 		if (!this.#equals(this.#value, value)) {
@@ -153,6 +161,22 @@ export class Signal<T> {
 	 * Update the current value in place.
 	 *
 	 * @param fn A function to update the value. If false is returned, dependants are not notified.
+	 *
+	 * @example
+	 * ```tsx
+	 * import { sig, watch } from "@mxjp/gluon";
+	 *
+	 * const items = sig([]);
+	 *
+	 * watch(items, items => {
+	 *   console.log("Items:", items);
+	 * });
+	 *
+	 * items.update(items => {
+	 *   items.push("foo");
+	 *   items.push("bar");
+	 * });
+	 * ```
 	 */
 	update(fn: (value: T) => void | boolean): void {
 		if (fn(this.#value) !== false) {
@@ -195,7 +219,7 @@ export class Signal<T> {
  * Create a new signal.
  *
  * @param value The initial value.
- * @param equals True to skip updates when an assigned value is strictly equal to the previous one or a function to determine of the values are equal.
+ * @param equals True to skip updates when an assigned value is strictly equal to the previous one or a function to determine if the values are equal. Default is true.
  * @returns The signal.
  */
 export function sig<T>(value: T, equals?: SignalEqualsFn<T> | boolean): Signal<T> {
@@ -204,6 +228,30 @@ export function sig<T>(value: T, equals?: SignalEqualsFn<T> | boolean): Signal<T
 
 /**
  * A value, signal or function to get a value.
+ *
+ * @example
+ * ```tsx
+ * import { sig, watch } from "@mxjp/gluon";
+ *
+ * const message = sig("Example");
+ *
+ * // Not reactive:
+ * watch(message.value, message => {
+ *   console.log("A:", message);
+ * });
+ *
+ * // Reactive:
+ * watch(message, message => {
+ *   console.log("B:", message);
+ * });
+ *
+ * // Reactive:
+ * watch(() => message.value, message => {
+ *   console.log("C:", message);
+ * });
+ *
+ * message.value = "Hello World!";
+ * ```
  */
 export type Expression<T> = T | Signal<T> | (() => T);
 
@@ -217,6 +265,28 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately.
+ *
+ * @example
+ * ```tsx
+ * import { sig, watch } from "@mxjp/gluon";
+ *
+ * const count = sig(0);
+ *
+ * // Capture teardown hooks registered by "watch":
+ * const dispose = capture(() => {
+ *   // Start watching:
+ *   watch(count, count => {
+ *     console.log("Count:", count);
+ *   });
+ * });
+ *
+ * count.value = 1;
+ *
+ * // Stop watching:
+ * dispose();
+ *
+ * count.value = 2;
+ * ```
  */
 export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 	if (expr instanceof Signal || typeof expr === "function") {
@@ -248,16 +318,10 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 			runInContext(context, () => {
 				const dependants = DEPENDANTS_STACK[DEPENDANTS_STACK.length - 1];
 				dependants.push([dependant, cycle]);
-				if (update) {
-					SKIP_STACK.push(false);
-				}
 				try {
 					uncapture(runExpr);
 				} finally {
 					dependants.pop();
-					if (update && SKIP_STACK.pop()) {
-						return;
-					}
 				}
 				disposeFn?.();
 				disposeFn = capture(runFn);
@@ -275,11 +339,26 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 }
 
 /**
- * Evaluate an expression and call a function when any accessed signals are updated.
+ * Evaluate an expression and call a function once when any accessed signals are updated.
+ *
+ * It is guaranteed that all triggers are called before other non-trigger dependants per signal update or batch.
  *
  * @param expr The expression evaluate.
  * @param fn The function to call when any accessed signals are updated.
  * @param cycle An arbitrary number to pass back to the function.
+ *
+ * @example
+ * ```tsx
+ * import { sig, trigger } from "@mxjp/gluon";
+ *
+ * const count = sig(0);
+ *
+ * console.log("Count:", trigger(count, cycle => {
+ *   console.log("Count is being updated:", cycle);
+ * }, 42));
+ *
+ * count.value++;
+ * ```
  */
 export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cycle = 0): T {
 	if (expr instanceof Signal || typeof expr === "function") {
@@ -307,6 +386,23 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  *
  * @param fn The function to run.
  * @returns The function's return value.
+ *
+ * @example
+ * ```tsx
+ * import { batch, sig, watch } from "@mxjp/gluon";
+ *
+ * const a = sig(2);
+ * const b = sig(3);
+ *
+ * watch(() => a.value + b.value, value => {
+ *   console.log("Sum:", value);
+ * });
+ *
+ * batch(() => {
+ *   a.value = 4;
+ *   b.value = 5;
+ * });
+ * ```
  */
 export function batch<T>(fn: () => T): T {
 	const triggers: Dependant[] = [];
@@ -324,71 +420,33 @@ export function batch<T>(fn: () => T): T {
 }
 
 /**
- * Skip the current update.
+ * Watch an expression and create a function to reactively access it's latest result.
  *
- * This is the opposite of {@link unskip}.
- */
-export function skip(): void {
-	if (SKIP_STACK.length > 0) {
-		SKIP_STACK[SKIP_STACK.length - 1] = true;
-	}
-}
-
-/**
- * The opposite of {@link skip}.
- */
-export function unskip(): void {
-	if (SKIP_STACK.length > 0) {
-		SKIP_STACK[SKIP_STACK.length - 1] = false;
-	}
-}
-
-/**
- * Wrap an expression to skip updates if it's result is strictly equal to the previous one.
+ * This is similar to {@link lazy}, but the expression is also evaluated if it isn't used.
  *
- * @param expr The expression to wrap.
- * @returns A function to evaluate the expression.
- */
-export function skipEqual<T>(expr: Expression<T>): () => T {
-	let previous: T | undefined = undefined;
-	return () => {
-		const value = get(expr);
-		if (previous === value) {
-			skip();
-		} else {
-			previous = value;
-		}
-		return value;
-	};
-}
-
-type BranchResults<T extends readonly (() => unknown)[]> = {
-	-readonly [P in keyof T]: ExpressionResult<T[P]>;
-};
-
-/**
- * Skip the current update only if all branches skip.
+ * @param expr The expression to watch.
+ * @param equals True to skip updates when a result is strictly equal to the previous one or a function to determine if the results are equal. Default is true.
+ * @returns A function to access the latest result.
  *
- * @param branches The branches to run.
- * @returns An array where each value corresponds to the result of the branch at the same index.
+ * @example
+ * ```ts
+ * import { sig, memo, watch } from "@mxjp/gluon";
+ *
+ * const count = sig(42);
+ *
+ * const memoized = memo(() => count.value);
+ *
+ * watch(memoized, count => {
+ *   console.log("Count:", count);
+ * });
+ * ```
  */
-export function branch<T extends readonly (() => unknown)[]>(...branches: T): BranchResults<T> {
-	const results = [] as BranchResults<T>;
-	let skips = 0;
-	for (let i = 0; i < branches.length; i++) {
-		SKIP_STACK.push(false);
-		try {
-			results.push(get(branches[i]));
-		} finally {
-			if (SKIP_STACK.pop()) {
-				skips++;
-			}
-		}
-	}
-	if (skips === branches.length) {
-		skip();
-	}
-	return results;
+export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolean): () => T {
+	const signal = sig<T>(undefined!, equals);
+	watch(expr, value => {
+		signal.value = value;
+	});
+	return () => signal.value;
 }
 
 /**
@@ -415,7 +473,9 @@ function createStackProxy(stack: Dependant[][]): [access: () => void, proxy: Dep
 }
 
 /**
- * Wrap an expression to be evaulated only initially or when any accessed signal has been updated since the last call.
+ * Wrap an expression to be evaulated only when any of the accessed signals have been updated.
+ *
+ * This is similar to {@link memo}, but the expression is only evaulated if it is used.
  *
  * @param expr The expression to wrap.
  * @returns A function to lazily evaluate the expression.
@@ -456,6 +516,21 @@ export function lazy<T>(expr: Expression<T>): () => T {
  *
  * @param fn The function to run.
  * @returns The function's return value.
+ *
+ * @example
+ * ```tsx
+ * import { sig, untrack, watch } from "@mxjp/gluon";
+ *
+ * const a = sig(2);
+ * const b = sig(3);
+ *
+ * watch(() => a.value + untrack(() => b.value), sum => {
+ *   console.log("Sum:", sum);
+ * });
+ *
+ * a.value = 4;
+ * b.value = 5;
+ * ```
  */
 export function untrack<T>(fn: () => T): T {
 	TRACKING_STACK.push(false);
@@ -490,6 +565,17 @@ export function track<T>(fn: () => T): T {
  *
  * @param expr The expression to evaluate.
  * @returns The expression result.
+ *
+ * @example
+ * ```tsx
+ * import { sig, get } from "@mxjp/gluon";
+ *
+ * const count = sig(42);
+ *
+ * get(42) // 42
+ * get(count) // 42
+ * get(() => 42) // 42
+ * ```
  */
 export function get<T>(expr: Expression<T>): T {
 	if (expr instanceof Signal) {

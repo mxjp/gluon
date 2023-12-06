@@ -1,3 +1,4 @@
+import { teardown } from "./lifecycle.js";
 import { Expression, watch } from "./signals.js";
 import { View } from "./view.js";
 
@@ -19,7 +20,7 @@ export function createText(expr: Expression<unknown>): Text {
  *
  * Supported content types are:
  * + Null and undefined (not displayed).
- * + Arbitrarily nested Arrays of content.
+ * + Arbitrarily nested arrays/fragments of content.
  * + DOM nodes (document fragments will result in undefined behavior).
  * + {@link View Views}.
  * + Anything created with gluons jsx runtime.
@@ -27,6 +28,35 @@ export function createText(expr: Expression<unknown>): Text {
  *
  * @param content The content to render.
  * @returns A view instance.
+ *
+ * @example
+ * ```tsx
+ * import { render, sig } from "@mxjp/gluon";
+ *
+ * // Not displayed:
+ * render(null);
+ * render(undefined);
+ *
+ * // Arbitrarily nested arrays/fragments of content:
+ * render([["Hello"], " World!"]);
+ * render(<><>"Hello"</>{" World!"}</>);
+ *
+ * // DOM nodes:
+ * render(<h1>Hello World!</h1>);
+ * render(document.createElement("input"));
+ * render(document.createTextNode("Hello World!"));
+ *
+ * // Views:
+ * render(render("Hello World!"));
+ * render(when(true, () => "Hello World!"));
+ * render(<When value={true}>{() => "Hello World!"}</When>);
+ *
+ * // Text:
+ * render("Hello World!");
+ * render(() => "Hello World!");
+ * render(42);
+ * render(sig(42));
+ * ```
  */
 export function render(content: unknown): View {
 	if (content instanceof View) {
@@ -84,14 +114,55 @@ export function render(content: unknown): View {
 }
 
 /**
- * Render arbitrary content and append it to the specified parent.
+ * Render arbitrary content and append it to the specified parent until the current context is disposed.
  *
  * @param parent The parent node.
  * @param content The content to render. See {@link render} for supported types.
  * @returns The view instance.
+ *
+ * @example
+ * ```tsx
+ * import { mount } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <h1>Hello World!</h1>
+ * );
+ * ```
+ *
+ * Since the content is removed when the current context is disposed, this can also be used to temporarily append
+ * content to different elements while some component is rendered:
+ * ```tsx
+ * import { mount } from "@mxjp/gluon";
+ *
+ * function Popover(props: { text: unknown, children: unknown }) {
+ *   const visible = sig(false);
+ *
+ *   mount(
+ *     document.body,
+ *     <Show when={visible}>
+ * 		{props.children}
+ *     </Show>
+ *   );
+ *
+ *   return <button $click={() => { visible.value = !visible.value; }}>
+ *     {props.text}
+ *   </button>;
+ * }
+ *
+ * mount(
+ *   document.body,
+ *   <Popover text="Click me!">
+ *     Hello World!
+ *   </Popover>
+ * );
+ * ```
  */
 export function mount(parent: Node, content: unknown): View {
 	const view = render(content);
 	parent.appendChild(view.take());
+	teardown(() => {
+		view.detach();
+	});
 	return view;
 }

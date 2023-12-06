@@ -1,7 +1,4 @@
-import { useNamespace } from "./element.js";
-import { useUniqueId } from "./ids.js";
-import { Expression } from "./signals.js";
-import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view.js";
+import { Expression, IterContentFn, MapContentFn, iter, map, nest, show, useNamespace, useUniqueId, when } from "../core/index.js";
 
 type Falsy = null | undefined | false | 0 | 0n | "";
 

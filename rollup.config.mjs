@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const license = await readFile(join(fileURLToPath(import.meta.url), "../LICENSE"), "utf-8");
 
 export default defineConfig({
-	input: "./dist/es/core.js",
+	input: "./dist/es/core/index.js",
 	output: [
 		{
 			file: "./dist/gluon.js",

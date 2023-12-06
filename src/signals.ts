@@ -315,12 +315,14 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 			}
 			cycle++;
 			runInContext(context, () => {
-				const dependants = DEPENDANTS_STACK[DEPENDANTS_STACK.length - 1];
-				dependants.push([dependant, cycle]);
+				const dependants: Dependant[] = [[dependant, cycle]];
+				DEPENDANTS_STACK.push(dependants);
+				TRIGGERS_STACK.push([]);
 				try {
 					uncapture(runExpr);
 				} finally {
-					dependants.pop();
+					DEPENDANTS_STACK.pop();
+					TRIGGERS_STACK.pop();
 				}
 				disposeFn?.();
 				disposeFn = capture(runFn);

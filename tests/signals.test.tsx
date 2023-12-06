@@ -157,6 +157,27 @@ await test("signals", async ctx => {
 			assertEvents(events, [2]);
 		});
 
+		await ctx.test("stack isolation", () => {
+			const events: unknown[] = [];
+			const inner = sig(1);
+			const outer = sig(1);
+
+			watch(() => {
+				watch(inner, value => {
+					events.push(`i${value}`);
+				});
+				return outer.value;
+			}, value => {
+				events.push(`o${value}`);
+			});
+
+			assertEvents(events, ["i1", "o1"]);
+			inner.value = 2;
+			assertEvents(events, ["i2"]);
+			outer.value = 2;
+			assertEvents(events, ["i2", "o2"]);
+		});
+
 	});
 
 	await ctx.test("trigger", async ctx => {

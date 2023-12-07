@@ -18,13 +18,16 @@
 	"exports": {
 		".": "./dist/es/index.js",
 		"./jsx-runtime": "./dist/es/jsx/runtime.js",
-		"./jsx-dev-runtime": "./dist/es/jsx/dev-runtime.js"
+		"./jsx-dev-runtime": "./dist/es/jsx/dev-runtime.js",
+		"./router": "./dist/es/router/index.js"
 	},
 	"scripts": {
 		"build": "concurrently npm:build:es npm:build:types && concurrently npm:build:bundles npm:build:tests",
 		"build:es": "tsc -p tsconfig-es.json",
 		"build:types": "tsc -p tsconfig-types.json",
-		"build:bundles": "rollup --config",
+		"build:bundles": "concurrently npm:build:bundle:*",
+		"build:bundle:core": "rollup --config rollup.core.mjs",
+		"build:bundle:router": "rollup --config rollup.router.mjs",
 		"build:tests": "tsc -p tests/tsconfig.json",
 		"start": "concurrently npm:start:*",
 		"start:es": "tsc -p tsconfig-es.json -w",

@@ -1,4 +1,40 @@
-import { Expression, IterContentFn, MapContentFn, iter, map, nest, show, useNamespace, useUniqueId, when } from "../core/index.js";
+import { ContextPairFor, ContextValueFor, Expression, IterContentFn, MapContentFn, inject, iter, map, nest, show, useNamespace, useUniqueId, when } from "../core/index.js";
+
+/**
+ * Inject an entry.
+ *
+ * @example
+ * ```tsx
+ * import { mount, Inject, extract } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <>
+ *     <Inject key="message" value="Hello World!">
+ *       {() => <h1>{extract("message")}</h1>}
+ *     </Inject>
+ *
+ *     <Inject value={["message", "Hello World!"]}>
+ *       {() => <h1>{extract("message")}</h1>}
+ *     </Inject>
+ *   </>
+ * );
+ * ```
+ */
+export function Inject<K, R>(props: {
+	key: K,
+	value: ContextValueFor<K>,
+	children: () => R,
+} | {
+	value: ContextPairFor<K>,
+	children: () => R,
+}): unknown {
+	if ("key" in props) {
+		return inject([props.key, props.value], props.children);
+	} else {
+		return inject(props.value, props.children);
+	}
+}
 
 type Falsy = null | undefined | false | 0 | 0n | "";
 

@@ -3,6 +3,11 @@
 # gluon!
 This is a tiny signal based rendering library that aims to be usable with widely adopted or even without any build systems to avoid maintenance overhead for long living projects.
 
+> ## Why?
+> [SolidJS](https://www.solidjs.com/) is a great framework which I used for many personal projects. However it's core reactivity primitives are designed in a way that sometimes requires weird workarounds for problems that shouldn't exist in the first place. For instance, gluon uses a lightweight stack based approach for tracking dependencies in contrast to solidjs reactivity scope owners.
+>
+> In gluon, there are two basic reactivity primitives: **Signals** and **watch**. Watch is similar to solidjs' **createEffect**, but it's inputs are split into an expression with dependancy tracking and a callback without tracking which makes avoiding infinite loops and unexpectedly tracked signal accesses a lot easier.
+
 ## Documentation
 + [Installation](#installation)
   + [JSX Setup](#jsx-setup)

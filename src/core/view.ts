@@ -226,7 +226,7 @@ export function map<T>(expr: Expression<Iterable<T>>, content: MapContentFn<T>):
 		const instances: Instance[] = [];
 		const instanceMap = new Map<T, Instance>();
 
-		const first: Node = document.createComment(" map ");
+		const first: Node = document.createComment("g");
 		setBoundary(first, first);
 
 		teardown(() => {
@@ -354,7 +354,7 @@ export function iter<T>(expr: Expression<Iterable<T>>, content: (value: T, index
 			view: View;
 		}
 
-		const first: Node = document.createComment(" iter ");
+		const first: Node = document.createComment("g");
 		setBoundary(first, first);
 
 		const instances: Instance[] = [];
@@ -443,7 +443,7 @@ export class MovableView {
 				setBoundary(this.#view.first, this.#view.last);
 				this.#view.setBoundaryOwner(setBoundary);
 				teardown(() => {
-					const anchor = document.createComment(" moved ");
+					const anchor = document.createComment("g");
 					const parent = self.parent;
 					if (parent) {
 						parent.insertBefore(anchor, self.first);
@@ -480,6 +480,6 @@ export function show(expr: Expression<boolean>, content: unknown): View {
 	return nest(() => {
 		return show()
 			? () => inner
-			: () => document.createComment(" hidden ");
+			: () => document.createComment("g");
 	});
 }

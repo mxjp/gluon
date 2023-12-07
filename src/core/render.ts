@@ -70,7 +70,7 @@ export function render(content: unknown): View {
 				for (let i = 0; i < flat.length; i++) {
 					const part = flat[i];
 					if (part === null || part === undefined) {
-						parent.appendChild(document.createComment(" anchor "));
+						parent.appendChild(document.createComment("g"));
 					} else if (part instanceof Node) {
 						parent.appendChild(part);
 					} else if (part instanceof View) {
@@ -99,7 +99,7 @@ export function render(content: unknown): View {
 			}
 		}
 		if (content === null || content === undefined) {
-			const node = document.createComment(" anchor ");
+			const node = document.createComment("g");
 			setBoundary(node, node);
 		} else if (content instanceof Node) {
 			setBoundary(content, content);

@@ -1,5 +1,5 @@
 import { Expression, get } from "../core/index.js";
-import { joinPath } from "./path.js";
+import { join } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 
 export class ChildRouter implements Router {
@@ -30,10 +30,10 @@ export class ChildRouter implements Router {
 	}
 
 	push(path: string, query?: QueryInit): void {
-		this.#parent.push(joinPath(this.#mountPath, path), query);
+		this.#parent.push(join(this.#mountPath, path), query);
 	}
 
 	replace(path: string, query?: QueryInit): void {
-		this.#parent.replace(joinPath(this.#mountPath, path), query);
+		this.#parent.replace(join(this.#mountPath, path), query);
 	}
 }

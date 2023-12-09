@@ -1,6 +1,6 @@
 import { Expression, Signal, View, batch, get, nest, sig, watch } from "../core/index.js";
 import { ChildRouter } from "./child-router.js";
-import { normalizePath } from "./path.js";
+import { normalize } from "./path.js";
 import { getRouter, useRouter } from "./router.js";
 
 export interface RouteMatchFn {
@@ -27,7 +27,7 @@ export interface RouteMatch<T extends Route> extends ParentRouteMatch<T> {
 /**
  * Find the first matching route.
  *
- * @param path The {@link normalizePath normalized} path to match against. Non normalized paths result in undefined behavior.
+ * @param path The {@link normalize normalized} path to match against. Non normalized paths result in undefined behavior.
  * @param routes The routes to test in order.
  * @returns A match or undefined if none of the routes matched.
  */
@@ -40,9 +40,9 @@ export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMat
 				if (path.startsWith(test) || path === test.slice(0, -1)) {
 					return {
 						route,
-						path: normalizePath(path.slice(0, route.path.length - 1)),
+						path: normalize(path.slice(0, route.path.length - 1)),
 						params: undefined,
-						rest: normalizePath(path.slice(route.path.length)),
+						rest: normalize(path.slice(route.path.length)),
 					};
 				}
 			} else if (test === path) {
@@ -59,15 +59,15 @@ export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMat
 				let matched: string;
 				let params: unknown;
 				if (Array.isArray(match)) {
-					matched = normalizePath(match[0]);
+					matched = normalize(match[0]);
 					params = match[1];
 				} else {
-					matched = normalizePath(match);
+					matched = normalize(match);
 					params = undefined;
 				}
 				let rest = path;
 				if (path.startsWith(matched) && (path.length === matched.length || path[matched.length] === "/")) {
-					rest = normalizePath(path.slice(matched.length));
+					rest = normalize(path.slice(matched.length));
 				}
 				return {
 					route,
@@ -82,7 +82,7 @@ export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMat
 				const matched = match[0];
 				let rest = path;
 				if (path.startsWith(matched) && (path.length === matched.length || path[matched.length] === "/")) {
-					rest = normalizePath(path.slice(matched.length));
+					rest = normalize(path.slice(matched.length));
 				}
 				return {
 					route,

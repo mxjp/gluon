@@ -7,7 +7,7 @@
  * @param path The path to normalize.
  * @returns The normalized path.
  */
-export function normalizePath(path: string) {
+export function normalize(path: string) {
 	if (path === "/" || path === "") {
 		return "";
 	}
@@ -22,12 +22,12 @@ export function normalizePath(path: string) {
  *
  * @param parent The parent path.
  * @param child The child path.
- * @returns A {@link normalizePath normalized} path.
+ * @returns A {@link normalize normalized} path.
  */
-export function joinPath(parent: string, child: string): string {
-	parent = normalizePath(parent);
+export function join(parent: string, child: string): string {
+	parent = normalize(parent);
 	if (parent.endsWith("/")) {
 		parent = parent.slice(0, -1);
 	}
-	return parent + normalizePath(child);
+	return parent + normalize(child);
 }

@@ -1,50 +1,50 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { joinPath, normalizePath } from "@mxjp/gluon/router";
+import { join, normalize } from "@mxjp/gluon/router";
 
 await test("router/path", async ctx => {
 
 	await ctx.test("normalize", () => {
-		strictEqual(normalizePath(""), "");
-		strictEqual(normalizePath("/"), "");
+		strictEqual(normalize(""), "");
+		strictEqual(normalize("/"), "");
 
-		strictEqual(normalizePath("foo"), "/foo");
-		strictEqual(normalizePath("/foo"), "/foo");
+		strictEqual(normalize("foo"), "/foo");
+		strictEqual(normalize("/foo"), "/foo");
 
-		strictEqual(normalizePath("foo/"), "/foo/");
-		strictEqual(normalizePath("/foo/"), "/foo/");
+		strictEqual(normalize("foo/"), "/foo/");
+		strictEqual(normalize("/foo/"), "/foo/");
 	});
 
 	await ctx.test("join", () => {
-		strictEqual(joinPath("", ""), "");
-		strictEqual(joinPath("", "/"), "");
-		strictEqual(joinPath("/", ""), "");
-		strictEqual(joinPath("/", "/"), "");
+		strictEqual(join("", ""), "");
+		strictEqual(join("", "/"), "");
+		strictEqual(join("/", ""), "");
+		strictEqual(join("/", "/"), "");
 
-		strictEqual(joinPath("foo", ""), "/foo");
-		strictEqual(joinPath("/foo", ""), "/foo");
-		strictEqual(joinPath("", "foo"), "/foo");
-		strictEqual(joinPath("", "/foo"), "/foo");
-		strictEqual(joinPath("foo/", ""), "/foo");
-		strictEqual(joinPath("/foo/", ""), "/foo");
+		strictEqual(join("foo", ""), "/foo");
+		strictEqual(join("/foo", ""), "/foo");
+		strictEqual(join("", "foo"), "/foo");
+		strictEqual(join("", "/foo"), "/foo");
+		strictEqual(join("foo/", ""), "/foo");
+		strictEqual(join("/foo/", ""), "/foo");
 
-		strictEqual(joinPath("", "foo/"), "/foo/");
-		strictEqual(joinPath("", "/foo/"), "/foo/");
+		strictEqual(join("", "foo/"), "/foo/");
+		strictEqual(join("", "/foo/"), "/foo/");
 
-		strictEqual(joinPath("foo", "bar"), "/foo/bar");
-		strictEqual(joinPath("foo", "/bar"), "/foo/bar");
-		strictEqual(joinPath("foo/", "bar"), "/foo/bar");
-		strictEqual(joinPath("/foo", "bar"), "/foo/bar");
-		strictEqual(joinPath("/foo", "/bar"), "/foo/bar");
-		strictEqual(joinPath("/foo/", "/bar"), "/foo/bar");
+		strictEqual(join("foo", "bar"), "/foo/bar");
+		strictEqual(join("foo", "/bar"), "/foo/bar");
+		strictEqual(join("foo/", "bar"), "/foo/bar");
+		strictEqual(join("/foo", "bar"), "/foo/bar");
+		strictEqual(join("/foo", "/bar"), "/foo/bar");
+		strictEqual(join("/foo/", "/bar"), "/foo/bar");
 
-		strictEqual(joinPath("foo", "bar/"), "/foo/bar/");
-		strictEqual(joinPath("foo", "/bar/"), "/foo/bar/");
-		strictEqual(joinPath("foo/", "bar/"), "/foo/bar/");
-		strictEqual(joinPath("/foo", "bar/"), "/foo/bar/");
-		strictEqual(joinPath("/foo", "/bar/"), "/foo/bar/");
-		strictEqual(joinPath("/foo/", "/bar/"), "/foo/bar/");
+		strictEqual(join("foo", "bar/"), "/foo/bar/");
+		strictEqual(join("foo", "/bar/"), "/foo/bar/");
+		strictEqual(join("foo/", "bar/"), "/foo/bar/");
+		strictEqual(join("/foo", "bar/"), "/foo/bar/");
+		strictEqual(join("/foo", "/bar/"), "/foo/bar/");
+		strictEqual(join("/foo/", "/bar/"), "/foo/bar/");
 	});
 
 });

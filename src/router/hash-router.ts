@@ -1,5 +1,5 @@
 import { batch, sig, teardown } from "../core/index.js";
-import { normalizePath } from "./path.js";
+import { normalize } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 
 export interface HashRouterOptions {
@@ -29,10 +29,10 @@ export class HashRouter implements Router {
 			const hash = location.hash.slice(1);
 			const queryStart = hash.indexOf("?");
 			if (queryStart < 0) {
-				this.#path.value = normalizePath(hash);
+				this.#path.value = normalize(hash);
 				this.#query.value = undefined;
 			} else {
-				this.#path.value = normalizePath(hash.slice(0, queryStart));
+				this.#path.value = normalize(hash.slice(0, queryStart));
 				this.#query.value = new URLSearchParams(hash.slice(queryStart + 1));
 			}
 		});
@@ -55,7 +55,7 @@ export class HashRouter implements Router {
 	}
 
 	push(path: string, query?: QueryInit): void {
-		location.hash = `#${normalizePath(path)}${query === undefined ? "" : new URLSearchParams(query)}`;
+		location.hash = `#${normalize(path)}${query === undefined ? "" : new URLSearchParams(query)}`;
 	}
 
 	replace(path: string, query?: QueryInit): void {

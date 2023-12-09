@@ -1,5 +1,5 @@
 import { batch, sig, teardown } from "../core/index.js";
-import { normalizePath } from "./path.js";
+import { normalize } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 
 export interface HistoryRouterOptions {
@@ -29,7 +29,7 @@ export class HistoryRouter implements Router {
 
 	#parse = () => {
 		batch(() => {
-			this.#path.value = normalizePath(location.pathname);
+			this.#path.value = normalize(location.pathname);
 			const query = location.search.slice(1);
 			this.#query.value = query ? new URLSearchParams(query) : undefined;
 		});

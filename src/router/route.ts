@@ -1,4 +1,4 @@
-import { Expression, Signal, View, batch, get, nest, sig, watch } from "../core/index.js";
+import { Expression, Signal, View, get, nest, sig, watch } from "../core/index.js";
 import { ChildRouter } from "./child-router.js";
 import { normalize } from "./path.js";
 import { getRouter, useRouter } from "./router.js";
@@ -131,26 +131,25 @@ export class WatchedRoutes<T extends Route> {
 }
 
 /**
- * Watch and match routes against the current router's path.
+ * Watch and match routes against an expression.
  *
+ * @param path The normalized path.
  * @param routes The routes to watch.
  */
 export function watchRoutes<T extends Route>(path: Expression<string>, routes: T[]): WatchedRoutes<T> {
 	const parent = sig<ParentRouteMatch<T> | undefined>(undefined);
 	const rest = sig<string>(undefined!);
 	watch(() => matchRoute(get(path), routes), match => {
-		batch(() => {
-			if (match) {
-				if (!parent.value || parent.value.path !== match.path || parent.value.route !== match.route) {
-					parent.value = match;
-				}
-				rest.value = match.rest;
-			} else {
-				parent.value = undefined;
-				rest.value = "";
+		if (match) {
+			if (!parent.value || parent.value.path !== match.path || parent.value.route !== match.route) {
+				parent.value = match;
 			}
-		});
-	});
+			rest.value = match.rest;
+		} else {
+			parent.value = undefined;
+			rest.value = "";
+		}
+	}, false);
 	return new WatchedRoutes(parent, rest);
 }
 

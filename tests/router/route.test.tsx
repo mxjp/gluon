@@ -1,7 +1,9 @@
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
 
-import { Route, matchRoute } from "@mxjp/gluon/router";
+import { sig, watch } from "@mxjp/gluon";
+import { Route, matchRoute, watchRoutes } from "@mxjp/gluon/router";
+import { assertEvents } from "../common.js";
 
 await test("router/route", async ctx => {
 
@@ -65,6 +67,41 @@ await test("router/route", async ctx => {
 		assert({ path: /^\/foo\/$/ }, "/foo/bar");
 		assert({ path: /^\/foo(?=\/bar$)/ }, "/foo");
 		assert({ path: /^\/foo(?=\/bar$)/ }, "/foo/bar", ["/foo", "/bar"]);
+	});
+
+	await ctx.test("watch", () => {
+		const events: unknown[] = [];
+		const routes: Route[] = [
+			{ path: "/" },
+			{ path: /^\/foo(\/|$)/ },
+		];
+
+		const path = sig("");
+		const watched = watchRoutes(path, routes);
+		watch(() => watched.match, () => events.push("match"));
+		watch(() => watched.rest, () => events.push("rest"));
+		assertEvents(events, ["match", "rest"]);
+
+		strictEqual(watched.match?.route, routes[0]);
+		strictEqual(watched.match?.path, "");
+		strictEqual(watched.match?.params, undefined);
+		strictEqual(watched.rest, "");
+
+		path.value = "/foo";
+		assertEvents(events, ["match"]);
+		strictEqual(watched.match?.route, routes[1]);
+		strictEqual(watched.match?.path, "/foo");
+		strictEqual(Array.isArray(watched.match?.params), true);
+		strictEqual(watched.rest, "");
+
+		path.value = "/foo/bar";
+		assertEvents(events, ["rest"]);
+		strictEqual(watched.rest, "/bar");
+
+		path.value = "/bar";
+		assertEvents(events, ["match", "rest"]);
+		strictEqual(watched.match, undefined);
+		strictEqual(watched.rest, "");
 	});
 
 });

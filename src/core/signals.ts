@@ -14,17 +14,9 @@ interface DependantFn {
 type Dependant = [fn: DependantFn, cycle: number];
 
 /**
- * A container for defering updates.
- */
-interface Batch {
-	triggers: Dependant[],
-	dependants: Dependant[],
-}
-
-/**
  * Internal stack where the last item is the current batch. This may be empty.
  */
-const BATCH_STACK: Batch[] = [];
+const BATCH_STACK: Dependant[][] = [];
 
 /**
  * Internal stack where the last item indicates if signal access is currently tracked. This is never empty.
@@ -199,17 +191,15 @@ export class Signal<T> {
 	 */
 	notify(): void {
 		const triggers = this.#triggers;
+		this.#triggers = new Map();
+		triggers.forEach(callDependant);
+
 		const dependants = this.#dependants;
 		if (BATCH_STACK.length > 0) {
-			const batch = BATCH_STACK[BATCH_STACK.length - 1];
-			batch.triggers.push(...triggers);
-			batch.dependants.push(...dependants);
-			triggers.clear();
+			BATCH_STACK[BATCH_STACK.length - 1].push(...dependants);
 			dependants.clear();
 		} else {
-			this.#triggers = new Map();
 			this.#dependants = new Map();
-			triggers.forEach(callDependant);
 			dependants.forEach(callDependant);
 		}
 	}
@@ -265,6 +255,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately.
+ * @param trigger If true, {@link batch batches} are ignored and the callback is guaranteed to be called before all other non-trigger callbacks. This can be used to implement computations that can run during batches.
  *
  * @example
  * ```tsx
@@ -288,7 +279,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  * count.value = 2;
  * ```
  */
-export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
+export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false): void {
 	if (expr instanceof Signal || typeof expr === "function") {
 		const context = getContext();
 		let disposed = false;
@@ -316,13 +307,13 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 			cycle++;
 			runInContext(context, () => {
 				const dependants: Dependant[] = [[dependant, cycle]];
-				DEPENDANTS_STACK.push(dependants);
-				TRIGGERS_STACK.push([]);
+				TRIGGERS_STACK.push(trigger ? dependants : []);
+				DEPENDANTS_STACK.push(trigger ? [] : dependants);
 				try {
 					uncapture(runExpr);
 				} finally {
-					DEPENDANTS_STACK.pop();
 					TRIGGERS_STACK.pop();
+					DEPENDANTS_STACK.pop();
 				}
 				disposeFn?.();
 				disposeFn = capture(runFn);
@@ -405,24 +396,22 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  * ```
  */
 export function batch<T>(fn: () => T): T {
-	const triggers: Dependant[] = [];
-	const dependants: Dependant[] = [];
-	BATCH_STACK.push({ triggers, dependants });
+	const batch: Dependant[] = [];
+	BATCH_STACK.push(batch);
 	let value: T;
 	try {
 		value = fn();
 	} finally {
 		BATCH_STACK.pop();
 	}
-	notify(triggers);
-	notify(dependants);
+	notify(batch);
 	return value;
 }
 
 /**
  * Watch an expression and create a function to reactively access it's latest result.
  *
- * This is similar to {@link lazy}, but the expression is also evaluated if it isn't used.
+ * This is similar to {@link lazy}, but the expression is also evaluated if it isn't used and during batches.
  *
  * @param expr The expression to watch.
  * @param equals True to skip updates when a result is strictly equal to the previous one or a function to determine if the results are equal. Default is true.
@@ -445,31 +434,8 @@ export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolea
 	const signal = sig<T>(undefined!, equals);
 	watch(expr, value => {
 		signal.value = value;
-	});
+	}, true);
 	return () => signal.value;
-}
-
-/**
- * Internal utility for creating an intermediate proxy to capture dependants and call later.
- *
- * @param stack The stack to use.
- * @returns A tuple with a function to capture current dependants and the dependant that acts as the proxy.
- */
-function createStackProxy(stack: Dependant[][]): [access: () => void, proxy: Dependant] {
-	let proxyMap = new Map<DependantFn, number>();
-	const proxy: Dependant = [(accessedCycle) => {
-		if (proxy[1] !== accessedCycle) {
-			return;
-		}
-		proxy[1]++;
-		const map = proxyMap;
-		proxyMap = new Map();
-		map.forEach(callDependant);
-	}, 0];
-	return [
-		() => access(stack, proxyMap),
-		proxy,
-	];
 }
 
 /**
@@ -483,16 +449,23 @@ function createStackProxy(stack: Dependant[][]): [access: () => void, proxy: Dep
 export function lazy<T>(expr: Expression<T>): () => T {
 	let value: T;
 	let current = false;
-	const [accessTriggers, triggerProxy] = createStackProxy(TRIGGERS_STACK);
-	const [accessDependants, dependantProxy] = createStackProxy(DEPENDANTS_STACK);
+
+	let proxyMap = new Map<DependantFn, number>();
+	const proxy: Dependant = [(accessedCycle) => {
+		if (proxy[1] === accessedCycle) {
+			proxy[1]++;
+			const map = proxyMap;
+			proxyMap = new Map();
+			map.forEach(callDependant);
+		}
+	}, 0];
+
 	let cycle = 0;
 	return () => {
-		accessTriggers();
-		accessDependants();
+		access(DEPENDANTS_STACK, proxyMap);
 		if (!current) {
 			current = true;
-			TRIGGERS_STACK.push([triggerProxy]);
-			DEPENDANTS_STACK.push([dependantProxy]);
+			DEPENDANTS_STACK.push([proxy]);
 			try {
 				value = trigger(expr, accessedCycle => {
 					if (cycle === accessedCycle) {
@@ -501,7 +474,6 @@ export function lazy<T>(expr: Expression<T>): () => T {
 					}
 				}, cycle);
 			} finally {
-				TRIGGERS_STACK.pop();
 				DEPENDANTS_STACK.pop();
 			}
 		}

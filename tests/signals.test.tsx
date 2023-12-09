@@ -248,24 +248,83 @@ await test("signals", async ctx => {
 			assertEvents(events, ["a", "b", 2]);
 		});
 
-	});
-
-	await ctx.test("memo", async () => {
-		const events: unknown[] = [];
-		const signal = sig(1);
-
-		watch(memo(() => {
-			events.push("e");
-			return signal.value;
-		}), value => {
-			events.push(value);
+		await ctx.test("evaluate and update during batch", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			batch(() => {
+				trigger(signal, () => {
+					events.push("a");
+				});
+				assertEvents(events, []);
+				signal.value = 2;
+				assertEvents(events, ["a"]);
+			});
+			assertEvents(events, []);
 		});
 
-		assertEvents(events, ["e", 1]);
-		signal.value = 2;
-		assertEvents(events, ["e", 2]);
-		signal.notify();
-		assertEvents(events, ["e"]);
+		await ctx.test("update during batch", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			trigger(signal, () => {
+				events.push("a");
+			});
+			assertEvents(events, []);
+			batch(() => {
+				signal.value = 2;
+				assertEvents(events, ["a"]);
+			});
+			assertEvents(events, []);
+		});
+
+	});
+
+	await ctx.test("memo", async ctx => {
+
+		await ctx.test("watch", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+
+			watch(memo(() => {
+				events.push("e");
+				return signal.value;
+			}), value => {
+				events.push(value);
+			});
+
+			assertEvents(events, ["e", 1]);
+			signal.value = 2;
+			assertEvents(events, ["e", 2]);
+			signal.notify();
+			assertEvents(events, ["e"]);
+		});
+
+		await ctx.test("batch & nested memos", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			const inner = memo(() => {
+				events.push("i");
+				return signal.value * 2;
+			});
+			const outer = memo(() => {
+				events.push("o");
+				return signal.value + inner();
+			});
+
+			watch(outer, value => {
+				events.push(value);
+			});
+
+			assertEvents(events, ["i", "o", 3]);
+			signal.value = 2;
+			assertEvents(events, ["i", "o", 6]);
+
+			batch(() => {
+				signal.value = 3;
+				assertEvents(events, ["i", "o"]);
+			});
+			assertEvents(events, [9]);
+		});
+
 	});
 
 	await ctx.test("lazy", async ctx => {
@@ -410,6 +469,32 @@ await test("signals", async ctx => {
 
 			signal.value = 2;
 			assertEvents(events, ["eval", 2]);
+		});
+
+		await ctx.test("lazy in batch with memos", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			const inner = memo(() => {
+				events.push("inner");
+				return signal.value;
+			});
+			assertEvents(events, ["inner"]);
+			const outer = lazy(() => {
+				events.push("outer");
+				return inner();
+			});
+			assertEvents(events, []);
+			watch(outer, value => {
+				events.push(value);
+			});
+			assertEvents(events, ["outer", 1]);
+			batch(() => {
+				signal.value = 2;
+				assertEvents(events, ["inner"]);
+				signal.value = 3;
+				assertEvents(events, ["inner"]);
+			});
+			assertEvents(events, ["outer", 3]);
 		});
 
 	});

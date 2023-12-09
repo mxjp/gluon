@@ -40,9 +40,9 @@ export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMat
 				if (path.startsWith(test) || path === test.slice(0, -1)) {
 					return {
 						route,
-						path: normalize(path.slice(0, route.path.length - 1)),
+						path: normalize(path.slice(0, test.length - 1)),
 						params: undefined,
-						rest: normalize(path.slice(route.path.length)),
+						rest: normalize(path.slice(test.length)),
 					};
 				}
 			} else if (test === path) {
@@ -79,7 +79,7 @@ export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMat
 		} else if (route.path instanceof RegExp) {
 			const match = route.path.exec(path);
 			if (match !== null) {
-				const matched = match[0];
+				const matched = normalize(match[0], false);
 				let rest = path;
 				if (path.startsWith(matched) && (path.length === matched.length || path[matched.length] === "/")) {
 					rest = normalize(path.slice(matched.length));

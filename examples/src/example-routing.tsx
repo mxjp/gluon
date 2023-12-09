@@ -1,5 +1,5 @@
 import { sig } from "@mxjp/gluon";
-import { QueryInit, Router, Routes, UseRouter, getRouter, normalizePath } from "@mxjp/gluon/router";
+import { QueryInit, Router, Routes, UseRouter, getRouter, normalize } from "@mxjp/gluon/router";
 
 import { Box } from "./components/box";
 import { Row } from "./components/row";
@@ -88,7 +88,7 @@ class CustomRouter implements Router {
 	}
 
 	push(path: string, query?: QueryInit): void {
-		this.#path.value = normalizePath(path);
+		this.#path.value = normalize(path);
 	}
 
 	replace(path: string, query?: QueryInit): void {

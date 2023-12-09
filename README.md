@@ -38,6 +38,10 @@ This is a tiny signal based rendering library that aims to be usable with widely
 + [Performance](#performance)
   + [Update Batching](#update-batching)
   + [Lazy Expressions](#lazy-expressions)
++ [Routing](#routing)
+  + [Navigation](#navigation)
+  + [Route Matching](#route-matching)
+  + [Nested Routing](#nested-routing)
 + [Web Components](#web-components)
 + [Security](#security)
 
@@ -50,7 +54,14 @@ Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon
 ```bash
 npm i @mxjp/gluon
 ```
-Alternatively, you can copy the [human readable](https://www.unpkg.com/@mxjp/gluon/dist/gluon.js) or the [minified](https://www.unpkg.com/@mxjp/gluon/dist/gluon.min.js) es module bundle directly into your project.
+Alternatively, you can copy the modules you need directly into your project.
+
+| Name | npm package import | human readable | minified |
+|-|-|-|-|
+| Core | `@mxjp/gluon` | [gluon.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon.min.js) |
+| Router | `@mxjp/gluon/router` | [gluon-router.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon-router.js) | [gluon-router.min.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon-router.min.js) |
+
+Note, that human readable and minified bundles do not include any JSX related code.
 
 ## JSX Setup
 Gluon's npm package supports jsx without any special transform and can be used in typescript by adding the two options below:
@@ -656,6 +667,123 @@ const expression = lazy(() => expensiveComputation(input.value));
 // "expensiveComputation" runs only when any input was updated:
 watch(expression, () => { ... });
 watch(expression, () => { ... });
+```
+
+<br>
+
+
+
+# Routing
+Routers provide a reactive path and query parameters and allow navigating in their current context.
+
+Currently, there is a **HistoryRouter** that uses the location and history API and a **HashRouter** that uses the location hash as the path. You can also implement custom routers by implementing the **Router** interface.
+
+The **useRouter** function or **UseRouter** component can be used to provide a router to a context:
+```tsx
+import { mount } from "@mxjp/gluon";
+import { UseRouter, HistoryRouter } from "@mxjp/gluon/router";
+
+mount(
+  document.body,
+  <UseRouter router={new HistoryRouter()}>
+    Everything in here has access to the history router.
+  </UseRouter>
+);
+```
+
+The **routes** function or **Routes** component can be used to render content based on the current path.
+```tsx
+import { mount } from "@mxjp/gluon";
+import { UseRouter, HistoryRouter, Routes } from "@mxjp/gluon/router";
+
+mount(
+  document.body,
+  <UseRouter router={new HistoryRouter()}>
+    <Routes routes={[
+      { path: "/", content: () => "Home" },
+      { path: "/foo", content: ExamplePage },
+      { content: () => "Not found" },
+    ]} />
+  </UseRouter>
+);
+
+function ExamplePage() {
+  return "Example";
+}
+```
+
+## Navigation
+The router in the current context can be used for navigation.
+
+Routers implement a **push** function for regular navigation and a **replace** function for replacing the current path if possible.
+```tsx
+function ExamplePage() {
+  const router = getRouter().root;
+  return <button $click={() => {
+    router.push("/some-path");
+  }}>Navigate</button>;
+}
+```
+Note, that the router instance is replaced with a [child router](#nested-routing) inside of routed content. In this case, the **root** property provides access to the history router from above.
+
+## Route Matching
+When matching against a path, routes are tested in order. Route paths can be any of the following:
++ Strings with a trailing slash match that path and all sub paths.
++ Strings without traling slash match exactly that path.
++ Functions may return the path that was matched or a tuple with the matched path and extracted parameters to indicate a match.
++ For regular expressions, the match array is provided as parameters.
++ Routes without path match always.
+
+Route parameters are passed to the content functions or components. The example below renders an ID extracted from paths like **/books/42**:
+```tsx
+import { mount } from "@mxjp/gluon";
+import { UseRouter, HistoryRouter, Routes } from "@mxjp/gluon/router";
+
+function Example(props) {
+  return `ID: ${props.params[1]}`;
+}
+
+mount(
+  document.body,
+  <UseRouter router={new HistoryRouter()}>
+    <Routes routes={[
+      { path: /^\/books\/(\d+)(?:\/|$)/, content: Example },
+    ]} />
+  </UseRouter>
+);
+```
+
+## Nested Routing
+Routes can be arbitrarily nested with content in between.
+
+The example below renders text for the paths **/, /foo/bar, /foo/baz**
+```tsx
+import { mount } from "@mxjp/gluon";
+import { UseRouter, HistoryRouter, Routes } from "@mxjp/gluon/router";
+
+mount(
+  document.body,
+  <UseRouter router={new HistoryRouter()}>
+    <Routes routes={[
+      { path: "/", content: () => "Home" },
+      { path: "/foo/", content: () => {
+        const innerRouter = getRouter();
+        return <Routes routes={[
+          { path: "/bar", content: () => "Bar" },
+          { path: "/baz", content: () => "Baz" },
+        ]} />;
+      } },
+    ]} />
+  </UseRouter>
+);
+```
+The router instance is replaced with a [child router](#nested-routing) inside of routed content which only expose the unmatched rest path and navigate within the matched path. In the example above, the **innerRouter** navigates within **/foo**:
+```tsx
+// Navigates to /foo/bar:
+innerRouter.push("/bar");
+
+// To navigate globally, use the root router instead:
+innerRouter.root.push("/foo/bar");
 ```
 
 <br>

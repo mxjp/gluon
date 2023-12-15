@@ -208,13 +208,13 @@ export function Show(props: {
  *
  * mount(
  *   document.body,
- *   <Namespace uri={SVG}>
+ *   <UseNamespace uri={SVG}>
  *     {() => <svg version="1.1">...</svg>}
- *   </Namespace>
+ *   </UseNamespace>
  * );
  * ```
  */
-export function Namespace(props: {
+export function UseNamespace(props: {
 	uri: string;
 	children: () => unknown;
 }): unknown {

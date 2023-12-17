@@ -1,8 +1,7 @@
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
 
-import { sig, watch } from "@mxjp/gluon";
-import { Route, matchRoute, watchRoutes } from "@mxjp/gluon/router";
+import { sig, watch, Route, matchRoute, watchRoutes } from "@mxjp/gluon";
 import { assertEvents } from "../common.js";
 
 await test("router/route", async ctx => {

@@ -1,5 +1,6 @@
 /.github
 /assets
+/build
 /examples
 /scripts
 /tests

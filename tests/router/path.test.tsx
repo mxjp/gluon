@@ -1,7 +1,7 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { join, normalize } from "@mxjp/gluon/router";
+import { join, normalize } from "@mxjp/gluon";
 
 await test("router/path", async ctx => {
 

@@ -1,4 +1,4 @@
-import { Attributes, createElement } from "../core/index.js";
+import { Attributes, createElement } from "./element.js";
 
 export const Fragment = Symbol("fragment");
 

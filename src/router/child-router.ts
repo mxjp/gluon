@@ -1,4 +1,4 @@
-import { Expression, get } from "../core/index.js";
+import { Expression, get } from "../core/signals.js";
 import { join } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 

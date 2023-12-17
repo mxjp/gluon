@@ -1,4 +1,5 @@
-import { Expression, Signal, View, get, nest, sig, watch } from "../core/index.js";
+import { Expression, Signal, get, sig, watch } from "../core/signals.js";
+import { View, nest } from "../core/view.js";
 import { ChildRouter } from "./child-router.js";
 import { normalize } from "./path.js";
 import { getRouter, useRouter } from "./router.js";

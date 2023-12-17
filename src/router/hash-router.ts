@@ -1,4 +1,5 @@
-import { batch, sig, teardown } from "../core/index.js";
+import { teardown } from "../core/lifecycle.js";
+import { batch, sig } from "../core/signals.js";
 import { normalize } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 

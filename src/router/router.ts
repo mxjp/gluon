@@ -1,4 +1,4 @@
-import { extract, inject } from "../core/index.js";
+import { extract, inject } from "../core/context.js";
 
 export interface Router {
 	/**

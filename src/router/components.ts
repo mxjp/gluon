@@ -1,4 +1,4 @@
-import { nest } from "../core/index.js";
+import { nest } from "../core/view.js";
 import { ChildRouter } from "./child-router.js";
 import { Route, watchRoutes } from "./route.js";
 import { Router, getRouter, useRouter } from "./router.js";

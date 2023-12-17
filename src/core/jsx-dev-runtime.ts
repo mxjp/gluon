@@ -1,7 +1,7 @@
-import { Attributes } from "../core/index.js";
-import { Fragment, jsx } from "./runtime.js";
+import { Attributes } from "./element.js";
+import { Fragment, jsx } from "./jsx-runtime.js";
 
-export * from "./runtime.js";
+export * from "./jsx-runtime.js";
 
 export function jsxDEV(tagName: string | typeof Fragment, props: Attributes & { children?: unknown }): unknown {
 	return jsx(tagName, props);

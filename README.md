@@ -54,14 +54,6 @@ Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon
 ```bash
 npm i @mxjp/gluon
 ```
-Alternatively, you can copy the modules you need directly into your project.
-
-| Name | npm package import | human readable | minified |
-|-|-|-|-|
-| Core | `@mxjp/gluon` | [gluon.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon.min.js) |
-| Router | `@mxjp/gluon/router` | [gluon-router.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon-router.js) | [gluon-router.min.js](https://www.unpkg.com/@mxjp/gluon/dist/gluon-router.min.js) |
-
-Note, that human readable and minified bundles do not include any JSX related code.
 
 ## JSX Setup
 Gluon's npm package supports jsx without any special transform and can be used in typescript by adding the two options below:
@@ -73,6 +65,16 @@ Gluon's npm package supports jsx without any special transform and can be used i
   }
 }
 ```
+
+## Bundles
+Alternatively, you can copy the bundles below directly into your project for use without any build system.
+
+| Modules | Human Readable | Minified | Types |
+|-|-|-|-|
+| Core | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
+| Core, Router | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
+
+Note, that the bundles above do not include the JSX runtime and any JSX related components.
 
 ## Basic Usage
 The **mount** function renders any supported content and appends it to an element.
@@ -680,8 +682,7 @@ Currently, there is a **HistoryRouter** that uses the location and history API a
 
 The **useRouter** function or **UseRouter** component can be used to provide a router to a context:
 ```tsx
-import { mount } from "@mxjp/gluon";
-import { UseRouter, HistoryRouter } from "@mxjp/gluon/router";
+import { mount, UseRouter, HistoryRouter } from "@mxjp/gluon";
 
 mount(
   document.body,
@@ -693,8 +694,7 @@ mount(
 
 The **routes** function or **Routes** component can be used to render content based on the current path.
 ```tsx
-import { mount } from "@mxjp/gluon";
-import { UseRouter, HistoryRouter, Routes } from "@mxjp/gluon/router";
+import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
 
 mount(
   document.body,
@@ -736,8 +736,7 @@ When matching against a path, routes are tested in order. Route paths can be any
 
 Route parameters are passed to the content functions or components. The example below renders an ID extracted from paths like **/books/42**:
 ```tsx
-import { mount } from "@mxjp/gluon";
-import { UseRouter, HistoryRouter, Routes } from "@mxjp/gluon/router";
+import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
 
 function Example(props) {
   return `ID: ${props.params[1]}`;
@@ -758,8 +757,7 @@ Routes can be arbitrarily nested with content in between.
 
 The example below renders text for the paths **/, /foo/bar, /foo/baz**
 ```tsx
-import { mount } from "@mxjp/gluon";
-import { UseRouter, HistoryRouter, Routes } from "@mxjp/gluon/router";
+import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
 
 mount(
   document.body,

@@ -34,20 +34,26 @@ export function useNamespace<T>(ns: string, fn: () => T): T {
 	return inject([XMLNS, ns], fn);
 }
 
-function appendContent(parent: Node, content: unknown) {
+/**
+ * Append content to a node.
+ *
+ * @param node The node.
+ * @param content The content to append.
+ */
+export function appendContent(node: Node, content: unknown) {
 	if (content === null || content === undefined) {
 		return;
 	}
 	if (Array.isArray(content)) {
 		for (let i = 0; i < content.length; i++) {
-			appendContent(parent, content[i]);
+			appendContent(node, content[i]);
 		}
 	} else if (content instanceof Node) {
-		parent.appendChild(content);
+		node.appendChild(content);
 	} else if (content instanceof View) {
-		parent.appendChild(content.take());
+		node.appendChild(content.take());
 	} else {
-		parent.appendChild(createText(content));
+		node.appendChild(createText(content));
 	}
 }
 
@@ -97,24 +103,13 @@ function setAttr(elem: Element, name: string, value: unknown, prop: boolean): vo
 }
 
 /**
- * Create an element.
+ * Set attributes on an element.
  *
- * @param tagName The tag name.
+ * @param elem The element.
  * @param attrs The attributes to set.
- * @param content The content to append.
  * @param jsx True if the element is created by the jsx runtime.
- * @returns The element.
  */
-export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): HTMLElementTagNameMap[K];
-export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): SVGElementTagNameMap[K];
-export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): MathMLElementTagNameMap[K];
-export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): E;
-export function createElement(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): Element {
-	const ns = (extract(XMLNS) as string);
-	const elem = ns === undefined
-		? document.createElement(tagName)
-		: document.createElementNS(ns, tagName) as HTMLElement | SVGElement | MathMLElement;
-
+export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): void {
 	attrs: for (const name in attrs) {
 		if (jsx && name === "children") {
 			continue attrs;
@@ -131,11 +126,11 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 						for (const prop in value) {
 							if (prop.startsWith("--")) {
 								watch(value[prop as never], value => {
-									elem.style.setProperty(prop, value);
+									(elem as HTMLElement).style.setProperty(prop, value);
 								});
 							} else {
 								watch(value[prop as never], value => {
-									elem.style[prop as never] = value;
+									(elem as HTMLElement).style[prop as never] = value;
 								});
 							}
 						}
@@ -159,7 +154,28 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 			watch(value, value => setAttr(elem, name, value, prop));
 		}
 	}
+}
 
+/**
+ * Create an element.
+ *
+ * @param tagName The tag name.
+ * @param attrs The attributes to set.
+ * @param content The content to append.
+ * @param jsx True if the element is created by the jsx runtime.
+ * @returns The element.
+ */
+export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): HTMLElementTagNameMap[K];
+export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): SVGElementTagNameMap[K];
+export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): MathMLElementTagNameMap[K];
+export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): E;
+export function createElement(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): Element {
+	const ns = (extract(XMLNS) as string);
+	const elem = ns === undefined
+		? document.createElement(tagName)
+		: document.createElementNS(ns, tagName) as HTMLElement | SVGElement | MathMLElement;
+
+	setAttributes(elem, attrs, jsx);
 	appendContent(elem, content);
 	return elem;
 }

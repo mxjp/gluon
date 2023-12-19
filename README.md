@@ -38,6 +38,10 @@ This is a tiny signal based rendering library that aims to be usable with widely
 + [Performance](#performance)
   + [Update Batching](#update-batching)
   + [Lazy Expressions](#lazy-expressions)
++ [Async Utilities](#async-utilities)
+  + [Tasks](#tasks)
+  + [Unwrap](#unwrap)
+  + [Abort Controllers](#abort-controllers)
 + [Routing](#routing)
   + [Navigation](#navigation)
   + [Route Matching](#route-matching)
@@ -72,7 +76,7 @@ Alternatively, you can copy the bundles below directly into your project for use
 | Modules | Human Readable | Minified | Types |
 |-|-|-|-|
 | Core | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
-| Core, Router | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
+| Core, Async, Router | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
 
 Note, that the bundles above do not include the JSX runtime and any JSX related components.
 
@@ -669,6 +673,70 @@ const expression = lazy(() => expensiveComputation(input.value));
 // "expensiveComputation" runs only when any input was updated:
 watch(expression, () => { ... });
 watch(expression, () => { ... });
+```
+
+<br>
+
+
+
+# Async Utilities
+
+## Tasks
+The task system in gluon keeps track of pending tasks in a specific context.
+```tsx
+import { mount, useTasks, isPending, waitFor } from "@mxjp/gluon";
+
+mount(
+  document.body,
+  useTask(() => <>
+    <button
+      disabled={isPending}
+      $click={() => {
+        waitFor(new Promise(resolve => {
+          setTimeout(resolve, 1000);
+        }));
+      }}
+    >Click me!</button>
+  </>),
+);
+```
+
+## Unwrap
+Render content depending on an async function or promise.
+```tsx
+import { mount, unwrap, Unwrap } from "@mxjp/gluon";
+
+const promise = new Promise(resolve => {
+  setTimeout(resolve, 1000);
+});
+
+mount(
+  document.body,
+  <>
+    {unwrap({
+      source: promise,
+      pending: () => "Pending...",
+      resolved: value => `Resolved: ${value}`,
+      rejected: error => `Rejected: ${error}`,
+    })}
+
+    <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
+      {value => <>Resolved: {value}</>}
+    </Unwrap>
+  </>,
+);
+```
+
+## Abort Controllers
+Abort controllers can be used in many web APIs to abort things.
+
+The **useAbortController** and **useAbortSignal** functions can be used to abort things when the current context is disposed e.g. when content inside a `<When>` component is no longer rendered.
+```tsx
+import { useAbortSignal } from "@mxjp/gluon";
+
+fetch("/info.txt", { signal: useAbortSignal() });
+
+window.addEventListener("keydown", () => { ... }, { signal: useAbortSignal() });
 ```
 
 <br>

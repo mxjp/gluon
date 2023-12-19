@@ -1,5 +1,4 @@
-import { sig } from "@mxjp/gluon";
-import { QueryInit, Router, Routes, UseRouter, getRouter, normalize } from "@mxjp/gluon/router";
+import { QueryInit, Router, Routes, UseRouter, getRouter, normalize, sig } from "@mxjp/gluon";
 
 import { Box } from "./components/box";
 import { Row } from "./components/row";

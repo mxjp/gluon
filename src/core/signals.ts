@@ -1,4 +1,4 @@
-import { getContext, runInContext } from "./context.js";
+import { getContext, runInContext, wrapContext } from "./context.js";
 import { TeardownHook, capture, teardown, uncapture } from "./lifecycle.js";
 
 /**
@@ -293,9 +293,9 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 				value = expr.value;
 			};
 		} else {
-			runExpr = () => {
+			runExpr = wrapContext(() => {
 				value = (expr as () => T)();
-			};
+			});
 		}
 
 		const runFn = () => fn(value);

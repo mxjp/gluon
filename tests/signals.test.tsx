@@ -1,7 +1,7 @@
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
 
-import { batch, capture, lazy, memo, sig, teardown, trigger, watch } from "@mxjp/gluon";
+import { batch, capture, extract, inject, lazy, memo, sig, teardown, trigger, watch } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
@@ -176,6 +176,24 @@ await test("signals", async ctx => {
 			assertEvents(events, ["i2"]);
 			outer.value = 2;
 			assertEvents(events, ["i2", "o2"]);
+		});
+
+		await ctx.test("context", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			inject(["test", 42], () => {
+				watch(() => {
+					events.push(`e${extract("test")}`);
+					signal.access();
+				}, () => {
+					events.push(`c${extract("test")}`);
+				});
+			});
+			assertEvents(events, ["e42", "c42"]);
+			inject(["test", 7], () => {
+				signal.notify();
+			});
+			assertEvents(events, ["e42", "c42"]);
 		});
 
 	});

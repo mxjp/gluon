@@ -1,4 +1,4 @@
-import { extract, inject } from "./context.js";
+import { extract, inject, wrapContext } from "./context.js";
 import { createText } from "./render.js";
 import { Expression, watch } from "./signals.js";
 import { View } from "./view.js";
@@ -118,7 +118,7 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 		if (name.startsWith("$")) {
 			const capture = name.startsWith("$$");
 			const event = name.slice(capture ? 2 : 1);
-			elem.addEventListener(event, value as (event: Event) => void, { capture });
+			elem.addEventListener(event, wrapContext(value as (event: Event) => void), { capture });
 		} else {
 			switch (name) {
 				case "style":

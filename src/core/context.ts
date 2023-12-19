@@ -105,3 +105,21 @@ export function runInContext<R>(context: ReadonlyContext | undefined, fn: () => 
 		CONTEXT_STACK.pop();
 	}
 }
+
+/**
+ * Wrap a function to be run with the current context.
+ *
+ * @param fn The function to wrap.
+ * @returns The wrapper.
+ */
+export function wrapContext<T extends (...args: any) => any>(fn: T): T {
+	const context = getContext();
+	return ((...args) => {
+		CONTEXT_STACK.push(context);
+		try {
+			return fn(...args);
+		} finally {
+			CONTEXT_STACK.pop();
+		}
+	}) as T;
+}

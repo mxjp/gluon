@@ -2,6 +2,7 @@ import "./env.js";
 
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
+import { extract, inject } from "@mxjp/gluon";
 
 await test("jsx-runtime", async ctx => {
 
@@ -14,17 +15,20 @@ await test("jsx-runtime", async ctx => {
 
 	await ctx.test("events", () => {
 		const events: any[] = [];
-		const elem = <div
-			$click={event => {
-				// Don't remove, only for testing the type:
-				const _: MouseEvent = event;
-
-				events.push(event);
-			}}
-			$custom-event={(event: CustomEvent) => {
-				events.push(event);
-			}}
-		/>;
+		const elem = inject(["foo", "bar"], () => {
+			return <div
+				$click={event => {
+					strictEqual(extract("foo"), "bar");
+					// Don't remove, only for testing the type:
+					const _: MouseEvent = event;
+					events.push(event);
+				}}
+				$custom-event={(event: CustomEvent) => {
+					strictEqual(extract("foo"), "bar");
+					events.push(event);
+				}}
+			/>
+		});
 		const a = new MouseEvent("click");
 		elem.dispatchEvent(a);
 		const b = new CustomEvent("custom-event");
@@ -34,17 +38,21 @@ await test("jsx-runtime", async ctx => {
 
 	await ctx.test("capture events", () => {
 		const events: any[] = [];
-		const elem = <div
-			$$click={event => {
-				// Don't remove, only for testing the type:
-				const _: MouseEvent = event;
+		const elem = inject(["foo", "bar"], () => {
+			return <div
+				$$click={event => {
+					strictEqual(extract("foo"), "bar");
+					// Don't remove, only for testing the type:
+					const _: MouseEvent = event;
 
-				events.push(event);
-			}}
-			$$custom-event={(event: CustomEvent) => {
-				events.push(event);
-			}}
-		/>;
+					events.push(event);
+				}}
+				$$custom-event={(event: CustomEvent) => {
+					strictEqual(extract("foo"), "bar");
+					events.push(event);
+				}}
+			/>;
+		});
 		const a = new MouseEvent("click");
 		elem.dispatchEvent(a);
 		const b = new CustomEvent("custom-event");

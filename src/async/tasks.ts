@@ -66,7 +66,7 @@ export class Tasks {
 }
 
 /**
- * Run a function with a specific task instance.
+ * Run a function with a specific tasks instance.
  *
  * By default, a new child instance is created.
  *

@@ -684,7 +684,7 @@ watch(expression, () => { ... });
 ## Tasks
 The task system in gluon keeps track of pending tasks in a specific context.
 ```tsx
-import { mount, useTasks, isPending, waitFor } from "@mxjp/gluon";
+import { mount, useTasks, UseTasks, isPending, waitFor } from "@mxjp/gluon";
 
 mount(
   document.body,
@@ -698,6 +698,12 @@ mount(
       }}
     >Click me!</button>
   </>),
+
+  <UseTasks>
+    {() => <>
+      ...
+    </>}
+  </UseTasks>
 );
 ```
 

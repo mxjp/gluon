@@ -19,16 +19,30 @@ export const SVG = "http://www.w3.org/2000/svg";
 export const MATHML = "http://www.w3.org/1998/Math/MathML";
 
 /**
- * Key for {@link useNamespace setting} the namespace URI for newly created elements.
+ * Key for setting the namespace URI for newly created elements.
+ *
+ * @example
+ * ```tsx
+ * import { mount, XMLNS, SVG, Inject, inject, e } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <>
+ *     <Inject key={XMLNS} value={SVG}>
+ *       {() => <svg>...</svg>}
+ *     </Inject>
+ *
+ *     {inject([XMLNS, SVG], () => {
+ *       return e("svg", [...]);
+ *     })}
+ *   </>
+ * );
+ * ```
  */
 export const XMLNS = Symbol("namespace");
 
 /**
- * Run a function while using the specified namespace URI.
- *
- * @param ns The namespace URI to use.
- * @param fn The function to run.
- * @returns The function's return value.
+ * @deprecated Use {@link inject} with {@link XMLNS} directly.
  */
 export function useNamespace<T>(ns: string, fn: () => T): T {
 	return inject([XMLNS, ns], fn);

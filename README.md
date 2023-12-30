@@ -442,18 +442,18 @@ By default, elements are created as HTML elements. This works fine for most case
 
 The namespace URI for new elements can be set via [contexts](#context).
 ```tsx
-import { mount, useNamespace, UseNamespace, SVG } from "@mxjp/gluon";
+import { mount, inject, Inject, XMLNS, SVG } from "@mxjp/gluon";
 
 mount(
   document.body,
   <div>
-    {useNamespace(SVG, () => {
+    {inject([XMLNS, SVG], () => {
       return <svg version="1.1" viewBox="0 0 100 100">...</svg>;
     })}
 
-    <UseNamespace uri={SVG}>
+    <Inject key={XMLNS} value={SVG}>
       {() => <svg version="1.1" viewBox="0 0 100 100">...</svg>}
-    </UseNamespace>
+    </Inject>
   </div>,
 );
 ```

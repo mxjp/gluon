@@ -200,19 +200,7 @@ export function Show(props: {
 }
 
 /**
- * A component that renders content while using the specified namespace URI.
- *
- * @example
- * ```tsx
- * import { mount, Namespace, SVG } from "@mxjp/gluon";
- *
- * mount(
- *   document.body,
- *   <UseNamespace uri={SVG}>
- *     {() => <svg version="1.1">...</svg>}
- *   </UseNamespace>
- * );
- * ```
+ * @deprecated See {@link useNamespace}.
  */
 export function UseNamespace(props: {
 	uri: string;

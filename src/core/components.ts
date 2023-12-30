@@ -1,4 +1,8 @@
-import { ContextPairFor, ContextValueFor, Expression, IterContentFn, MapContentFn, inject, iter, map, nest, show, useNamespace, useUniqueId, when } from "../core/index.js";
+import { Context, ContextPairFor, ContextValueFor, ReadonlyContext, deriveContext, inject } from "./context.js";
+import { useNamespace } from "./element.js";
+import { useUniqueId } from "./ids.js";
+import { Expression } from "./signals.js";
+import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view.js";
 
 /**
  * Inject an entry.
@@ -34,6 +38,33 @@ export function Inject<K, R>(props: {
 	} else {
 		return inject(props.value, props.children);
 	}
+}
+
+/**
+ * Render content with a copy of the current context.
+ *
+ * @example
+ * ```tsx
+ * import { mount, DeriveContext, extract } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <DeriveContext>
+ *     {context => {
+ *       context.set("message", "Hello World!");
+ *       return <h1>{extract("message")}</h1>;
+ *     }}
+ *   </DeriveContext>
+ * );
+ * ```
+ */
+export function DeriveContext(props: {
+	/**
+	 * A function to render content.
+	 */
+	children: (context: Context, parent: ReadonlyContext) => unknown;
+}): unknown {
+	return deriveContext(props.children);
 }
 
 type Falsy = null | undefined | false | 0 | 0n | "";

@@ -66,7 +66,6 @@ export function extract<K>(key: K): ContextValueFor<K> | undefined {
  */
 export function inject<K, R>(value: ContextPairFor<K>, fn: () => R): R {
 	const context = new Map(getContext() as Map<any, any>) as Context;
-
 	if (Array.isArray(value)) {
 		context.set(value[0], value[1]);
 	} else {
@@ -85,9 +84,10 @@ export function inject<K, R>(value: ContextPairFor<K>, fn: () => R): R {
  * @param fn The function to run.
  * @returns The function's return value.
  */
-export function deriveContext<R>(fn: (context: Context) => R): R {
-	const context = new Map(getContext() as Map<any, any>) as Context;
-	return runInContext(context, () => fn(context));
+export function deriveContext<R>(fn: (context: Context, parent: ReadonlyContext) => R): R {
+	const parent = getContext() as Map<any, any>;
+	const context = new Map(parent) as Context;
+	return runInContext(context, () => fn(context, parent));
 }
 
 /**

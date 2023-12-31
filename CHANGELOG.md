@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4
++ **Deprecated:** `useNamespace` and `UseNamespace`.
+
 ## 1.3
 + Support context in expressions.
 + Add abort signal utilities.

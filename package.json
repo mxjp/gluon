@@ -41,9 +41,9 @@
 		"build:bundle:core": "node scripts/bundle.js -m core -o dist/gluon",
 		"build:bundle:all": "node scripts/bundle.js -m core async router -o dist/gluon.all",
 		"start": "concurrently npm:start:*",
-		"start:es": "tsc -p tsconfig-es.json -w",
-		"start:types": "tsc -p tsconfig-types.json -w",
-		"start:tests": "tsc -p tests/tsconfig.json -w",
+		"start:es": "tsc -p tsconfig-es.json -w --preserveWatchOutput",
+		"start:types": "tsc -p tsconfig-types.json -w --preserveWatchOutput",
+		"start:tests": "tsc -p tests/tsconfig.json -w --preserveWatchOutput",
 		"test": "node --enable-source-maps --test ./tests_out",
 		"prepack": "npm run build && npm test && node scripts/prepack.js"
 	},

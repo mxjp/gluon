@@ -13,14 +13,14 @@
  * });
  * ```
  */
-export type SymbolFor<V> = symbol & { PHANTOM_CONTEXT_KEY_FOR: V & never };
+export type ContextKeyFor<V> = symbol & { PHANTOM_CONTEXT_KEY_FOR: V & never };
 
 /**
  * The value type for a specific type of key.
  */
 export type ContextValueFor<K>
 	= K extends (new(...args: any) => infer T) ? T
-	: K extends SymbolFor<infer V> ? V
+	: K extends ContextKeyFor<infer V> ? V
 	: unknown;
 
 /**

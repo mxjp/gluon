@@ -1,7 +1,9 @@
 # Changelog
 
-## 1.4
+## 2.0
 + Support arbitrarily nested arrays and expressions as class attribute values.
++ Support arbitrarily nested arrays and expressions as style attribute values.
++ **Breaking:** Drop support for css strings in style attributes.
 + **Deprecated:** `useNamespace` and `UseNamespace`.
 
 ## 1.3

@@ -1,24 +1,4 @@
-import { Tasks, useTasks } from "./tasks.js";
 import { unwrap } from "./unwrap.js";
-
-/**
- * Renders content with a specific tasks instance.
- *
- * By default, a new child instance is created.
- */
-export function UseTasks(props: {
-	/**
-	 * A function to render content.
-	 */
-	children: () => unknown;
-
-	/**
-	 * The tasks instance.
-	 */
-	tasks?: Tasks;
-}): unknown {
-	return useTasks(props.children, props.tasks);
-}
 
 /**
  * Renders content depending on the state of an async function or promise.

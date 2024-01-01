@@ -24,13 +24,13 @@ import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view
  * );
  * ```
  */
-export function Inject<K, R>(props: {
+export function Inject<K>(props: {
 	key: K,
 	value: ContextValueFor<K>,
-	children: () => R,
+	children: () => unknown,
 } | {
 	value: ContextPairFor<K>,
-	children: () => R,
+	children: () => unknown,
 }): unknown {
 	if ("key" in props) {
 		return inject([props.key, props.value], props.children);

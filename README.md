@@ -719,26 +719,22 @@ watch(expression, () => { ... });
 ## Tasks
 The task system in gluon keeps track of pending tasks in a specific context.
 ```tsx
-import { mount, useTasks, UseTasks, isPending, waitFor } from "@mxjp/gluon";
+import { mount, Inject, Tasks, isPending, waitFor } from "@mxjp/gluon";
 
 mount(
   document.body,
-  useTask(() => <>
-    <button
-      disabled={isPending}
-      $click={() => {
-        waitFor(new Promise(resolve => {
-          setTimeout(resolve, 1000);
-        }));
-      }}
-    >Click me!</button>
-  </>),
-
-  <UseTasks>
+  <Inject value={new Tasks()}>
     {() => <>
-      ...
+      <button
+        disabled={isPending}
+        $click={() => {
+          waitFor(new Promise(resolve => {
+            setTimeout(resolve, 1000);
+          }));
+        }}
+      >Click me!</button>
     </>}
-  </UseTasks>
+  </Inject>
 );
 ```
 

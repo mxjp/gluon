@@ -1,7 +1,5 @@
 import { sig } from "../core/signals.js";
-import { extract, inject } from "../core/context.js";
-
-const TASKS = Symbol.for("gluon:async_tasks");
+import { extract } from "../core/context.js";
 
 export type TaskSource = (() => unknown) | Promise<unknown> | null | undefined;
 
@@ -66,32 +64,12 @@ export class Tasks {
 }
 
 /**
- * Run a function with a specific tasks instance.
- *
- * By default, a new child instance is created.
- *
- * @param fn The function to run.
- * @param tasks The tasks instance.
- * @returns The function's return value.
- */
-export function useTasks<T>(fn: () => T, tasks = new Tasks(getTasks())): T {
-	return inject([TASKS, tasks], fn);
-}
-
-/**
- * Get the tasks instance in the current context.
- */
-export function getTasks(): Tasks | undefined {
-	return extract(TASKS) as Tasks | undefined;
-}
-
-/**
  * Check if there are any pending tasks in the current tasks instance.
  *
  * This can be used in conjuction with {@link waitFor} to indicate if there are any pending tasks.
  */
 export function isSelfPending(): boolean {
-	return getTasks()?.selfPending ?? false;
+	return extract(Tasks)?.selfPending ?? false;
 }
 
 /**
@@ -100,7 +78,7 @@ export function isSelfPending(): boolean {
  * This can be used in conjunction with {@link waitFor} to disable inputs and buttons while there are any pending tasks.
  */
 export function isPending(): boolean {
-	return getTasks()?.pending ?? false;
+	return extract(Tasks)?.pending ?? false;
 }
 
 /**
@@ -109,5 +87,5 @@ export function isPending(): boolean {
  * @param source The async function or promise to wait for.
  */
 export function waitFor(source: TaskSource): void {
-	getTasks()?.waitFor(source);
+	extract(Tasks)?.waitFor(source);
 }

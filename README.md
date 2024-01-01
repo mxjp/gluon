@@ -175,17 +175,23 @@ mount(document.body, [
 ```
 
 ### Classes
-The **class** attribute can be an object with expressions that determine if a class is added or removed from the element class list.
+The **class** attribute can any combination of strings, arrays and objects with boolean expresions to determine which classes are added.
 ```tsx
 import { mount } from "@mxjp/gluon";
 
 mount(
   document.body,
-  <div class={{
-    foo: true,
-    bar: someSignal,
-    baz: () => someSignal.value,
-  }} />,
+  <>
+    <div class="example" />
+    <div class={[
+      "foo",
+      () => "bar",
+      {
+        baz: true,
+        boo: () => false,
+      },
+    ]} />
+  </>
 );
 ```
 

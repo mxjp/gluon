@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.4
++ Support arbitrarily nested arrays and expressions as class attribute values.
 + **Deprecated:** `useNamespace` and `UseNamespace`.
 
 ## 1.3

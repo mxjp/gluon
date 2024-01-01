@@ -2,7 +2,7 @@ import "./env.js";
 
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
-import { extract, inject } from "@mxjp/gluon";
+import { extract, inject, sig } from "@mxjp/gluon";
 
 await test("jsx-runtime", async ctx => {
 
@@ -71,6 +71,24 @@ await test("jsx-runtime", async ctx => {
 		deepStrictEqual(Array.from(elem.classList), ["a", "b"]);
 		strictEqual(elem.dataset.bar, "baz");
 		strictEqual(elem.title, "example");
+	});
+
+	await ctx.test("class attribute", () => {
+		const a = sig("a");
+		const d = sig(false);
+		const elem: HTMLElement = <div class={() => [
+			a.value,
+			"b",
+			{
+				c: true,
+				d,
+			},
+		]} />;
+		deepStrictEqual(Array.from(elem.classList), ["a", "b", "c"]);
+		a.value = "foo";
+		deepStrictEqual(Array.from(elem.classList), ["foo", "b", "c"]);
+		d.value = true;
+		deepStrictEqual(Array.from(elem.classList), ["foo", "b", "c", "d"]);
 	});
 
 	await ctx.test("api types", () => {

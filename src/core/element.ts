@@ -1,6 +1,6 @@
 import { extract, inject, wrapContext } from "./context.js";
 import { createText } from "./render.js";
-import { Expression, watch } from "./signals.js";
+import { Expression, get, watch } from "./signals.js";
 import { View } from "./view.js";
 
 /**
@@ -75,10 +75,10 @@ type EventAttributes = {
 	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
 };
 
+export type ClassValue = Expression<string | Record<string, Expression<boolean>> | ClassValue[]>;
+
 type SpecialAttributes = {
-	class?: Expression<string> | {
-		[K in string]?: Expression<boolean>;
-	};
+	class?: ClassValue;
 	style?: Expression<string> | {
 		[K in keyof CSSStyleDeclaration]?: Expression<CSSStyleDeclaration[K]>;
 	};
@@ -113,6 +113,27 @@ function setAttr(elem: Element, name: string, value: unknown, prop: boolean): vo
 		elem.removeAttribute(name);
 	} else {
 		elem.setAttribute(name, value as string);
+	}
+}
+
+function getClassTokens(value: ClassValue): string {
+	value = get(value);
+	if (typeof value === "string") {
+		return value;
+	} else {
+		let tokens = "";
+		if (Array.isArray(value)) {
+			for (let i = 0; i < value.length; i++) {
+				tokens += getClassTokens(value[i]) + " ";
+			}
+		} else {
+			for (const key in value) {
+				if (get(value[key])) {
+					tokens += key + " ";
+				}
+			}
+		}
+		return tokens;
 	}
 }
 
@@ -153,15 +174,10 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 					break;
 
 				case "class":
-					if (value !== null && typeof value === "object") {
-						for (const name in value) {
-							watch(value[name as never], enabled => {
-								elem.classList.toggle(name, enabled);
-							});
-						}
-						continue attrs;
-					}
-					break;
+					watch(() => getClassTokens(value as ClassValue), tokens => {
+						elem.setAttribute("class", tokens);
+					});
+					continue attrs;
 			}
 
 			const prop = isProp(elem, name);

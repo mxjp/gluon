@@ -6,6 +6,7 @@
 + Support arbitrarily nested arrays and expressions as style attribute values.
 + **Breaking:** Drop support for css strings in style attributes.
 + **Breaking:** Remove `useNamespace` and `UseNamespace`. Use `inject` or `deriveContext` instead.
++ **Breaking:** Remove `@mxjp/gluon/router` exports. Use `@mxjp/gluon` instead.
 
 ## 1.3
 + Support context in expressions.

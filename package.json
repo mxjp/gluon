@@ -20,10 +20,6 @@
 			"types": "./dist/es/index.d.ts",
 			"default": "./dist/es/index.js"
 		},
-		"./router": {
-			"types": "./dist/es/index.d.ts",
-			"default": "./dist/es/index.js"
-		},
 		"./jsx-runtime": {
 			"types": "./dist/es/core/jsx-runtime.d.ts",
 			"default": "./dist/es/core/jsx-runtime.js"

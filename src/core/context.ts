@@ -1,8 +1,27 @@
 
 /**
+ * Utility for phantom typed context key-value pairs.
+ *
+ * @example
+ * ```ts
+ * import { ContextKey } from "@mxjp/gluon";
+ *
+ * const key = Symbol("example") as SymbolFor<"exampleValue">;
+ *
+ * inject([key, "exampleValue"], () => {
+ *   const value = extract(key); // type = "exampleValue"
+ * });
+ * ```
+ */
+export type SymbolFor<V> = symbol & { PHANTOM_CONTEXT_KEY_FOR: V & never };
+
+/**
  * The value type for a specific type of key.
  */
-export type ContextValueFor<K> = K extends (new(...args: any) => infer T) ? T : unknown;
+export type ContextValueFor<K>
+	= K extends (new(...args: any) => infer T) ? T
+	: K extends SymbolFor<infer V> ? V
+	: unknown;
 
 /**
  * A key value pair or instance for a specific type of key.

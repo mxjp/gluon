@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.0
++ Add utility for phantom typed context key-value pairs.
 + Support arbitrarily nested arrays and expressions as class attribute values.
 + Support arbitrarily nested arrays and expressions as style attribute values.
 + **Breaking:** Drop support for css strings in style attributes.

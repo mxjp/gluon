@@ -4,7 +4,7 @@
 + Support arbitrarily nested arrays and expressions as class attribute values.
 + Support arbitrarily nested arrays and expressions as style attribute values.
 + **Breaking:** Drop support for css strings in style attributes.
-+ **Deprecated:** `useNamespace` and `UseNamespace`.
++ **Breaking:** Remove `useNamespace` and `UseNamespace`. Use `inject` or `deriveContext` instead.
 
 ## 1.3
 + Support context in expressions.

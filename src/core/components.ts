@@ -1,5 +1,4 @@
 import { Context, ContextPairFor, ContextValueFor, ReadonlyContext, deriveContext, inject } from "./context.js";
-import { useNamespace } from "./element.js";
 import { useUniqueId } from "./ids.js";
 import { Expression } from "./signals.js";
 import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view.js";
@@ -228,16 +227,6 @@ export function Show(props: {
 	children?: unknown;
 }): unknown {
 	return show(props.when, props.children);
-}
-
-/**
- * @deprecated See {@link useNamespace}.
- */
-export function UseNamespace(props: {
-	uri: string;
-	children: () => unknown;
-}): unknown {
-	return useNamespace(props.uri, props.children);
 }
 
 /**

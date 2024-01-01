@@ -1,4 +1,4 @@
-import { extract, inject, wrapContext } from "./context.js";
+import { extract, wrapContext } from "./context.js";
 import { createText } from "./render.js";
 import { Expression, get, watch } from "./signals.js";
 import { View } from "./view.js";
@@ -40,13 +40,6 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  * ```
  */
 export const XMLNS = Symbol("namespace");
-
-/**
- * @deprecated Use {@link inject} with {@link XMLNS} directly.
- */
-export function useNamespace<T>(ns: string, fn: () => T): T {
-	return inject([XMLNS, ns], fn);
-}
 
 /**
  * Append content to a node.

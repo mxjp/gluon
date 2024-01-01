@@ -79,6 +79,9 @@ await test("jsx-runtime", async ctx => {
 		const elem: HTMLElement = <div class={() => [
 			a.value,
 			"b",
+			undefined,
+			null,
+			false,
 			{
 				c: true,
 				d,

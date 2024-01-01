@@ -175,7 +175,7 @@ mount(document.body, [
 ```
 
 ### Classes
-The **class** attribute can any combination of strings, arrays and objects with boolean expresions to determine which classes are added.
+The **class** attribute can any combination of strings, arrays and objects with boolean expresions to determine which classes are added. Undefined, null and false is ignored.
 ```tsx
 import { mount } from "@mxjp/gluon";
 

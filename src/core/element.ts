@@ -75,7 +75,7 @@ type EventAttributes = {
 	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
 };
 
-export type ClassValue = Expression<string | Record<string, Expression<boolean>> | ClassValue[]>;
+export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean>> | ClassValue[]>;
 
 type SpecialAttributes = {
 	class?: ClassValue;
@@ -120,7 +120,7 @@ function getClassTokens(value: ClassValue): string {
 	value = get(value);
 	if (typeof value === "string") {
 		return value;
-	} else {
+	} else if (value) {
 		let tokens = "";
 		if (Array.isArray(value)) {
 			for (let i = 0; i < value.length; i++) {
@@ -134,6 +134,8 @@ function getClassTokens(value: ClassValue): string {
 			}
 		}
 		return tokens;
+	} else {
+		return "";
 	}
 }
 

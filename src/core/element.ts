@@ -77,21 +77,22 @@ type EventAttributes = {
 
 export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean>> | ClassValue[]>;
 
+export type StyleMap = { [K in keyof CSSStyleDeclaration]?: Expression<CSSStyleDeclaration[K]> };
+export type StyleValue = Expression<StyleMap | StyleValue[]>;
+
 type SpecialAttributes = {
 	class?: ClassValue;
-	style?: Expression<string> | {
-		[K in keyof CSSStyleDeclaration]?: Expression<CSSStyleDeclaration[K]>;
-	};
+	style?: StyleValue;
 };
 
-type OtherAttributes = {
-	[K in Exclude<string, keyof EventAttributes>]: Expression<unknown>;
+type GenericAttributes = {
+	[K in Exclude<string, keyof EventAttributes | keyof SpecialAttributes>]: Expression<unknown>;
 };
 
 /**
  * Represents an object with element attributes.
  */
-export type Attributes = EventAttributes & SpecialAttributes & OtherAttributes;
+export type Attributes = EventAttributes & SpecialAttributes & GenericAttributes;
 
 function isProp(obj: object, name: string): boolean {
 	if (name in obj) {
@@ -139,6 +140,35 @@ function getClassTokens(value: ClassValue): string {
 	}
 }
 
+type StyleHandler = (name: string, value: unknown) => void;
+
+function watchStyle(value: StyleValue, handler: StyleHandler) {
+	watch(value, value => {
+		if (Array.isArray(value)) {
+			let overwrites: string[][] = [];
+			for (let i = value.length - 1; i >= 0; i--) {
+				const self: string[] = [];
+				overwrites[i] = self;
+				watchStyle(value[i], (name, value) => {
+					if (!self.includes(name)) {
+						self.push(name);
+					}
+					for (let o = i + 1; o < overwrites.length; o++) {
+						if (overwrites[o].includes(name)) {
+							return;
+						}
+					}
+					handler(name, value);
+				});
+			}
+		} else if (value) {
+			for (const name in value) {
+				watch(value[name]!, value => handler(name, value));
+			}
+		}
+	});
+}
+
 /**
  * Set attributes on an element.
  *
@@ -159,21 +189,15 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 		} else {
 			switch (name) {
 				case "style":
-					if (value !== null && typeof value === "object") {
-						for (const prop in value) {
-							if (prop.startsWith("--")) {
-								watch(value[prop as never], value => {
-									(elem as HTMLElement).style.setProperty(prop, value);
-								});
-							} else {
-								watch(value[prop as never], value => {
-									(elem as HTMLElement).style[prop as never] = value;
-								});
-							}
+					const style = (elem as HTMLElement).style;
+					watchStyle(value as StyleValue, (name, value) => {
+						if (name in style) {
+							(style as any)[name] = value;
+						} else {
+							style.setProperty(name, value === null ? null : String(value));
 						}
-						continue attrs;
-					}
-					break;
+					});
+					continue attrs;
 
 				case "class":
 					watch(() => getClassTokens(value as ClassValue), tokens => {

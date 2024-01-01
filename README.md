@@ -175,7 +175,7 @@ mount(document.body, [
 ```
 
 ### Classes
-The **class** attribute can any combination of strings, arrays and objects with boolean expresions to determine which classes are added. Undefined, null and false is ignored.
+The **class** attribute can be any combination of strings, arrays and objects with boolean expresions to determine which classes are added. Undefined, null and false is ignored.
 ```tsx
 import { mount } from "@mxjp/gluon";
 
@@ -195,20 +195,32 @@ mount(
 );
 ```
 
+Note, that all expressions used in the class attribute are evaluated for every signal update. To avoid expensive computations, use [lazy](#lazy-expressions).
+
 ### Styles
-The **style** attribute can be an object with expressions:
+The **style** attribute can be any combination of arrays, objects and expressions.
 ```tsx
-import { mount } from "@mxjp/gluon";
+import { mount, sig } from "@mxjp/gluon";
+
+const someSignal = sig("42px");
 
 mount(
   document.body,
-  <div style={{
-    color: "red",
-    width: someSignal,
-    height: () => `${someOtherSignal.value}px`,
-  }} />,
+  <>
+    <div style={{ color: "red" }} />
+    <div style={() => [
+      { color: "red" },
+      { color: () => "blue" },
+      { color: someSignal },
+      [
+        { width: "42px" },
+      ],
+    ]} />
+  </>
 );
 ```
+
+Note, that properties that are no longer specified after a signal update are not reset automatically to keep the current implementation simple. When properties are specified multiple times, the last one is used.
 
 ### Events
 Attributes that start with **$** are added as event listeners. Attributes starting with **$$** are added as capturing event listeners.

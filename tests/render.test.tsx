@@ -2,7 +2,7 @@ import "./env.js";
 
 import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
-import { extract, inject, sig } from "@mxjp/gluon";
+import { StyleMap, extract, inject, sig } from "@mxjp/gluon";
 
 await test("jsx-runtime", async ctx => {
 
@@ -92,6 +92,41 @@ await test("jsx-runtime", async ctx => {
 		deepStrictEqual(Array.from(elem.classList), ["foo", "b", "c"]);
 		d.value = true;
 		deepStrictEqual(Array.from(elem.classList), ["foo", "b", "c", "d"]);
+	});
+
+	await ctx.test("style attribute", () => {
+		const a = sig<StyleMap>({ color: "blue" });
+		const b = sig("red");
+		const c = sig<StyleMap>({ width: "42px" });
+		const elem: HTMLElement = <div style={[
+			a,
+			() => [
+				[
+					{ color: b },
+				],
+				c.value,
+			],
+		]} />;
+		strictEqual(elem.style.color, "red");
+		strictEqual(elem.style.width, "42px");
+		c.value = { width: "7px" };
+		strictEqual(elem.style.color, "red");
+		strictEqual(elem.style.width, "7px");
+		a.value = { color: "blue", width: "13px" };
+		strictEqual(elem.style.color, "red");
+		strictEqual(elem.style.width, "7px");
+		b.value = "green";
+		strictEqual(elem.style.color, "green");
+		strictEqual(elem.style.width, "7px");
+		c.value = {};
+		strictEqual(elem.style.color, "green");
+		strictEqual(elem.style.width, "7px");
+		a.value = { color: "gray" };
+		strictEqual(elem.style.color, "green");
+		strictEqual(elem.style.width, "7px");
+		b.value = "silver";
+		strictEqual(elem.style.color, "silver");
+		strictEqual(elem.style.width, "7px");
 	});
 
 	await ctx.test("api types", () => {

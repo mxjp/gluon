@@ -38,6 +38,7 @@ This is a tiny signal based rendering library that aims to be usable with widely
 + [Performance](#performance)
   + [Update Batching](#update-batching)
   + [Lazy Expressions](#lazy-expressions)
+    + [Memos](#memos)
 + [Async Utilities](#async-utilities)
   + [Tasks](#tasks)
   + [Unwrap](#unwrap)
@@ -195,7 +196,7 @@ mount(
 );
 ```
 
-Note, that all expressions used in the class attribute are evaluated for every signal update. To avoid expensive computations, use [lazy](#lazy-expressions).
+Note, that all expressions used in the class attribute are evaluated for every signal update. To avoid expensive computations, use [lazy](#lazy-expressions) or [memo](#memos).
 
 ### Styles
 The **style** attribute can be any combination of arrays, objects and expressions.
@@ -686,7 +687,23 @@ import { sig, watch, lazy } from "@mxjp/gluon";
 
 const input = sig(0);
 
+// "expensiveComputation" dosn't run immediately:
 const expression = lazy(() => expensiveComputation(input.value));
+
+// "expensiveComputation" runs only when any input was updated:
+watch(expression, () => { ... });
+watch(expression, () => { ... });
+```
+
+### Memos
+The **memo** utility is similar to lazy expressions, but the wrapped expression is evaulated even if the output is not used.
+```tsx
+import { sig, watch, memo } from "@mxjp/gluon";
+
+const input = sig(0);
+
+// "expensiveComputation" runs once immediately:
+const expression = memo(() => expensiveComputation(input.value));
 
 // "expensiveComputation" runs only when any input was updated:
 watch(expression, () => { ... });

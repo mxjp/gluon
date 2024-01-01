@@ -1,6 +1,6 @@
 import { Attributes, createElement } from "./element.js";
 
-export const Fragment = Symbol("fragment");
+export const Fragment = Symbol.for("gluon:jsx-fragment");
 
 export function jsx(type: any, props: any): unknown {
 	if (type === Fragment) {

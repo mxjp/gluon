@@ -2,6 +2,7 @@
 
 ## 2.0
 + Add utility for phantom typed context key-value pairs.
++ Add value type to XMLNS context key.
 + Support arbitrarily nested arrays and expressions as class attribute values.
 + Support arbitrarily nested arrays and expressions as style attribute values.
 + **Breaking:** Drop support for css strings in style attributes.

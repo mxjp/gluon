@@ -1,4 +1,4 @@
-import { extract, wrapContext } from "./context.js";
+import { ContextKeyFor, extract, wrapContext } from "./context.js";
 import { createText } from "./render.js";
 import { Expression, get, watch } from "./signals.js";
 import { View } from "./view.js";
@@ -39,7 +39,7 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  * );
  * ```
  */
-export const XMLNS = Symbol("namespace");
+export const XMLNS = Symbol.for("gluon:namespace") as ContextKeyFor<typeof HTML | typeof SVG | typeof MATHML>;
 
 /**
  * Append content to a node.
@@ -219,7 +219,7 @@ export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, 
 export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): MathMLElementTagNameMap[K];
 export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): E;
 export function createElement(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): Element {
-	const ns = (extract(XMLNS) as string);
+	const ns = extract(XMLNS);
 	const elem = ns === undefined
 		? document.createElement(tagName)
 		: document.createElementNS(ns, tagName) as HTMLElement | SVGElement | MathMLElement;

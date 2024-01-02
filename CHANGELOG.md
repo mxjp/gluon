@@ -3,8 +3,8 @@
 ## 2.0
 + Add utility for phantom typed context key-value pairs.
 + Add value type to XMLNS context key.
-+ Support arbitrarily nested arrays and expressions as class attribute values.
-+ Support arbitrarily nested arrays and expressions as style attribute values.
++ Add value type ro ROUTER context key.
++ Support arbitrarily nested arrays and expressions as class & style attribute values.
 + **Breaking:** Drop support for css strings in style attributes.
 + **Breaking:** Remove `useNamespace` and `UseNamespace`. Use `inject` or `deriveContext` instead.
 + **Breaking:** Remove `useTasks` and `getTasks`. Use `inject` or `deriveContext` instead.

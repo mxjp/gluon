@@ -14,7 +14,7 @@ export function example() {
 		<Iter each={[0, 1, 2]}>
 			{i =>
 				<Row>
-					<Button action={() => place.value = i}>Move here</Button>
+					<Button action={() => { place.value = i; }}>Move here</Button>
 					<When value={() => place.value === i}>
 						{() => content.move()}
 					</When>

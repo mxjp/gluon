@@ -85,15 +85,47 @@ type GenericAttributes = {
  */
 export type Attributes = SpecialAttributes & GenericAttributes;
 
-function isProp(obj: object, name: string): boolean {
+/**
+ * Internal cache for writable properties per prototype and property name.
+ */
+const PROP_CACHE = new WeakMap<object, Record<string, boolean>>();
+
+/**
+ * Check if the specified object has a writable property.
+ *
+ * @deprecated This is considered internal API and might be changed or removed at any time.
+ */
+export function isWritable(obj: object, name: string): boolean {
 	if (name in obj) {
-		while (obj) {
-			const desc = Object.getOwnPropertyDescriptor(obj, name);
-			if (desc) {
-				return Boolean(desc.writable || desc.set);
-			}
-			obj = Object.getPrototypeOf(obj);
+		const desc = Object.getOwnPropertyDescriptor(obj, name);
+		if (desc !== undefined) {
+			return Boolean(desc.writable ?? desc.set);
 		}
+		const proto = Object.getPrototypeOf(obj);
+		const fromCache = PROP_CACHE.get(proto)?.[name];
+		if (fromCache !== undefined) {
+			return fromCache;
+		}
+		const result = isProtoWritable(proto, name);
+		const cache = PROP_CACHE.get(proto);
+		if (cache === undefined) {
+			PROP_CACHE.set(proto, { [name]: result });
+		} else {
+			cache[name] = result;
+		}
+		return result;
+	}
+	return false;
+}
+
+function isProtoWritable(obj: object, name: string) {
+	let proto = obj;
+	while (proto !== null) {
+		const desc = Object.getOwnPropertyDescriptor(proto, name);
+		if (desc !== undefined) {
+			return Boolean(desc.writable ?? desc.set);
+		}
+		proto = Object.getPrototypeOf(proto);
 	}
 	return false;
 }
@@ -197,7 +229,7 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 					continue attrs;
 			}
 
-			const prop = isProp(elem, name);
+			const prop = isWritable(elem, name);
 			watch(value, value => setAttr(elem, name, value, prop));
 		}
 	}

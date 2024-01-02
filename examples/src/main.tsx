@@ -1,4 +1,4 @@
-import { Iter, Nest, When, mount, sig } from "@mxjp/gluon";
+import { Inject, Iter, Nest, Tasks, When, mount, sig } from "@mxjp/gluon";
 import { Column } from "./components/column";
 
 import classes from "./main.module.css";
@@ -12,6 +12,7 @@ const exampleNames: string[] = [
 	"stopwatch",
 	"routing",
 	"movable",
+	"benchmark",
 ];
 
 const route = sig(location.hash.slice(1));
@@ -45,30 +46,34 @@ function ExampleView(props: { name: string }) {
 
 mount(
 	document.body,
-	<div class={classes.app}>
-		<div class={classes.area}>
-			<div class={classes.menu}>
-				<h1>gluon! examples</h1>
-				<div class={classes.menuItems}>
-					<Iter each={exampleNames}>
-						{name => (
-							<a href={`#${name}`}>{name}</a>
-						)}
-					</Iter>
+	<Inject value={new Tasks()}>
+		{() => {
+			return <div class={classes.app}>
+				<div class={classes.area}>
+					<div class={classes.menu}>
+						<h1>gluon! examples</h1>
+						<div class={classes.menuItems}>
+							<Iter each={exampleNames}>
+								{name => (
+									<a href={`#${name}`}>{name}</a>
+								)}
+							</Iter>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class={classes.area}>
-			<div class={classes.view}>
-				<Nest>
-					{() => {
-						const name = route.value;
-						if (exampleNames.includes(name)) {
-							return () => <ExampleView name={name} />;
-						}
-					}}
-				</Nest>
-			</div>
-		</div>
-	</div>,
+				<div class={classes.area}>
+					<div class={classes.view}>
+						<Nest>
+							{() => {
+								const name = route.value;
+								if (exampleNames.includes(name)) {
+									return () => <ExampleView name={name} />;
+								}
+							}}
+						</Nest>
+					</div>
+				</div>
+			</div>;
+		}}
+	</Inject>
 );

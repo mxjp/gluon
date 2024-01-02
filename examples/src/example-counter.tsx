@@ -8,7 +8,7 @@ export function example() {
 	return <>
 		<div>A simple counter to demonstrate basic signals.</div>
 		<Row>
-			<Button action={() => count.value++}>
+			<Button action={() => { count.value++; }}>
 				Clicked {count} {() => count.value === 1 ? "time" : "times"}!
 			</Button>
 		</Row>

@@ -44,7 +44,8 @@
 				font-weight: 600;
 			}
 
-			a {
+			a,
+			button.asText {
 				color: var(--accent);
 				text-decoration: none;
 				cursor: pointer;
@@ -52,28 +53,44 @@
 			}
 
 			a:hover,
-			a:focus-visible {
+			a:focus-visible,
+			button.asText:hover,
+			button.asText:focus-visible {
 				text-decoration: underline;
 			}
 
 			button {
 				font-family: inherit;
 				font-size: inherit;
-				background-color: var(--accent);
-				color: black;
-				font-weight: 600;
-				text-align: center;
-
-				padding: var(--control-padding);
-				border: none;
-				border-radius: var(--control-radius);
-
 				outline: none;
 				cursor: pointer;
 			}
 
-			button:focus-visible,
-			button:hover:not(:active) {
+			button:not(.asText) {
+				background-color: var(--accent);
+				color: black;
+				font-weight: 600;
+				text-align: center;
+				padding: var(--control-padding);
+				border: none;
+				border-radius: var(--control-radius);
+			}
+
+			button.asText {
+				background-color: transparent;
+				border: none;
+			}
+
+			a[disabled],
+			button[disabled],
+			input[type=text][disabled] {
+				opacity: .5;
+				cursor: default;
+				pointer-events: none;
+			}
+
+			button:focus-visible:not(.asText),
+			button:hover:not(:active):not(.asText) {
 				background-color: var(--accent-lit);
 			}
 

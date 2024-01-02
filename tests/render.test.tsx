@@ -73,6 +73,27 @@ await test("jsx-runtime", async ctx => {
 		strictEqual(elem.title, "example");
 	});
 
+	await ctx.test("removed attribute", () => {
+		const signal = sig<any>(false);
+		const elem: HTMLElement = <div test-attr={signal} />;
+		strictEqual(elem.getAttribute("test-attr"), null);
+
+		signal.value = true;
+		strictEqual(elem.getAttribute("test-attr"), "");
+
+		signal.value = 42;
+		strictEqual(elem.getAttribute("test-attr"), "42");
+
+		signal.value = null;
+		strictEqual(elem.getAttribute("test-attr"), null);
+
+		signal.value = "abc";
+		strictEqual(elem.getAttribute("test-attr"), "abc");
+
+		signal.value = undefined;
+		strictEqual(elem.getAttribute("test-attr"), null);
+	});
+
 	await ctx.test("class attribute", () => {
 		const a = sig("a");
 		const d = sig(false);

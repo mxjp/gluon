@@ -101,10 +101,10 @@ function isProp(obj: object, name: string): boolean {
 function setAttr(elem: Element, name: string, value: unknown, prop: boolean): void {
 	if (prop) {
 		(elem as Record<string, any>)[name] = value;
-	} else if (value === null || value === undefined) {
+	} else if (value === null || value === undefined || value === false) {
 		elem.removeAttribute(name);
 	} else {
-		elem.setAttribute(name, value as string);
+		elem.setAttribute(name, value === true ? "" : value as string);
 	}
 }
 

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.0
++ Add support for generic boolean attributes.
 + Add utility for phantom typed context key-value pairs.
 + Add value type to XMLNS context key.
 + Add value type ro ROUTER context key.

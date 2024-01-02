@@ -26,7 +26,7 @@ export type ContextValueFor<K>
 /**
  * A key value pair or instance for a specific type of key.
  */
-export type ContextPairFor<K> = [K, ContextValueFor<K>] | (K extends (new(...args: any) => infer V) ? V : never);
+export type ContextPair<K> = K | [K, ContextValueFor<K>];
 
 /**
  * Interface for a context that should not be modified.
@@ -83,7 +83,7 @@ export function extract<K>(key: K): ContextValueFor<K> | undefined {
  * @param fn The function to run.
  * @returns The function's return value.
  */
-export function inject<K, R>(value: ContextPairFor<K>, fn: () => R): R {
+export function inject<K, R>(value: ContextPair<K>, fn: () => R): R {
 	const context = new Map(getContext() as Map<any, any>) as Context;
 	if (Array.isArray(value)) {
 		context.set(value[0], value[1]);

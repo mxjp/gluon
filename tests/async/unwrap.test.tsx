@@ -2,7 +2,7 @@ import "../env.js";
 
 import test from "node:test";
 
-import { Tasks, Unwrap, useTasks } from "@mxjp/gluon";
+import { Tasks, Unwrap, inject } from "@mxjp/gluon";
 
 import { future, text } from "../common.js";
 import { strictEqual } from "node:assert";
@@ -38,7 +38,7 @@ await test("async/unwrap", async ctx => {
 	await ctx.test("pending task", async () => {
 		const [promise, resolve] = future();
 		const tasks = new Tasks();
-		useTasks(() => <Unwrap source={promise} />, tasks);
+		inject(tasks, () => <Unwrap source={promise} />);
 		strictEqual(tasks.pending, true);
 		resolve();
 		await Promise.resolve();
@@ -48,7 +48,7 @@ await test("async/unwrap", async ctx => {
 	await ctx.test("inert task", async () => {
 		const [promise, resolve] = future();
 		const tasks = new Tasks();
-		useTasks(() => <Unwrap source={promise} inert />, tasks);
+		inject(tasks, () => <Unwrap source={promise} inert />);
 		strictEqual(tasks.pending, false);
 		resolve();
 		await Promise.resolve();

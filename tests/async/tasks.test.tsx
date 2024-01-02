@@ -1,7 +1,7 @@
 import test from "node:test";
 import { strictEqual } from "node:assert";
 
-import { Tasks, getTasks, isPending, isSelfPending, useTasks, waitFor, watch, wrapContext } from "@mxjp/gluon";
+import { Tasks, extract, inject, isPending, isSelfPending, waitFor, watch, wrapContext } from "@mxjp/gluon";
 
 import { assertEvents, future } from "../common.js";
 
@@ -81,17 +81,15 @@ await test("async/tasks", async ctx => {
 	});
 
 	await ctx.test("context api", async () => {
-		strictEqual(getTasks(), undefined);
-
 		strictEqual(isPending(), false);
 		strictEqual(isSelfPending(), false);
 
-		await useTasks(() => {
-			const outer = getTasks();
+		await inject(new Tasks(), () => {
+			const outer = extract(Tasks);
 			strictEqual(outer instanceof Tasks, true);
 
-			useTasks(() => {
-				strictEqual(getTasks()?.parent, outer);
+			inject(new Tasks(outer), () => {
+				strictEqual(extract(Tasks)?.parent, outer);
 			});
 
 			const [a, resolveA] = future();

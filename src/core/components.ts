@@ -1,4 +1,4 @@
-import { Context, ContextPairFor, ContextValueFor, ReadonlyContext, deriveContext, inject } from "./context.js";
+import { Context, ContextPair, ContextValueFor, ReadonlyContext, deriveContext, inject } from "./context.js";
 import { useUniqueId } from "./ids.js";
 import { Expression } from "./signals.js";
 import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view.js";
@@ -29,7 +29,7 @@ export function Inject<K>(props: {
 	value: ContextValueFor<K>,
 	children: () => unknown,
 } | {
-	value: ContextPairFor<K>,
+	value: ContextPair<K>,
 	children: () => unknown,
 }): unknown {
 	if ("key" in props) {

@@ -2,9 +2,12 @@ import { Attributes, createElement } from "./element.js";
 
 export const Fragment = Symbol.for("gluon:jsx-fragment");
 
-export function jsx(type: any, props: any): unknown {
+export function jsx(type: any, props: any, key: any): unknown {
 	if (type === Fragment) {
 		return props.children;
+	}
+	if (key !== undefined) {
+		props.key = key;
 	}
 	if (typeof type === "function") {
 		return type(props);
@@ -12,9 +15,12 @@ export function jsx(type: any, props: any): unknown {
 	return createElement(type, props, [props.children], true);
 }
 
-export function jsxs(type: any, props: any): unknown {
+export function jsxs(type: any, props: any, key: any): unknown {
 	if (type === Fragment) {
 		return props.children;
+	}
+	if (key !== undefined) {
+		props.key = key;
 	}
 	if (typeof type === "function") {
 		return type(props);

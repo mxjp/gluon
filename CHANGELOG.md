@@ -5,6 +5,7 @@
 + Add value type to XMLNS context key.
 + Add value type ro ROUTER context key.
 + Support arbitrarily nested arrays and expressions as class & style attribute values.
++ Fix missing key properties in jsx expressions.
 + **Breaking:** Drop support for css strings in style attributes.
 + **Breaking:** Remove `useNamespace` and `UseNamespace`. Use `inject` or `deriveContext` instead.
 + **Breaking:** Remove `useTasks` and `getTasks`. Use `inject` or `deriveContext` instead.

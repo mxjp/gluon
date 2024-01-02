@@ -1,4 +1,4 @@
-import { QueryInit, Router, Routes, UseRouter, getRouter, normalize, sig } from "@mxjp/gluon";
+import { Inject, QueryInit, ROUTER, Router, Routes, extract, normalize, sig } from "@mxjp/gluon";
 
 import { Box } from "./components/box";
 import { Row } from "./components/row";
@@ -7,7 +7,7 @@ import { Button } from "./components/button";
 let nextCycle = 0;
 
 function ContextInfo() {
-	const router = getRouter();
+	const router = extract(ROUTER)!;
 	const cycle = nextCycle++;
 	return <div>path={() => router.path || "/"} cycle={cycle}</div>;
 }
@@ -15,7 +15,7 @@ function ContextInfo() {
 function Link(props: {
 	path: string;
 }) {
-	const router = getRouter();
+	const router = extract(ROUTER)!;
 	return <Button action={() => {
 		router.push(props.path);
 	}}>
@@ -24,47 +24,45 @@ function Link(props: {
 }
 
 export function example() {
-	return <>
-		<div>This example demonstrates gluon's standard routing using a custom router implementation.</div>
-		<div>The green boxes indicate different routing contexts and the cycles indicate when elements are re-rendered.</div>
-		<Box>
-			<UseRouter router={new CustomRouter()}>
-				{() => <>
-					<ContextInfo />
-					<Row>
-						<Link path="/" />
-						<Link path="/foo" />
-						<Link path="/bar" />
-					</Row>
-					<Box>
-						<Routes routes={[
-							{
-								path: "/foo/",
-								content: () => <>
-									<ContextInfo />
-									<Row>
-										<Link path="/" />
-										<Link path="/a" />
-										<Link path="/b" />
-									</Row>
-								</>,
-							},
-							{
-								path: "",
-								content: () => <>
-									Home
-									<ContextInfo />
-								</>,
-							},
-							{
-								content: () => "Fallback",
-							},
-						]} />
-					</Box>
-				</>}
-			</UseRouter>
-		</Box>
-	</>;
+	return <Inject key={ROUTER} value={new CustomRouter()}>
+		{() => <>
+			<div>This example demonstrates gluon's standard routing using a custom router implementation.</div>
+			<div>The green boxes indicate different routing contexts and the cycles indicate when elements are re-rendered.</div>
+			<Box>
+				<ContextInfo />
+				<Row>
+					<Link path="/" />
+					<Link path="/foo" />
+					<Link path="/bar" />
+				</Row>
+				<Box>
+					<Routes routes={[
+						{
+							path: "/foo/",
+							content: () => <>
+								<ContextInfo />
+								<Row>
+									<Link path="/" />
+									<Link path="/a" />
+									<Link path="/b" />
+								</Row>
+							</>,
+						},
+						{
+							path: "",
+							content: () => <>
+								Home
+								<ContextInfo />
+							</>,
+						},
+						{
+							content: () => "Fallback",
+						},
+					]} />
+				</Box>
+			</Box>
+		</>}
+	</Inject>;
 }
 
 class CustomRouter implements Router {

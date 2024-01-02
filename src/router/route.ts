@@ -1,8 +1,9 @@
+import { extract, inject } from "../core/context.js";
 import { Expression, Signal, get, sig, watch } from "../core/signals.js";
 import { View, nest } from "../core/view.js";
 import { ChildRouter } from "./child-router.js";
 import { normalize } from "./path.js";
-import { getRouter, useRouter } from "./router.js";
+import { ROUTER } from "./router.js";
 
 export interface RouteMatchFn {
 	(path: string): string | [string, unknown] | undefined;
@@ -159,16 +160,17 @@ export interface ContentRoute extends Route {
 }
 
 export function routes(routes: ContentRoute[]): View {
-	const router = getRouter();
+	const router = extract(ROUTER);
+	if (!router) {
+		throw new Error("router not available");
+	}
 	const watched = watchRoutes(() => router.path, routes);
 	return nest(() => {
 		const match = watched.match;
 		if (match) {
-			return () => {
-				return useRouter(new ChildRouter(router, match.path, () => watched.rest), () => {
-					return match.route.content(match.params);
-				});
-			};
+			return () => inject([ROUTER, new ChildRouter(router, match.path, () => watched.rest)], () => {
+				return match.route.content(match.params);
+			});
 		}
 	});
 }

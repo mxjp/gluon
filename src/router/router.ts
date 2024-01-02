@@ -1,4 +1,4 @@
-import { extract, inject } from "../core/context.js";
+import { ContextKeyFor, extract, inject } from "../core/context.js";
 
 export interface Router {
 	/**
@@ -27,16 +27,4 @@ export interface Router {
 
 export type QueryInit = ConstructorParameters<typeof URLSearchParams>[0];
 
-const ROUTER = Symbol.for("gluon:router");
-
-export function getRouter(): Router {
-	const router = extract(ROUTER) as Router | undefined;
-	if (!router) {
-		throw new Error("router is not available");
-	}
-	return router;
-}
-
-export function useRouter<T>(router: Router, fn: () => T) {
-	return inject([ROUTER, router], fn);
-}
+export const ROUTER = Symbol.for("gluon:router") as ContextKeyFor<Router>;

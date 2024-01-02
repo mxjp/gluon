@@ -784,36 +784,38 @@ window.addEventListener("keydown", () => { ... }, { signal: useAbortSignal() });
 Routers provide a reactive path and query parameters and allow navigating in their current context.
 
 Currently, there is a **HistoryRouter** that uses the location and history API and a **HashRouter** that uses the location hash as the path. You can also implement custom routers by implementing the **Router** interface.
-
-The **useRouter** function or **UseRouter** component can be used to provide a router to a context:
 ```tsx
-import { mount, UseRouter, HistoryRouter } from "@mxjp/gluon";
+import { mount, Inject, HistoryRouter } from "@mxjp/gluon";
 
 mount(
   document.body,
-  <UseRouter router={new HistoryRouter()}>
-    Everything in here has access to the history router.
-  </UseRouter>
+  <Inject key={ROUTER} value={new HistoryRouter()}>
+    {() => <>
+      Everything in here has access to the history router.
+    </>}
+  </Inject>
 );
 ```
 
 The **routes** function or **Routes** component can be used to render content based on the current path.
 ```tsx
-import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
+import { mount, UseRouter, HistoryRouter, ROUTER, Routes } from "@mxjp/gluon";
 
 mount(
   document.body,
-  <UseRouter router={new HistoryRouter()}>
-    <Routes routes={[
-      { path: "/", content: () => "Home" },
-      { path: "/foo", content: ExamplePage },
-      { content: () => "Not found" },
-    ]} />
-  </UseRouter>
+  <Inject key={ROUTER} value={new HistoryRouter()}>
+    {() => <>
+      <Routes routes={[
+        { path: "/", content: () => "Home" },
+        { path: "/foo", content: ExamplePage },
+        { content: () => "Not found" },
+      ]} />
+    </>}
+  </Inject>
 );
 
 function ExamplePage() {
-  return "Example";
+  return <>Example</>;
 }
 ```
 
@@ -823,7 +825,7 @@ The router in the current context can be used for navigation.
 Routers implement a **push** function for regular navigation and a **replace** function for replacing the current path if possible.
 ```tsx
 function ExamplePage() {
-  const router = getRouter().root;
+  const router = extract(ROUTER).root;
   return <button $click={() => {
     router.push("/some-path");
   }}>Navigate</button>;
@@ -849,11 +851,13 @@ function Example(props) {
 
 mount(
   document.body,
-  <UseRouter router={new HistoryRouter()}>
-    <Routes routes={[
-      { path: /^\/books\/(\d+)(?:\/|$)/, content: Example },
-    ]} />
-  </UseRouter>
+  <Inject key={ROUTER} value={new HistoryRouter()}>
+    {() => <>
+      <Routes routes={[
+        { path: /^\/books\/(\d+)(?:\/|$)/, content: Example },
+      ]} />
+    </>}
+  </Inject>
 );
 ```
 
@@ -866,18 +870,20 @@ import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
 
 mount(
   document.body,
-  <UseRouter router={new HistoryRouter()}>
-    <Routes routes={[
-      { path: "/", content: () => "Home" },
-      { path: "/foo/", content: () => {
-        const innerRouter = getRouter();
-        return <Routes routes={[
-          { path: "/bar", content: () => "Bar" },
-          { path: "/baz", content: () => "Baz" },
-        ]} />;
-      } },
-    ]} />
-  </UseRouter>
+  <Inject key={ROUTER} value={new HistoryRouter()}>
+    {() => <>
+      <Routes routes={[
+        { path: "/", content: () => "Home" },
+        { path: "/foo/", content: () => {
+          const innerRouter = extract(ROUTER);
+          return <Routes routes={[
+            { path: "/bar", content: () => "Bar" },
+            { path: "/baz", content: () => "Baz" },
+          ]} />;
+        } },
+      ]} />
+    </>}
+  </Inject>
 );
 ```
 The router instance is replaced with a [child router](#nested-routing) inside of routed content which only expose the unmatched rest path and navigate within the matched path. In the example above, the **innerRouter** navigates within **/foo**:

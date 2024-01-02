@@ -64,10 +64,6 @@ export function appendContent(node: Node, content: unknown) {
 	}
 }
 
-type EventAttributes = {
-	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
-};
-
 export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean>> | ClassValue[]>;
 
 export type StyleMap = { [K in keyof CSSStyleDeclaration]?: Expression<CSSStyleDeclaration[K]> };
@@ -76,16 +72,18 @@ export type StyleValue = Expression<StyleMap | StyleValue[]>;
 type SpecialAttributes = {
 	class?: ClassValue;
 	style?: StyleValue;
+} | {
+	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
 };
 
 type GenericAttributes = {
-	[K in Exclude<string, keyof EventAttributes | keyof SpecialAttributes>]: Expression<unknown>;
+	[K in Exclude<string, keyof SpecialAttributes>]: Expression<unknown>;
 };
 
 /**
  * Represents an object with element attributes.
  */
-export type Attributes = EventAttributes & SpecialAttributes & GenericAttributes;
+export type Attributes = SpecialAttributes & GenericAttributes;
 
 function isProp(obj: object, name: string): boolean {
 	if (name in obj) {

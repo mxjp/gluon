@@ -2,6 +2,7 @@ import { Iter, Nest, When } from "@mxjp/gluon";
 import { Bench, BenchResult, Group } from "./benchmarks/common";
 import classes from "./benchmarks/common.module.css";
 import { Button } from "./components/button";
+import { renderingBenches } from "./benchmarks/rendering";
 
 export function example() {
 	return <>
@@ -56,8 +57,5 @@ function Entry(props: {
 }
 
 const root = new Group("All", [
-	new Group("Rendering", [
-		new Bench("Attribute Prop Test", () => import("./benchmarks/rendering/attr-prop-test")),
-		new Bench("Attribute Non-Prop Test", () => import("./benchmarks/rendering/attr-non-prop-test")),
-	]),
+	renderingBenches,
 ]);

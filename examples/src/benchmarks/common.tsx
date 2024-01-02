@@ -32,11 +32,14 @@ export class Group {
 
 export class Bench {
 	#status = sig<Status>({ type: "none" });
+	#run: () => Promise<BenchResult>;
 
 	constructor(
 		public name: string,
-		public module: () => Promise<BenchModule>,
-	) {}
+		run: () => Promise<BenchResult>,
+	) {
+		this.#run = run;
+	}
 
 	get status() {
 		return this.#status.value;
@@ -45,9 +48,7 @@ export class Bench {
 	async run() {
 		this.#status.value = { type: "running" };
 		try {
-			await wait(100);
-			const module = await this.module();
-			const result = await module.run();
+			const result = await this.#run();
 			this.#status.value = { type: "done", result };
 		} catch (error) {
 			console.error(error);
@@ -60,20 +61,25 @@ export interface BenchModule {
 	run(): Promise<BenchResult> | BenchResult;
 }
 
-export function offscreenSync(options: {
+export async function offscreenSync(options: {
 	cycle: () => void;
 	sampleSize?: number;
 	warmupTime?: number;
 	time?: number;
-}): BenchResult {
+	cooldown?: number;
+}): Promise<BenchResult> {
 	const {
 		cycle,
 		sampleSize = 1_000_000,
 		warmupTime = 100,
 		time = 3_000,
+		cooldown = 100,
 	} = options;
+	await wait(100);
 	benchSync(cycle, sampleSize, warmupTime);
-	return benchSync(cycle, sampleSize, time);
+	const result = benchSync(cycle, sampleSize, time);
+	await wait(cooldown);
+	return result;
 }
 
 function benchSync(cycle: () => void, sampleSize: number, targetTime: number): BenchResult {

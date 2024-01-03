@@ -147,6 +147,7 @@ e("div") instanceof HTMLDivElement; // true
 All attributes except **class** and **style** are set using **setAttribute**.
 + When prefixed with `prop:` or `attr:` are always set as properties or using **setAttribute**.
 + Attributes set to **null**, **undefined** or **false** are removed.
++ Attributes set to **true** are set as an empty string.
 
 ```tsx
 import { mount } from "@mxjp/gluon";

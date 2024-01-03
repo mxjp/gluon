@@ -12,6 +12,7 @@
 + **Breaking:** Remove `useTasks` and `getTasks`. Use `inject` or `deriveContext` instead.
 + **Breaking:** Remove `@mxjp/gluon/router` exports. Use `@mxjp/gluon` instead.
 + **Breaking:** Remove `stylesheet` utility.
++ **Breaking:** Set all attributes except **class** and **style** as attributes by default. To set as properties, prefix attribute names with `prop:`.
 
 ## 1.3
 + Support context in expressions.

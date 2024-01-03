@@ -1,27 +1,6 @@
-import { isWritable } from "@mxjp/gluon";
 import { Bench, Group, offscreenSync } from "./common";
 
 export const renderingBenches = new Group("Rendering", [
-	new Group("Writable Properties", [
-		new Bench("Properties", () => {
-			const elem: HTMLElement = <div />;
-			return offscreenSync({
-				cycle() {
-					isWritable(elem, "style");
-				},
-			});
-		}),
-
-		new Bench("Non-Properties", () => {
-			const elem: HTMLElement = <div />;
-			return offscreenSync({
-				cycle() {
-					isWritable(elem, "foo-bar");
-				},
-			});
-		}),
-	]),
-
 	new Group("Create Element", [
 		new Bench("cloneNode", () => {
 			const template = document.createElement("template");

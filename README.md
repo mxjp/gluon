@@ -144,18 +144,22 @@ e("div") instanceof HTMLDivElement; // true
 ```
 
 ## Attributes
-Attributes are set using writable properties if possible and **setAttribute** otherwise.
+All attributes except **class** and **style** are set using **setAttribute**.
++ When prefixed with `prop:` or `attr:` are always set as properties or using **setAttribute**.
++ Attributes set to **null**, **undefined** or **false** are removed.
+
 ```tsx
 import { mount } from "@mxjp/gluon";
 
 mount(
   document.body,
-  <div
-    title="This is set using the title property."
-    something-else="This is set using setAttribute."
+  <input
+    type="text"
+    prop:value="Some text"
   />,
 );
 ```
+
 Attribute values can be expressions.
 ```tsx
 import { mount, sig } from "@mxjp/gluon";

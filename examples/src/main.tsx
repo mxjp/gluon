@@ -9,6 +9,7 @@ await new Promise(resolve => {
 
 const exampleNames: string[] = [
 	"counter",
+	"input",
 	"stopwatch",
 	"routing",
 	"movable",

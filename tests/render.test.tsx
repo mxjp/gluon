@@ -67,11 +67,13 @@ await test("render", async ctx => {
 			foo="bar"
 			class="a b"
 			data-bar="baz"
-			title="example"
+			attr:data-baz="boo"
+			prop:title="example"
 		/> as HTMLElement;
 		strictEqual(elem.getAttribute("foo"), "bar");
 		deepStrictEqual(Array.from(elem.classList), ["a", "b"]);
 		strictEqual(elem.dataset.bar, "baz");
+		strictEqual(elem.dataset.baz, "boo");
 		strictEqual(elem.title, "example");
 	});
 

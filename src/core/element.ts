@@ -70,6 +70,10 @@ type SpecialAttributes = {
 	style?: StyleValue;
 } | {
 	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
+} | {
+	[K in `prop:${string}`]?: Expression<unknown>;
+} | {
+	[K in `attr:${string}`]?: Expression<unknown>;
 };
 
 type GenericAttributes = {
@@ -81,57 +85,8 @@ type GenericAttributes = {
  */
 export type Attributes = SpecialAttributes & GenericAttributes;
 
-/**
- * Internal cache for writable properties per prototype and property name.
- */
-const PROP_CACHE = new WeakMap<object, Record<string, boolean>>();
-
-/**
- * Check if the specified object has a writable property.
- *
- * @deprecated This is considered internal API and might be changed or removed at any time.
- */
-export function isWritable(obj: object, name: string): boolean {
-	if (name in obj) {
-		const desc = Object.getOwnPropertyDescriptor(obj, name);
-		if (desc !== undefined) {
-			return Boolean(desc.writable ?? desc.set);
-		}
-		const proto = Object.getPrototypeOf(obj) as object | null;
-		if (proto !== null) {
-			const fromCache = PROP_CACHE.get(proto)?.[name];
-			if (fromCache !== undefined) {
-				return fromCache;
-			}
-			const result = isProtoWritable(proto, name);
-			const cache = PROP_CACHE.get(proto);
-			if (cache === undefined) {
-				PROP_CACHE.set(proto, { [name]: result });
-			} else {
-				cache[name] = result;
-			}
-			return result;
-		}
-	}
-	return false;
-}
-
-function isProtoWritable(obj: object, name: string) {
-	let proto: object | null = obj;
-	while (proto !== null) {
-		const desc = Object.getOwnPropertyDescriptor(proto, name);
-		if (desc !== undefined) {
-			return Boolean(desc.writable ?? desc.set);
-		}
-		proto = Object.getPrototypeOf(proto) as object | null;
-	}
-	return false;
-}
-
-function setAttr(elem: Element, name: string, value: unknown, prop: boolean): void {
-	if (prop) {
-		(elem as Record<string, any>)[name] = value;
-	} else if (value === null || value === undefined || value === false) {
+function setAttr(elem: Element, name: string, value: unknown): void {
+	if (value === null || value === undefined || value === false) {
 		elem.removeAttribute(name);
 	} else {
 		elem.setAttribute(name, value === true ? "" : value as string);
@@ -206,6 +161,12 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 			const capture = name.startsWith("$$");
 			const event = name.slice(capture ? 2 : 1);
 			elem.addEventListener(event, wrapContext(value as (event: Event) => void), { capture });
+		} else if (name.startsWith("prop:")) {
+			const prop = name.slice(5);
+			watch(value, value => (elem as any)[prop] = value);
+		} else if (name.startsWith("attr:")) {
+			const attr = name.slice(5);
+			watch(value, value => setAttr(elem, attr, value));
 		} else {
 			switch (name) {
 				case "style": {
@@ -227,9 +188,7 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 					continue attrs;
 				}
 			}
-
-			const prop = isWritable(elem, name);
-			watch(value, value => setAttr(elem, name, value, prop));
+			watch(value, value => setAttr(elem, name, value));
 		}
 	}
 }

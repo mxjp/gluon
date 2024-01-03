@@ -4,5 +4,4 @@ export * from "./ids.js";
 export * from "./lifecycle.js";
 export * from "./render.js";
 export * from "./signals.js";
-export * from "./styles.js";
 export * from "./view.js";

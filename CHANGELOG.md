@@ -11,6 +11,7 @@
 + **Breaking:** Remove `useNamespace` and `UseNamespace`. Use `inject` or `deriveContext` instead.
 + **Breaking:** Remove `useTasks` and `getTasks`. Use `inject` or `deriveContext` instead.
 + **Breaking:** Remove `@mxjp/gluon/router` exports. Use `@mxjp/gluon` instead.
++ **Breaking:** Remove `stylesheet` utility.
 
 ## 1.3
 + Support context in expressions.

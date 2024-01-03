@@ -41,9 +41,11 @@
 		"start:types": "tsc -p tsconfig-types.json -w --preserveWatchOutput",
 		"start:tests": "tsc -p tests/tsconfig.json -w --preserveWatchOutput",
 		"test": "node --enable-source-maps --test ./tests_out",
-		"prepack": "npm run build && npm test && node scripts/prepack.js"
+		"lint": "eslint --config .eslintrc.cjs ./{src,test}/**/*.{ts,tsx}",
+		"prepack": "npm run build && npm run lint && npm test && node scripts/prepack.js"
 	},
 	"devDependencies": {
+		"@mpt/eslint-rules": "^5.0.1",
 		"@mxjp/gluon": "file:.",
 		"@rollup/plugin-terser": "^0.4.4",
 		"@types/jsdom": "^21.1.6",

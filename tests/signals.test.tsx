@@ -1,12 +1,11 @@
-import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
+import test from "node:test";
 
 import { batch, capture, extract, inject, lazy, memo, sig, teardown, trigger, watch } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
 await test("signals", async ctx => {
-
 	await ctx.test("inert usage", () => {
 		const signal = sig(42);
 		strictEqual(signal.value, 42);
@@ -27,7 +26,6 @@ await test("signals", async ctx => {
 	});
 
 	await ctx.test("watch", async ctx => {
-
 		await ctx.test("static", () => {
 			const events: unknown[] = [];
 			watch(42, value => {
@@ -195,11 +193,9 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, ["e42", "c42"]);
 		});
-
 	});
 
 	await ctx.test("trigger", async ctx => {
-
 		await ctx.test("behavior", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
@@ -293,11 +289,9 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, []);
 		});
-
 	});
 
 	await ctx.test("memo", async ctx => {
-
 		await ctx.test("watch", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
@@ -342,11 +336,9 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, [9]);
 		});
-
 	});
 
 	await ctx.test("lazy", async ctx => {
-
 		await ctx.test("behavior", () => {
 			const events: unknown[] = [];
 			const a = sig(2);
@@ -514,7 +506,5 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, ["outer", 3]);
 		});
-
 	});
-
 });

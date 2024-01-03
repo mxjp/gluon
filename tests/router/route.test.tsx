@@ -1,11 +1,11 @@
-import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
+import test from "node:test";
 
-import { sig, watch, Route, matchRoute, watchRoutes } from "@mxjp/gluon";
+import { matchRoute, Route, sig, watch, watchRoutes } from "@mxjp/gluon";
+
 import { assertEvents } from "../common.js";
 
 await test("router/route", async ctx => {
-
 	await ctx.test("match", async () => {
 		function assert(
 			route: Route,
@@ -102,5 +102,4 @@ await test("router/route", async ctx => {
 		strictEqual(watched.match, undefined);
 		strictEqual(watched.rest, "");
 	});
-
 });

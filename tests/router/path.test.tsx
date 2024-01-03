@@ -4,7 +4,6 @@ import test from "node:test";
 import { join, normalize } from "@mxjp/gluon";
 
 await test("router/path", async ctx => {
-
 	await ctx.test("normalize", () => {
 		strictEqual(normalize(""), "");
 		strictEqual(normalize("/"), "");
@@ -56,5 +55,4 @@ await test("router/path", async ctx => {
 		strictEqual(join("/foo", "/bar/"), "/foo/bar/");
 		strictEqual(join("/foo/", "/bar/"), "/foo/bar/");
 	});
-
 });

@@ -1,5 +1,5 @@
-import { sig } from "../core/signals.js";
 import { extract } from "../core/context.js";
+import { sig } from "../core/signals.js";
 
 export type TaskSource = (() => unknown) | Promise<unknown> | null | undefined;
 
@@ -35,7 +35,7 @@ export class Tasks {
 	 * True if this instance or any of it's parents has any pending tasks.
 	 */
 	get pending(): boolean {
-		return this.#parent?.pending || this.#pending.value > 0;
+		return (this.#parent?.pending ?? false) || this.#pending.value > 0;
 	}
 
 	/**
@@ -46,7 +46,7 @@ export class Tasks {
 	waitFor(source: TaskSource): void {
 		if (typeof source === "function") {
 			this.#pending.value++;
-			(async () => {
+			void (async () => {
 				try {
 					await source();
 				} catch {}

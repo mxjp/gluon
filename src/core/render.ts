@@ -64,7 +64,7 @@ export function render(content: unknown): View {
 	}
 	return new View((setBoundary, self) => {
 		if (Array.isArray(content)) {
-			const flat = content.flat(Infinity);
+			const flat = content.flat(Infinity) as unknown[];
 			if (flat.length > 1) {
 				const parent = document.createDocumentFragment();
 				for (let i = 0; i < flat.length; i++) {
@@ -94,9 +94,8 @@ export function render(content: unknown): View {
 				}
 				setBoundary(parent.firstChild!, parent.lastChild!);
 				return;
-			} else {
-				content = flat[0];
 			}
+			content = flat[0];
 		}
 		if (content === null || content === undefined) {
 			const node = document.createComment("g");

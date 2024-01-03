@@ -1,7 +1,7 @@
-import { Context, ContextPair, ContextValueFor, ReadonlyContext, deriveContext, inject } from "./context.js";
+import { Context, ContextPair, ContextValueFor, deriveContext, inject, ReadonlyContext } from "./context.js";
 import { useUniqueId } from "./ids.js";
 import { Expression } from "./signals.js";
-import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view.js";
+import { iter, IterContentFn, map, MapContentFn, nest, show, when } from "./view.js";
 
 /**
  * Inject an entry.
@@ -25,18 +25,17 @@ import { IterContentFn, MapContentFn, iter, map, nest, show, when } from "./view
  * ```
  */
 export function Inject<K>(props: {
-	key: K,
-	value: ContextValueFor<K>,
-	children: () => unknown,
+	key: K;
+	value: ContextValueFor<K>;
+	children: () => unknown;
 } | {
-	value: ContextPair<K>,
-	children: () => unknown,
+	value: ContextPair<K>;
+	children: () => unknown;
 }): unknown {
 	if ("key" in props) {
 		return inject([props.key, props.value], props.children);
-	} else {
-		return inject(props.value, props.children);
 	}
+	return inject(props.value, props.children);
 }
 
 /**
@@ -120,17 +119,17 @@ export function When<T>(props: {
 	/**
 	 * The expression to evaluate.
 	 */
-	value: Expression<T | Falsy>,
+	value: Expression<T | Falsy>;
 
 	/**
 	 * A function to create content if the value is truthy.
 	 */
-	children: (value: T) => unknown,
+	children: (value: T) => unknown;
 
 	/**
 	 * An optional function to create content if the value is falsy.
 	 */
-	else?: () => unknown,
+	else?: () => unknown;
 }): unknown {
 	return when(props.value, props.children, props.else);
 }
@@ -222,7 +221,7 @@ export function Show(props: {
 	/**
 	 * The expression to evaluate.
 	 */
-	when: Expression<boolean>,
+	when: Expression<boolean>;
 
 	children?: unknown;
 }): unknown {
@@ -249,6 +248,6 @@ export function Show(props: {
  */
 export function UseUniqueId(props: {
 	children: (id: string) => unknown;
-}) {
+}): unknown {
 	return useUniqueId(props.children);
 }

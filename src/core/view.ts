@@ -1,6 +1,6 @@
+import { capture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
-import { TeardownHook, capture, teardown } from "./lifecycle.js";
-import { Expression, Signal, memo, get, sig, watch } from "./signals.js";
+import { Expression, get, memo, sig, Signal, watch } from "./signals.js";
 
 /**
  * A function that is called when the view boundary may have been changed.
@@ -178,9 +178,8 @@ export function when<T>(value: Expression<T | Falsy>, thenFn: (value: T) => unkn
 		const value = getValue();
 		if (value) {
 			return () => thenFn(value);
-		} else {
-			return elseFn;
 		}
+		return elseFn;
 	});
 }
 
@@ -250,7 +249,6 @@ export function map<T>(expr: Expression<Iterable<T>>, content: MapContentFn<T>):
 					instance.index.value = index;
 					last = instance.view.last;
 					index++;
-
 				} else {
 					instance = instanceMap.get(value);
 					if (instance === undefined) {
@@ -282,7 +280,6 @@ export function map<T>(expr: Expression<Iterable<T>>, content: MapContentFn<T>):
 						instanceMap.set(value, instance);
 						last = instance.view.last;
 						index++;
-
 					} else if (instance.cycle !== cycle) {
 						instance.index.value = index;
 						instance.cycle = cycle;
@@ -467,7 +464,7 @@ export class MovableView {
 /**
  * Render and wrap arbitrary content so that it can be moved and reused.
  */
-export function movable(content: unknown) {
+export function movable(content: unknown): MovableView {
 	return new MovableView(render(content));
 }
 

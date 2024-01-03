@@ -22,5 +22,6 @@ for (const key of [
 	"CustomEvent",
 	"MouseEvent",
 ]) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	(globalThis as any)[key] = dom.window[key];
 }

@@ -1,4 +1,4 @@
-import { ContextKeyFor, extract, inject } from "../core/context.js";
+import { ContextKeyFor } from "../core/context.js";
 
 export interface Router {
 	/**
@@ -21,7 +21,17 @@ export interface Router {
 	 */
 	get query(): URLSearchParams | undefined;
 
+	/**
+	 * Navigate to the specified path within the path this router is mounted in.
+	 *
+	 * @param path The path. This may not be normalized.
+	 * @param query The query part.
+	 */
 	push(path: string, query?: QueryInit): void;
+
+	/**
+	 * Same as {@link push}, but replaces the URL in history if possible.
+	 */
 	replace(path: string, query?: QueryInit): void;
 }
 

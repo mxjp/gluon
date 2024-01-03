@@ -20,8 +20,8 @@ export type ContextKeyFor<V> = symbol & { PHANTOM_CONTEXT_KEY_FOR: V & never };
  */
 export type ContextValueFor<K>
 	= K extends (new(...args: any) => infer T) ? T
-	: K extends ContextKeyFor<infer V> ? V
-	: unknown;
+		: K extends ContextKeyFor<infer V> ? V
+			: unknown;
 
 /**
  * A key value pair or instance for a specific type of key.
@@ -88,7 +88,7 @@ export function inject<K, R>(value: ContextPair<K>, fn: () => R): R {
 	if (Array.isArray(value)) {
 		context.set(value[0], value[1]);
 	} else {
-		const constructor = (value as any).constructor;
+		const constructor = (value as any).constructor as unknown;
 		if (typeof constructor !== "function") {
 			throw new TypeError("value must have a constructor");
 		}
@@ -133,10 +133,10 @@ export function runInContext<R>(context: ReadonlyContext | undefined, fn: () => 
  */
 export function wrapContext<T extends (...args: any) => any>(fn: T): T {
 	const context = getContext();
-	return ((...args) => {
+	return ((...args: unknown[]) => {
 		CONTEXT_STACK.push(context);
 		try {
-			return fn(...args);
+			return fn(...args) as T;
 		} finally {
 			CONTEXT_STACK.pop();
 		}

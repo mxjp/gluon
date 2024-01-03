@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { jsx } from "./jsx-runtime.js";
 
 export * from "./jsx-runtime.js";

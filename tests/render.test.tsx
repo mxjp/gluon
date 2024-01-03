@@ -1,11 +1,11 @@
 import "./env.js";
 
-import test from "node:test";
 import { deepStrictEqual, strictEqual } from "node:assert";
-import { StyleMap, extract, inject, sig } from "@mxjp/gluon";
+import test from "node:test";
+
+import { extract, inject, sig, StyleMap } from "@mxjp/gluon";
 
 await test("jsx-runtime", async ctx => {
-
 	await ctx.test("element content", () => {
 		strictEqual((<div />).outerHTML, "<div></div>");
 		strictEqual((<div></div>).outerHTML, "<div></div>");
@@ -20,6 +20,7 @@ await test("jsx-runtime", async ctx => {
 				$click={event => {
 					strictEqual(extract("foo"), "bar");
 					// Don't remove, only for testing the type:
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 					const _: MouseEvent = event;
 					events.push(event);
 				}}
@@ -27,7 +28,7 @@ await test("jsx-runtime", async ctx => {
 					strictEqual(extract("foo"), "bar");
 					events.push(event);
 				}}
-			/>
+			/> as HTMLElement;
 		});
 		const a = new MouseEvent("click");
 		elem.dispatchEvent(a);
@@ -43,6 +44,7 @@ await test("jsx-runtime", async ctx => {
 				$$click={event => {
 					strictEqual(extract("foo"), "bar");
 					// Don't remove, only for testing the type:
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 					const _: MouseEvent = event;
 
 					events.push(event);
@@ -51,7 +53,7 @@ await test("jsx-runtime", async ctx => {
 					strictEqual(extract("foo"), "bar");
 					events.push(event);
 				}}
-			/>;
+			/> as HTMLElement;
 		});
 		const a = new MouseEvent("click");
 		elem.dispatchEvent(a);
@@ -66,7 +68,7 @@ await test("jsx-runtime", async ctx => {
 			class="a b"
 			data-bar="baz"
 			title="example"
-		/>;
+		/> as HTMLElement;
 		strictEqual(elem.getAttribute("foo"), "bar");
 		deepStrictEqual(Array.from(elem.classList), ["a", "b"]);
 		strictEqual(elem.dataset.bar, "baz");
@@ -75,7 +77,7 @@ await test("jsx-runtime", async ctx => {
 
 	await ctx.test("removed attribute", () => {
 		const signal = sig<any>(false);
-		const elem: HTMLElement = <div test-attr={signal} />;
+		const elem = <div test-attr={signal} /> as HTMLElement;
 		strictEqual(elem.getAttribute("test-attr"), null);
 
 		signal.value = true;
@@ -97,7 +99,7 @@ await test("jsx-runtime", async ctx => {
 	await ctx.test("class attribute", () => {
 		const a = sig("a");
 		const d = sig(false);
-		const elem: HTMLElement = <div class={() => [
+		const elem = <div class={() => [
 			a.value,
 			"b",
 			undefined,
@@ -107,7 +109,7 @@ await test("jsx-runtime", async ctx => {
 				c: true,
 				d,
 			},
-		]} />;
+		]} /> as HTMLElement;
 		deepStrictEqual(Array.from(elem.classList), ["a", "b", "c"]);
 		a.value = "foo";
 		deepStrictEqual(Array.from(elem.classList), ["foo", "b", "c"]);
@@ -119,7 +121,7 @@ await test("jsx-runtime", async ctx => {
 		const a = sig<StyleMap>({ color: "blue" });
 		const b = sig("red");
 		const c = sig<StyleMap>({ width: "42px" });
-		const elem: HTMLElement = <div style={[
+		const elem = <div style={[
 			a,
 			() => [
 				[
@@ -127,7 +129,7 @@ await test("jsx-runtime", async ctx => {
 				],
 				c.value,
 			],
-		]} />;
+		]} /> as HTMLElement;
 		strictEqual(elem.style.color, "red");
 		strictEqual(elem.style.width, "42px");
 		c.value = { width: "7px" };
@@ -151,7 +153,7 @@ await test("jsx-runtime", async ctx => {
 	});
 
 	await ctx.test("api types", () => {
-		const elem = <div />;
+		const elem = <div /> as HTMLElement;
 		strictEqual(elem instanceof HTMLDivElement, true);
 		elem.classList.add("foo");
 		elem.click();
@@ -171,15 +173,14 @@ await test("jsx-runtime", async ctx => {
 				foo
 				{[[<span>bar{42}</span>]]}
 			</>
-		</div>;
+		</div> as HTMLElement;
 
 		strictEqual(elem.outerHTML, [
 			`<div>`,
-				`<input type="text">`,
-				`foo`,
-				`<span>bar42</span>`,
+			`<input type="text">`,
+			`foo`,
+			`<span>bar42</span>`,
 			`</div>`,
 		].join(""));
 	});
-
 });

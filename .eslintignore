@@ -1,0 +1,8 @@
+/node_modules
+/build
+/dist
+/tests_out
+*.js
+*.cjs
+*.mjs
+*.html

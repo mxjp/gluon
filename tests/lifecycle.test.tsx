@@ -1,11 +1,10 @@
 import test from "node:test";
 
-import { TeardownHook, capture, teardown, uncapture } from "@mxjp/gluon";
+import { capture, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
 await test("lifecycle", async ctx => {
-
 	await ctx.test("inert use", () => {
 		teardown(() => {
 			throw new Error("this should not happen");
@@ -38,7 +37,6 @@ await test("lifecycle", async ctx => {
 					events.push(6);
 				});
 			});
-
 		});
 
 		assertEvents(events, [0, 1, 3, 5]);
@@ -47,5 +45,4 @@ await test("lifecycle", async ctx => {
 		inner();
 		assertEvents(events, [6]);
 	});
-
 });

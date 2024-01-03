@@ -1,5 +1,5 @@
 import { getContext, runInContext, wrapContext } from "./context.js";
-import { TeardownHook, capture, teardown, uncapture } from "./lifecycle.js";
+import { capture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 
 /**
  * A function that is stored inside any accessed signals alongside a cycle.
@@ -356,14 +356,13 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
 		const triggers = TRIGGERS_STACK[TRIGGERS_STACK.length - 1];
 		triggers.push([
 			cycle => uncapture(() => fn(cycle)),
-			cycle
+			cycle,
 		]);
 		try {
 			if (expr instanceof Signal) {
 				return expr.value;
-			} else {
-				return (expr as () => T)();
 			}
+			return (expr as () => T)();
 		} finally {
 			triggers.pop();
 		}
@@ -451,7 +450,7 @@ export function lazy<T>(expr: Expression<T>): () => T {
 	let current = false;
 
 	let proxyMap = new Map<DependantFn, number>();
-	const proxy: Dependant = [(accessedCycle) => {
+	const proxy: Dependant = [accessedCycle => {
 		if (proxy[1] === accessedCycle) {
 			proxy[1]++;
 			const map = proxyMap;
@@ -552,9 +551,9 @@ export function track<T>(fn: () => T): T {
 export function get<T>(expr: Expression<T>): T {
 	if (expr instanceof Signal) {
 		return expr.value;
-	} else if (typeof expr === "function") {
-		return (expr as () => T)();
-	} else {
-		return expr;
 	}
+	if (typeof expr === "function") {
+		return (expr as () => T)();
+	}
+	return expr;
 }

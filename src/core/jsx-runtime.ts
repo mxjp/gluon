@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Attributes, createElement } from "./element.js";
 
 export const Fragment = Symbol.for("gluon:jsx-fragment");

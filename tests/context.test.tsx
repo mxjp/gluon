@@ -1,10 +1,9 @@
+import { strictEqual } from "node:assert";
 import test from "node:test";
 
 import { deriveContext, extract, inject } from "@mxjp/gluon";
-import { strictEqual } from "node:assert";
 
 await test("context", async ctx => {
-
 	await ctx.test("nesting", () => {
 		strictEqual(extract("foo"), undefined);
 
@@ -23,5 +22,4 @@ await test("context", async ctx => {
 
 		strictEqual(extract("foo"), undefined);
 	});
-
 });

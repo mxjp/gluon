@@ -1,12 +1,11 @@
-import test from "node:test";
 import { strictEqual } from "node:assert";
+import test from "node:test";
 
-import { Tasks, extract, inject, isPending, isSelfPending, waitFor, watch, wrapContext } from "@mxjp/gluon";
+import { extract, inject, isPending, isSelfPending, Tasks, waitFor, watch, wrapContext } from "@mxjp/gluon";
 
 import { assertEvents, future } from "../common.js";
 
 await test("async/tasks", async ctx => {
-
 	await ctx.test("waitFor", async () => {
 		const parent = new Tasks();
 		const inner = new Tasks(parent);
@@ -110,5 +109,4 @@ await test("async/tasks", async ctx => {
 				}));
 		});
 	});
-
 });

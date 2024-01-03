@@ -1,5 +1,5 @@
-import { View, nest } from "../core/view.js";
 import { sig } from "../core/signals.js";
+import { nest, View } from "../core/view.js";
 import { waitFor } from "./tasks.js";
 
 export interface UnwrapOptions<T> {
@@ -58,8 +58,8 @@ export function unwrap<T>(options: UnwrapOptions<T>): View {
 
 	promise.then(value => {
 		state.value = { type: "resolved", value };
-	}, value => {
-		state.value = { type: "rejected", value }
+	}, (value: unknown) => {
+		state.value = { type: "rejected", value };
 	});
 
 	if (!inert) {

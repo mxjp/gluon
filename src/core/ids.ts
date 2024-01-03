@@ -7,7 +7,7 @@ const NEXT = Symbol.for("gluon:next_id");
  * @returns The unique id.
  */
 export function uniqueId(): string {
-	const id = (globalThis as any)[NEXT] ?? 0;
+	const id = ((globalThis as any)[NEXT] as number | undefined) ?? 0;
 	(globalThis as any)[NEXT] = id + 1;
 	return `gluon_${id}`;
 }

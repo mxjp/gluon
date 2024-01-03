@@ -8,7 +8,7 @@
  * @param preserveDir True to keep trailing slashes.
  * @returns The normalized path.
  */
-export function normalize(path: string, preserveDir = true) {
+export function normalize(path: string, preserveDir = true): string {
 	if (path === "/" || path === "") {
 		return "";
 	}

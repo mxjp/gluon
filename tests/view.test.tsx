@@ -1,13 +1,13 @@
 import "./env.js";
 
-import test from "node:test";
 import { notStrictEqual, strictEqual, throws } from "node:assert";
+import test from "node:test";
 
-import { View, capture, iter, map, nest, render, movable, sig, teardown, watch, when, show, mount } from "@mxjp/gluon";
-import { TestView, assertEvents, boundaryEvents, testView, text } from "./common.js";
+import { capture, iter, map, mount, movable, nest, render, show, sig, teardown, View, watch, when } from "@mxjp/gluon";
+
+import { assertEvents, boundaryEvents, TestView, testView, text } from "./common.js";
 
 await test("view", async ctx => {
-
 	await ctx.test("init incomplete", () => {
 		throws(() => new View(() => {}));
 		throws(() => new View(setBoundary => {
@@ -20,7 +20,7 @@ await test("view", async ctx => {
 
 	await ctx.test("init single node", () => {
 		const view = new View(setBoundary => {
-			const node = <div>test</div>;
+			const node = <div>test</div> as HTMLElement;
 			setBoundary(node, node);
 		});
 
@@ -68,8 +68,8 @@ await test("view", async ctx => {
 		let node!: Node;
 		let parent!: Node;
 		const view = new View(setBoundary => {
-			node = <div>test</div>;
-			parent = <div>{node}</div>;
+			node = <div>test</div> as HTMLElement;
+			parent = <div>{node}</div> as HTMLElement;
 			setBoundary(node, node);
 		});
 		strictEqual(node.parentNode, parent);
@@ -81,8 +81,8 @@ await test("view", async ctx => {
 		let node!: Node;
 		let parent!: Node;
 		const view = new View(setBoundary => {
-			node = <div>test</div>;
-			parent = <div>{node}</div>;
+			node = <div>test</div> as HTMLElement;
+			parent = <div>{node}</div> as HTMLElement;
 			setBoundary(node, node);
 		});
 		strictEqual(node.parentNode, parent);
@@ -108,7 +108,7 @@ await test("view", async ctx => {
 	});
 
 	await ctx.test("mount", async () => {
-		const root = <div />;
+		const root = <div /> as HTMLElement;
 		strictEqual(text(root), "");
 		let view!: View;
 		const signal = sig(1);
@@ -126,7 +126,6 @@ await test("view", async ctx => {
 	});
 
 	await ctx.test("nest", async ctx => {
-
 		await ctx.test("lifecycle", () => {
 			const events: unknown[] = [];
 			const signal = sig(0);
@@ -143,7 +142,7 @@ await test("view", async ctx => {
 						teardown(() => {
 							events.push(`-${value}`);
 						});
-						return <div>{value}</div>;
+						return <div>{value}</div> as HTMLElement;
 					};
 				});
 			});
@@ -169,7 +168,7 @@ await test("view", async ctx => {
 			const inner = sig<TestView | undefined>(undefined);
 
 			let view!: View;
-			const dispose = capture(() => {
+			capture(() => {
 				view = nest(() => {
 					const view = inner.value?.view;
 					return () => view;
@@ -199,7 +198,6 @@ await test("view", async ctx => {
 			strictEqual(text(view.take()), "");
 			assertEvents(events, [""]);
 		});
-
 	});
 
 	await ctx.test("when", () => {
@@ -255,7 +253,6 @@ await test("view", async ctx => {
 	});
 
 	await ctx.test("map", async ctx => {
-
 		function sequenceTest(sequence: unknown[][]) {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
@@ -354,12 +351,10 @@ await test("view", async ctx => {
 				ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
 				throw error;
 			}
-		})
-
+		});
 	});
 
 	await ctx.test("iter", async ctx => {
-
 		function sequenceTest(sequence: unknown[][]) {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
@@ -410,7 +405,6 @@ await test("view", async ctx => {
 				[],
 			]);
 		});
-
 	});
 
 	await ctx.test("movable", async () => {
@@ -462,5 +456,4 @@ await test("view", async ctx => {
 		signal.value = true;
 		strictEqual(text(view.take()), "inner: 4");
 	});
-
 });

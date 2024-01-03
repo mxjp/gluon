@@ -1,6 +1,7 @@
-/node_modules
 /build
 /dist
+/examples
+/node_modules
 /tests_out
 *.js
 *.cjs

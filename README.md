@@ -886,7 +886,7 @@ mount(
   </Inject>
 );
 ```
-The router instance is replaced with a [child router](#nested-routing) inside of routed content which only expose the unmatched rest path and navigate within the matched path. In the example above, the **innerRouter** navigates within **/foo**:
+The router instance is replaced with a [child router](#nested-routing) inside of routed content which only exposes the unmatched rest path and navigates within the matched path. In the example above, the **innerRouter** navigates within **/foo**:
 ```tsx
 // Navigates to /foo/bar:
 innerRouter.push("/bar");

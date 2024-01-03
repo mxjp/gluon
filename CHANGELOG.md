@@ -4,7 +4,7 @@
 + Add support for generic boolean attributes.
 + Add utility for phantom typed context key-value pairs.
 + Add value type to XMLNS context key.
-+ Add value type ro ROUTER context key.
++ Add value type to ROUTER context key.
 + Support arbitrarily nested arrays and expressions as class & style attribute values.
 + Fix missing key properties in jsx expressions.
 + **Breaking:** Drop support for css strings in style attributes.

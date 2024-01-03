@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { extract, inject, sig, StyleMap } from "@mxjp/gluon";
 
-await test("jsx-runtime", async ctx => {
+await test("render", async ctx => {
 	await ctx.test("element content", () => {
 		strictEqual((<div />).outerHTML, "<div></div>");
 		strictEqual((<div></div>).outerHTML, "<div></div>");

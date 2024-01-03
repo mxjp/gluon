@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, extract, get, inject, lazy, mapper, memo, sig, string, teardown, trigger, watch } from "@mxjp/gluon";
+import { batch, capture, extract, get, inject, lazy, mapper, memo, optionalString, sig, string, teardown, trigger, watch } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
@@ -530,8 +530,8 @@ await test("signals", async ctx => {
 	});
 
 	await ctx.test("optionalString", () => {
-		strictEqual(get(string(42)), "42");
-		strictEqual(get(string(null)), null);
-		strictEqual(get(string(undefined)), undefined);
+		strictEqual(get(optionalString(42)), "42");
+		strictEqual(get(optionalString(null)), null);
+		strictEqual(get(optionalString(undefined)), undefined);
 	});
 });

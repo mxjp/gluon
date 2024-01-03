@@ -1,30 +1,45 @@
-import { e, isWritable } from "@mxjp/gluon";
+import { isWritable } from "@mxjp/gluon";
 import { Bench, Group, offscreenSync } from "./common";
 
 export const renderingBenches = new Group("Rendering", [
-	new Bench("Attribute Prop Test", () => {
-		const elem: HTMLElement = <div />;
-		return offscreenSync({
-			cycle() {
-				isWritable(elem, "style");
-			},
-		});
-	}),
+	new Group("Writable Properties", [
+		new Bench("Properties", () => {
+			const elem: HTMLElement = <div />;
+			return offscreenSync({
+				cycle() {
+					isWritable(elem, "style");
+				},
+			});
+		}),
 
-	new Bench("Attribute Non-Prop Test", () => {
-		const elem: HTMLElement = <div />;
-		return offscreenSync({
-			cycle() {
-				isWritable(elem, "foo-bar");
-			},
-		});
-	}),
+		new Bench("Non-Properties", () => {
+			const elem: HTMLElement = <div />;
+			return offscreenSync({
+				cycle() {
+					isWritable(elem, "foo-bar");
+				},
+			});
+		}),
+	]),
 
 	new Group("Create Element", [
+		new Bench("innerHTML", () => {
+			const host: HTMLElement = <div />;
+			return offscreenSync({
+				sampleSize: 10_000,
+				cooldown: 3_000,
+				cycle() {
+					host.innerHTML = `<input type="text" class="foo bar baz" style="color: red; width: 42px;" placeholder="Hello World!" value="Some text...">`;
+					const elem = host.childNodes.item(0);
+					elem.addEventListener("click", () => {});
+				},
+			});
+		}),
+
 		new Bench("document.createElement", () => {
 			return offscreenSync({
 				sampleSize: 10_000,
-				cooldown: 500,
+				cooldown: 3_000,
 				cycle() {
 					const elem = document.createElement("input");
 					elem.type = "text";
@@ -33,17 +48,7 @@ export const renderingBenches = new Group("Rendering", [
 					elem.style.width = "42px";
 					elem.placeholder = "Hello World!";
 					elem.value = "Some text...";
-				},
-			});
-		}),
-
-		new Bench("innerHTML", () => {
-			const host: HTMLElement = <div />;
-			return offscreenSync({
-				sampleSize: 10_000,
-				cooldown: 500,
-				cycle() {
-					host.innerHTML = `<input type="text" class="foo bar baz" style="color: red; width: 42px;" placeholder="Hello World!" value="Some text...">`;
+					elem.addEventListener("click", () => {});
 				},
 			});
 		}),
@@ -51,7 +56,7 @@ export const renderingBenches = new Group("Rendering", [
 		new Bench("gluon jsx", () => {
 			return offscreenSync({
 				sampleSize: 10_000,
-				cooldown: 500,
+				cooldown: 3_000,
 				cycle() {
 					(<input
 						type="text"
@@ -62,26 +67,8 @@ export const renderingBenches = new Group("Rendering", [
 						}}
 						placeholder="Hello World!"
 						value="Some text..."
+						$click={() => {}}
 					/>);
-				},
-			});
-		}),
-
-		new Bench("gluon e", () => {
-			return offscreenSync({
-				sampleSize: 10_000,
-				cooldown: 500,
-				cycle() {
-					e("input", {
-						type: "text",
-						class: "foo bar baz",
-						style: {
-							color: "red",
-							width: "42px",
-						},
-						placeholder: "Hello World!",
-						value: "Some text...",
-					});
 				},
 			});
 		}),

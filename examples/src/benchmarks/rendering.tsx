@@ -23,15 +23,16 @@ export const renderingBenches = new Group("Rendering", [
 	]),
 
 	new Group("Create Element", [
-		new Bench("innerHTML", () => {
-			const host: HTMLElement = <div />;
+		new Bench("cloneNode", () => {
+			const template = document.createElement("template");
+			template.innerHTML = `<input type="text" class="foo bar baz" style="color: red; width: 42px;" placeholder="Hello World!" value="Some text...">`;
 			return offscreenSync({
 				sampleSize: 10_000,
 				cooldown: 3_000,
 				cycle() {
-					host.innerHTML = `<input type="text" class="foo bar baz" style="color: red; width: 42px;" placeholder="Hello World!" value="Some text...">`;
-					const elem = host.childNodes.item(0);
+					const elem = template.content.childNodes[0].cloneNode(true);
 					elem.addEventListener("click", () => {});
+					return elem;
 				},
 			});
 		}),
@@ -49,6 +50,7 @@ export const renderingBenches = new Group("Rendering", [
 					elem.placeholder = "Hello World!";
 					elem.value = "Some text...";
 					elem.addEventListener("click", () => {});
+					return elem;
 				},
 			});
 		}),
@@ -58,7 +60,7 @@ export const renderingBenches = new Group("Rendering", [
 				sampleSize: 10_000,
 				cooldown: 3_000,
 				cycle() {
-					(<input
+					return <input
 						type="text"
 						class="foo bar baz"
 						style={{
@@ -68,7 +70,7 @@ export const renderingBenches = new Group("Rendering", [
 						placeholder="Hello World!"
 						value="Some text..."
 						$click={() => {}}
-					/>);
+					/>;
 				},
 			});
 		}),

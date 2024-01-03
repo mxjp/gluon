@@ -146,7 +146,7 @@ e("div") instanceof HTMLDivElement; // true
 ## Attributes
 Attributes are set using writable properties if possible and **setAttribute** otherwise.
 ```tsx
-import { mount, e } from "@mxjp/gluon";
+import { mount } from "@mxjp/gluon";
 
 mount(
   document.body,
@@ -271,41 +271,33 @@ mount(
 ### Views
 Views are sequences of one or more nodes that change over time. They can be used to render collections or conditional content.
 
-For every view type, there also is a "component" for use with JSX. All the view examples below show both versions.
+For every view listed below, there is a lower cased variant for use without jsx.
 
 #### `<When>`
 Render conditional content or optional fallback content.
 
 Note, that content is recreated if the expression result is not strictly equal to the last one. To keep content alive when the condition is falsy, use [show](#show) instead.
 ```tsx
-import { mount, when, When, sig } from "@mxjp/gluon";
+import { mount, When, sig } from "@mxjp/gluon";
 
 const message = sig(null);
 
 mount(
   document.body,
-  <>
-    {when(message, message => <>
-      <h1>{message}</h1>
-    </>, () => <>
-      No message to render.
-    </>)}
-
-    <When value={message} else={() => <>No message to render.</>}>
-      {message => <h1>{message}</h1>}
-    </When>
-  </>,
+  <When value={message} else={() => <>No message to render.</>}>
+    {message => <h1>{message}</h1>}
+  </When>
 );
 ```
 
 #### `<Nest>`
-Render content using a function returned from an expression.
+Render a [component](#components) returned from an expression.
 
 Note, that content is recreated every time the expression is rerun.
 
 For simple conditional content, prefer using [when](#when).
 ```tsx
-import { mount, nest, Nest, sig } from "@mxjp/gluon";
+import { mount, Nest, sig } from "@mxjp/gluon";
 
 const message = sig({
   type: "foo",
@@ -314,25 +306,15 @@ const message = sig({
 
 mount(
   document.body,
-  <>
-    {nest(() => {
+  <Nest>
+    {() => {
       const current = message.value;
       switch (current.type) {
         case "foo": return () => (<h1>{current.text}</h1>);
         case "bar": ...;
       }
-    })}
-
-    <Nest>
-      {() => {
-        const current = message.value;
-        switch (current.type) {
-          case "foo": return () => (<h1>{current.text}</h1>);
-          case "bar": ...;
-        }
-      }}
-    </Nest>
-  </>,
+    }}
+  </Nest>
 );
 ```
 
@@ -343,17 +325,13 @@ Items are rendered in iteration order and duplicates are silently ignored.
 
 The **index** parameter is a function that can be used to reactively get the current index.
 ```tsx
-import { mount, map, Map, sig } from "@mxjp/gluon";
+import { mount, Map, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
 mount(
   document.body,
   <ul>
-    {map(items, (value, index) => <>
-      <li>{() => index() + 1}: {value}</li>;
-    </>)}
-
     <Map each={items}>
       {(value, index) => <li>{() => index() + 1}: {value}</li>}
     </Map>
@@ -361,22 +339,18 @@ mount(
 );
 ```
 
-#### `iter`
-The **iter** function creates a view that renders content for each index in an iterable.
+#### `<Iter>`
+Render content for each index / item pair in an iterable.
 
 Items are rendered in iteration order.
 ```tsx
-import { mount, iter, Iter, sig } from "@mxjp/gluon";
+import { mount, Iter, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
 mount(
   document.body,
   <ul>
-    {iter(items, (value, index) => <>
-      <li>{index + 1}: {value}</li>
-    </>)}
-
     <Iter each={items}>
       {(value, index) => <li>{index + 1}: {value}</li>}
     </Iter>
@@ -384,32 +358,28 @@ mount(
 );
 ```
 
-#### `show`
-The **show** function creates a view that shows rendered content if an expression is truthy.
+#### `<Show>`
+Attach content if an expression is truthy.
 
-Note, that content is not disposed when hidden. To conditionally render content, use [when](#when) or [nest](#nest) instead.
+To conditionally render content, use [when](#when) or [nest](#nest) instead.
 
 ```tsx
-import { mount, show, Show, sig } from "@mxjp/gluon";
+import { mount, Show, sig } from "@mxjp/gluon";
 
 const showMessage = sig(false);
 
 mount(
   document.body,
-  <>
-    {show(showMessage, <>Hello World!</>)}
-
-    <Show when={showMessage}>
-      Hello World!
-    </Show>
-  </>
+  <Show when={showMessage}>
+    Hello World!
+  </Show>
 );
 ```
 
 #### `movable`
-The **movable** function renders content, so that it can be safely moved to new places.
+The **movable** function wraps content, so that it can be safely moved to new places.
 
-Note, that content is detached from it's previous place when moved.
+When moved, content is safely detached from it's previous parent.
 ```tsx
 import { mount, movable } from "@mxjp/gluon";
 
@@ -435,7 +405,7 @@ content.detach();
 ```
 
 ### Fragments & Arrays
-Content can also consist of arbitrarily nested jsx fragments and arrays.
+Content can be wrapped in arbitrarily nested arrays and jsx fragments.
 ```tsx
 import { mount } from "@mxjp/gluon";
 
@@ -452,8 +422,8 @@ mount(
 
 Note, that jsx fragments in gluon return their children as is.
 ```tsx
-typeof (<>Hello World!</>); // => string
-Array.isArray(<>foo{42}</>); // => true
+<>Hello World!</>; // => string
+<>foo{42}</>; // => ["foo", 42]
 ```
 
 ## Namespaces
@@ -461,15 +431,11 @@ By default, elements are created as HTML elements. This works fine for most case
 
 The namespace URI for new elements can be set via [contexts](#context).
 ```tsx
-import { mount, inject, Inject, XMLNS, SVG } from "@mxjp/gluon";
+import { mount, Inject, XMLNS, SVG } from "@mxjp/gluon";
 
 mount(
   document.body,
   <div>
-    {inject([XMLNS, SVG], () => {
-      return <svg version="1.1" viewBox="0 0 100 100">...</svg>;
-    })}
-
     <Inject key={XMLNS} value={SVG}>
       {() => <svg version="1.1" viewBox="0 0 100 100">...</svg>}
     </Inject>
@@ -478,7 +444,7 @@ mount(
 ```
 
 ## Components
-Gluon has no special component system. Instead components are just functions that return content and take arbitrary inputs. When used with JSX syntax, functions are called with the properties object as the first parameter.
+On gluon, components are simple functions that return content and take arbitrary inputs. When used with JSX syntax, props are passed as the first argument.
 ```tsx
 import { mount, Signal } from "@mxjp/gluon";
 
@@ -504,7 +470,7 @@ mount(
 );
 ```
 
-To accept both static and reactive inputs, the **get** function can be used to evaluate expressions.
+By default, properties are non-reactive. To accept reactive properties, you can use [expressions](#reactivity) and the **get** function to evaluate them when needed:
 ```tsx
 import { mount, get, Expression } from "@mxjp/gluon";
 
@@ -552,19 +518,21 @@ dispose();
 
 Teardown hooks can be used in **watch** and **view** callbacks.
 ```tsx
-import { mount, sig, map } from "@mxjp/gluon";
+import { mount, sig, Map, teardown } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "baz"]);
 
 mount(
   document.body,
-  map(items, value => {
-    console.log("Rendering:", value);
-    teardown(() => {
-      console.log("Removing:", value);
-    });
-    return <li>{value}</li>;
-  }),
+  <Map each={items}>
+    {item => {
+      console.log("Rendering:", item);
+      teardown(() => {
+        console.log("Removing:", item);
+      });
+      return <li>{item}</li>;
+    }}
+  </Map>
 );
 ```
 
@@ -594,15 +562,15 @@ inject(new Example(), () => {
 
 Contexts automatically work with all synchronous code and all gluon APIs:
 ```tsx
-import { mount, when, inject, extract } from "@mxjp/gluon";
+import { mount, When, Inject, extract } from "@mxjp/gluon";
 
 mount(
   document.body,
-  inject(["message", "Hello World!"], () => {
-    return when(someSignal, () => {
-      return <h1>{extract("message")}</h1>;
-    });
-  }),
+  <Inject key="message" value="Hello World!">
+    {() => <When value={someSignal}>
+      {() => <h1>{extract("message")}</h1>}
+    </When>}
+  </Inject>
 );
 ```
 To make contexts work with other asynchronous code, you can manually run functions in a different context:
@@ -741,7 +709,7 @@ mount(
 ## Unwrap
 Render content depending on an async function or promise.
 ```tsx
-import { mount, unwrap, Unwrap } from "@mxjp/gluon";
+import { mount, Unwrap } from "@mxjp/gluon";
 
 const promise = new Promise(resolve => {
   setTimeout(resolve, 1000);
@@ -749,18 +717,9 @@ const promise = new Promise(resolve => {
 
 mount(
   document.body,
-  <>
-    {unwrap({
-      source: promise,
-      pending: () => "Pending...",
-      resolved: value => `Resolved: ${value}`,
-      rejected: error => `Rejected: ${error}`,
-    })}
-
-    <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
-      {value => <>Resolved: {value}</>}
-    </Unwrap>
-  </>,
+  <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
+    {value => <>Resolved: {value}</>}
+  </Unwrap>,
 );
 ```
 

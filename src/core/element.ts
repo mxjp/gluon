@@ -23,7 +23,7 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  *
  * @example
  * ```tsx
- * import { mount, XMLNS, SVG, Inject, inject, e } from "@mxjp/gluon";
+ * import { mount, XMLNS, SVG, Inject } from "@mxjp/gluon";
  *
  * mount(
  *   document.body,
@@ -31,10 +31,6 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  *     <Inject key={XMLNS} value={SVG}>
  *       {() => <svg>...</svg>}
  *     </Inject>
- *
- *     {inject([XMLNS, SVG], () => {
- *       return e("svg", [...]);
- *     })}
  *   </>
  * );
  * ```

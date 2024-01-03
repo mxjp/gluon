@@ -3,9 +3,20 @@ import { Bench, BenchResult, Group } from "./benchmarks/common";
 import classes from "./benchmarks/common.module.css";
 import { Button } from "./components/button";
 import { renderingBenches } from "./benchmarks/rendering";
+import { Row } from "./components/row";
 
 export function example() {
 	return <>
+		<div>This is a collection of performance benchmarks.</div>
+		<Row>
+			<Button disabled={() => !root.hasResults} action={() => {
+				const json = JSON.stringify(root.toJSON().items, null, "\t") + "\n";
+				(<a
+					href={`data:application/json;base64,${btoa(json)}`}
+					download={`bench_${Date.now()}.json`} />
+				).click();
+			}}>Export JSON</Button>
+		</Row>
 		<div class={classes.grid}>
 			<Entry item={root} indent={0} />
 		</div>

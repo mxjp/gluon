@@ -1,17 +1,19 @@
-import { isPending, waitFor } from "@mxjp/gluon";
+import { Expression, get, isPending, waitFor } from "@mxjp/gluon";
 
 export function Button(props: {
 	children?: unknown;
 	action: () => void | Promise<void>;
 	asText?: boolean;
+	disabled?: Expression<boolean>;
 }) {
+	const disabled = () => get(props.disabled) || isPending();
 	return <button
 		class={{
 			asText: props.asText,
 		}}
-		disabled={isPending}
+		disabled={disabled}
 		$click={event => {
-			if (isPending()) {
+			if (disabled()) {
 				return;
 			}
 			event.stopPropagation();

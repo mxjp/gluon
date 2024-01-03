@@ -17,6 +17,11 @@ export type Status = {
 	result: BenchResult;
 };
 
+export interface GroupJson {
+	name: string;
+	items: (GroupJson | BenchJson)[];
+}
+
 export class Group {
 	constructor(
 		public name: string,
@@ -28,6 +33,25 @@ export class Group {
 			await item.run();
 		}
 	}
+
+	get hasResults(): boolean {
+		return this.items.some(item => item.hasResults);
+	}
+
+	toJSON(): GroupJson {
+		return {
+			name: this.name,
+			items: this.items
+				.filter(i => i.hasResults)
+				.map(i => i.toJSON()),
+		};
+	}
+}
+
+export interface BenchJson {
+	name: string;
+	opsPerSec: number;
+	samples: number;
 }
 
 export class Bench {
@@ -54,6 +78,22 @@ export class Bench {
 			console.error(error);
 			this.#status.value = { type: "failed" };
 		}
+	}
+
+	get hasResults(): boolean {
+		return this.#status.value.type === "done";
+	}
+
+	toJSON(): BenchJson {
+		const status = this.#status.value;
+		if (status.type !== "done") {
+			throw new Error("no result");
+		}
+		return {
+			name: this.name,
+			opsPerSec: Math.round(status.result.ops / status.result.time),
+			samples: status.result.samples,
+		};
 	}
 }
 

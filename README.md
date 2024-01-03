@@ -960,4 +960,11 @@ mount(
   document.body,
   <div innerHTML={dangerous} />,
 );
+
+// Using unrestricted user input as attribute name is unsafe:
+const someUserInput = "innerHTML";
+mount(
+  document.body,
+  <div {...{[someUserInput]: "123"}} />,
+);
 ```

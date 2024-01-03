@@ -133,5 +133,9 @@ function benchSync(cycle: () => void, sampleSize: number, targetTime: number): B
 		time += performance.now() - start;
 		samples++;
 	}
-	return { time, ops: samples * sampleSize, samples };
+	return {
+		time: time / 1000,
+		ops: samples * sampleSize,
+		samples,
+	};
 }

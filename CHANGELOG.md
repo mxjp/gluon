@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1
++ Add expression mapping utilities: `mapper`, `string` and `optionalString`.
+
 ## 2.0
 + Add support for generic boolean attributes.
 + Add utility for phantom typed context key-value pairs.

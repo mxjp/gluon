@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, extract, inject, lazy, memo, sig, teardown, trigger, watch } from "@mxjp/gluon";
+import { batch, capture, extract, get, inject, lazy, mapper, memo, sig, string, teardown, trigger, watch } from "@mxjp/gluon";
 
 import { assertEvents } from "./common.js";
 
@@ -506,5 +506,32 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, ["outer", 3]);
 		});
+	});
+
+	await ctx.test("mapper", () => {
+		const map = mapper((i: number) => String(i));
+
+		const a = map(42);
+		strictEqual(a, "42");
+
+		const b = map(() => 42);
+		strictEqual(typeof b, "function");
+		strictEqual((b as () => string)(), "42");
+
+		const c = map(sig(42));
+		strictEqual(typeof c, "function");
+		strictEqual((c as () => string)(), "42");
+	});
+
+	await ctx.test("string", () => {
+		strictEqual(get(string(42)), "42");
+		strictEqual(get(string(null)), "null");
+		strictEqual(get(string(undefined)), "undefined");
+	});
+
+	await ctx.test("optionalString", () => {
+		strictEqual(get(string(42)), "42");
+		strictEqual(get(string(null)), null);
+		strictEqual(get(string(undefined)), undefined);
 	});
 });

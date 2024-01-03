@@ -557,3 +557,33 @@ export function get<T>(expr: Expression<T>): T {
 	}
 	return expr;
 }
+
+/**
+ * Create a function that maps an expression value.
+ */
+export function mapper<I, O>(map: (input: I) => O): (input: Expression<I>) => Expression<O> {
+	return input => {
+		if (input instanceof Signal) {
+			return () => map(input.value);
+		}
+		if (typeof input === "function") {
+			return () => map((input as () => I)());
+		}
+		return map(input);
+	};
+}
+
+/**
+ * Convert all expression values to strings.
+ */
+export const string = mapper((input: unknown) => String(input));
+
+/**
+ * Convert all expression values to strings except **null** or **undefined**.
+ */
+export const optionalString = mapper((input: unknown) => {
+	if (input === null || input === undefined) {
+		return input;
+	}
+	return String(input);
+});

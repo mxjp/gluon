@@ -1,4 +1,5 @@
 import { extract } from "../core/context.js";
+import { teardown } from "../core/lifecycle.js";
 import { sig } from "../core/signals.js";
 
 export type TaskSource = (() => unknown) | Promise<unknown> | null | undefined;
@@ -36,6 +37,20 @@ export class Tasks {
 	 */
 	get pending(): boolean {
 		return (this.#parent?.pending ?? false) || this.#pending.value > 0;
+	}
+
+	/**
+	 * Pretend, that there is a pending task until the current context is disposed.
+	 */
+	setPending(): void {
+		this.#pending.value++;
+		let disposed = false;
+		teardown(() => {
+			if (!disposed) {
+				disposed = true;
+				this.#pending.value--;
+			}
+		});
 	}
 
 	/**
@@ -79,6 +94,26 @@ export function isSelfPending(): boolean {
  */
 export function isPending(): boolean {
 	return extract(Tasks)?.pending ?? false;
+}
+
+/**
+ * Pretend, that there is a pending task in the current tasks instance until the current context is disposed.
+ *
+ * @example
+ * ```tsx
+ * import { inject, Tasks, capture, setPending, isPending } from "@mxjp/gluon";
+ *
+ * inject(new Tasks(), () => {
+ *   isPending(); // => false
+ *   const stop = capture(setPending);
+ *   isPending(); // => true
+ *   stop();
+ *   isPending(); // => false
+ * });
+ * ```
+ */
+export function setPending(): void {
+	extract(Tasks)?.setPending();
 }
 
 /**

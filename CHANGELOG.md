@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2
++ Add manual pending tasks: `Tasks.setPending` and `setPending`.
+
 ## 2.1
 + Add expression mapping utilities: `mapper`, `string` and `optionalString`.
 

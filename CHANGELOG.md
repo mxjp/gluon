@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.3
++ Use hyphen cased style properties. (Exact behavior was previously unspecified)
+
 ## 2.2
 + Add manual pending tasks: `Tasks.setPending` and `setPending`.
 

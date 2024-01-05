@@ -62,7 +62,16 @@ export function appendContent(node: Node, content: unknown): void {
 
 export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean>> | ClassValue[]>;
 
-export type StyleMap = { [K in keyof CSSStyleDeclaration]?: Expression<CSSStyleDeclaration[K]> };
+type HyphenCase<T> = T extends `${infer A}${infer B}`
+	? `${A extends Capitalize<A> ? "-" : ""}${Lowercase<A>}${HyphenCase<B>}`
+	: T;
+
+export type StyleMap = {
+	[K in keyof CSSStyleDeclaration as HyphenCase<K>]?: Expression<undefined | null | string>;
+} & {
+	[K in string]?: Expression<undefined | null | string>;
+};
+
 export type StyleValue = Expression<StyleMap | StyleValue[]>;
 
 type SpecialAttributes = {
@@ -172,11 +181,7 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 				case "style": {
 					const style = (elem as HTMLElement).style;
 					watchStyle(value as StyleValue, (name, value) => {
-						if (name in style) {
-							(style as any)[name] = value;
-						} else {
-							style.setProperty(name, value === null ? null : String(value));
-						}
+						style.setProperty(name, value ? String(value) : null);
 					});
 					continue attrs;
 				}

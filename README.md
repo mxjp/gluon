@@ -205,6 +205,8 @@ Note, that all expressions used in the class attribute are evaluated for every s
 
 ### Styles
 The **style** attribute can be any combination of arrays, objects and expressions.
+
+Properties use the same casing as in css.
 ```tsx
 import { mount, sig } from "@mxjp/gluon";
 
@@ -215,7 +217,10 @@ mount(
   <>
     <div style={{ color: "red" }} />
     <div style={() => [
-      { color: "red" },
+      {
+        color: "red",
+        "font-size": "1rem",
+      },
       { color: () => "blue" },
       { color: someSignal },
       [

@@ -77,16 +77,16 @@ export type StyleValue = Expression<StyleMap | StyleValue[]>;
 type SpecialAttributes = {
 	class?: ClassValue;
 	style?: StyleValue;
-} | {
+} & {
 	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
-} | {
+} & {
 	[K in `prop:${string}`]?: Expression<unknown>;
-} | {
+} & {
 	[K in `attr:${string}`]?: Expression<unknown>;
 };
 
 type GenericAttributes = {
-	[K in Exclude<string, keyof SpecialAttributes>]: Expression<unknown>;
+	[K in string]?: Expression<unknown>;
 };
 
 /**

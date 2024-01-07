@@ -72,7 +72,7 @@ export type StyleMap = {
 	[K in string]?: Expression<undefined | null | string>;
 };
 
-export type StyleValue = Expression<StyleMap | StyleValue[]>;
+export type StyleValue = Expression<undefined | StyleMap | StyleValue[]>;
 
 type SpecialAttributes = {
 	class?: ClassValue;

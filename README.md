@@ -454,7 +454,7 @@ mount(
 ```
 
 ## Components
-On gluon, components are simple functions that return content and take arbitrary inputs. When used with JSX syntax, props are passed as the first argument.
+In gluon, components are simple functions that return content and take arbitrary inputs. When used with JSX syntax, props are passed as the first argument.
 ```tsx
 import { mount, Signal } from "@mxjp/gluon";
 
@@ -721,15 +721,32 @@ Render content depending on an async function or promise.
 ```tsx
 import { mount, Unwrap } from "@mxjp/gluon";
 
-const promise = new Promise(resolve => {
-  setTimeout(resolve, 1000);
-});
+const promise = new Promise(resolve => setTimeout(resolve, 1000));
 
 mount(
   document.body,
   <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
     {value => <>Resolved: {value}</>}
   </Unwrap>,
+);
+```
+
+To unwrap promises returned from an expression, unwrap can be combined with [when](#when).
+```tsx
+import { mount, Unwrap, When, sig } from "@mxjp/gluon";
+
+const promise = sig(undefined);
+setInterval(() => {
+  promise.value = new Promise(resolve => setTimeout(resolve, 1000));
+}, 3000);
+
+mount(
+  document.body,
+  <When value={promise}>
+    {promise => <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
+      {value => <>Resolved: {value}</>}
+    </Unwrap>}
+  </When>
 );
 ```
 

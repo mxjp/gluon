@@ -1,4 +1,4 @@
-import { Inject, Iter, Nest, Tasks, When, mount, sig } from "@mxjp/gluon";
+import { Inject, Iter, Nest, Tasks, Unwrap, mount, sig } from "@mxjp/gluon";
 import { Column } from "./components/column";
 
 import classes from "./main.module.css";
@@ -26,11 +26,6 @@ interface ExampleModule {
 }
 
 function ExampleView(props: { name: string }) {
-	const module = sig<ExampleModule | null>(null);
-	import(`./example-${props.name}.tsx`).then(instance => {
-		module.value = instance;
-	});
-
 	return <Column>
 		<h1>{props.name}</h1>
 		<a
@@ -38,10 +33,12 @@ function ExampleView(props: { name: string }) {
 			target="_blank"
 			referrerpolicy="no-referrer"
 		>view source</a>
-
-		<When value={module}>
+		<Unwrap<ExampleModule>
+			source={() => import(`./example-${props.name}.tsx`)}
+			pending={() => "Loading example..."}
+		>
 			{module => <module.example />}
-		</When>
+		</Unwrap>
 	</Column>;
 }
 

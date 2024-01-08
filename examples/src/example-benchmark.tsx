@@ -2,8 +2,9 @@ import { Iter, Nest, When } from "@mxjp/gluon";
 import { Bench, BenchResult, Group } from "./benchmarks/common";
 import classes from "./benchmarks/common.module.css";
 import { Button } from "./components/button";
-import { renderingBenches } from "./benchmarks/rendering";
+import { renderingGroup } from "./benchmarks/rendering";
 import { Row } from "./components/row";
+import { signalsGroup } from "./benchmarks/signals";
 
 export function example() {
 	return <>
@@ -37,7 +38,7 @@ function Entry(props: {
 }) {
 	return <>
 		<div class={classes.name} style={{
-			"--indent": props.indent,
+			"--indent": String(props.indent),
 		}}>
 			<Button asText action={() => props.item.run()}>
 				{props.item.name}
@@ -68,5 +69,6 @@ function Entry(props: {
 }
 
 const root = new Group("All", [
-	renderingBenches,
+	renderingGroup,
+	signalsGroup,
 ]);

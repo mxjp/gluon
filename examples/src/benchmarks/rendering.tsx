@@ -1,8 +1,8 @@
 import { Bench, Group, offscreenSync } from "./common";
 
-export const renderingBenches = new Group("Rendering", [
+export const renderingGroup = new Group("Rendering", [
 	new Group("Create Element", [
-		new Bench("cloneNode", () => {
+		new Bench("cloneNode (vanilla js)", () => {
 			const template = document.createElement("template");
 			template.innerHTML = `<input type="text" class="foo bar baz" style="color: red; width: 42px;" placeholder="Hello World!" value="Some text...">`;
 			return offscreenSync({
@@ -16,7 +16,7 @@ export const renderingBenches = new Group("Rendering", [
 			});
 		}),
 
-		new Bench("document.createElement", () => {
+		new Bench("document.createElement (vanilla js)", () => {
 			return offscreenSync({
 				sampleSize: 10_000,
 				cooldown: 3_000,

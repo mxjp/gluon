@@ -110,10 +110,10 @@ export async function offscreenSync(options: {
 }): Promise<BenchResult> {
 	const {
 		cycle,
-		sampleSize = 1_000_000,
+		sampleSize = 100_000,
 		warmupTime = 100,
-		time = 3_000,
-		cooldown = 100,
+		time = 2_000,
+		cooldown = 500,
 	} = options;
 	await wait(100);
 	benchSync(cycle, sampleSize, warmupTime);

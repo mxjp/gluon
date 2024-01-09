@@ -13,6 +13,7 @@ const exampleNames: string[] = [
 	"stopwatch",
 	"routing",
 	"movable",
+	"custom-view",
 	"benchmark",
 ];
 

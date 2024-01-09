@@ -60,7 +60,7 @@ export function appendContent(node: Node, content: unknown): void {
 	}
 }
 
-export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean>> | ClassValue[]>;
+export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean | undefined>> | ClassValue[]>;
 
 type HyphenCase<T> = T extends `${infer A}${infer B}`
 	? `${A extends Capitalize<A> ? "-" : ""}${Lowercase<A>}${HyphenCase<B>}`

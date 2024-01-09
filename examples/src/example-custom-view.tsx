@@ -1,4 +1,4 @@
-import { Signal, View, render, sig, watch } from "@mxjp/gluon";
+import { Show, Signal, View, render, sig, watch } from "@mxjp/gluon";
 import { Row } from "./components/row";
 import { Button } from "./components/button";
 import { Box } from "./components/box";
@@ -6,19 +6,26 @@ import { TextInput } from "./components/text-input";
 
 export function example() {
 	const rotate = sig();
+	const show = sig(true);
 	return <>
 		<div>This example shows a custom view that rotates the order of it's children when a signal is updated.</div>
+		<div>To demonstrate boundary tracking, you can also hide the custom view, rotate the order and then show it again.</div>
 		<Row>
 			<Button action={() => rotate.notify()}>Rotate</Button>
+			<Button action={() => { show.value = !show.value }}>
+				{() => show.value ? "Hide" : "Show"}
+			</Button>
 		</Row>
 		<Box>
-			<Row>
+			<div>Before</div>
+			<Show when={show}>
 				<RotateOrder on={rotate}>
-					<TextInput style={{ width: "5rem" }} value={sig("A")} />
-					<TextInput style={{ width: "5rem" }} value={sig("B")} />
-					<TextInput style={{ width: "5rem" }} value={sig("C")} />
+					<TextInput style={{ width: "10rem" }} value={sig("A")} />
+					<TextInput style={{ width: "10rem" }} value={sig("B")} />
+					<TextInput style={{ width: "10rem" }} value={sig("C")} />
 				</RotateOrder>
-			</Row>
+			</Show>
+			<div>After</div>
 		</Box>
 	</>;
 }

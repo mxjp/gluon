@@ -212,8 +212,10 @@ export class Signal<T> {
  * @param equals True to skip updates when an assigned value is strictly equal to the previous one or a function to determine if the values are equal. Default is true.
  * @returns The signal.
  */
-export function sig<T>(value: T, equals?: SignalEqualsFn<T> | boolean): Signal<T> {
-	return new Signal(value, equals);
+export function sig(): Signal<void>;
+export function sig<T>(value: T, equals?: SignalEqualsFn<T> | boolean): Signal<T>;
+export function sig<T>(value?: T, equals?: SignalEqualsFn<T> | boolean): Signal<T> {
+	return new Signal<T>(value!, equals);
 }
 
 /**

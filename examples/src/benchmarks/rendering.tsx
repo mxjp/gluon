@@ -50,5 +50,27 @@ export const renderingGroup = new Group("Rendering", [
 				},
 			});
 		}),
+
+		new Bench("undefined attributes", () => {
+			return offscreen({
+				sampleSize: 10_000,
+				cycle() {
+					return <div
+						a={undefined}
+						b={undefined}
+						c={undefined}
+						d={undefined}
+						e={undefined}
+						f={undefined}
+						g={undefined}
+						h={undefined}
+						i={undefined}
+						j={undefined}
+						style={undefined}
+						class={undefined}
+					/>;
+				},
+			});
+		}),
 	]),
 ]);

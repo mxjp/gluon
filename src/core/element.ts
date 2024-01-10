@@ -166,6 +166,9 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
 			continue attrs;
 		}
 		const value = attrs[name as keyof Attributes];
+		if (value === undefined) {
+			continue attrs;
+		}
 		if (name.startsWith("$")) {
 			const capture = name.startsWith("$$");
 			const event = name.slice(capture ? 2 : 1);

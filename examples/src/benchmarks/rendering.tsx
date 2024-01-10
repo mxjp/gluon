@@ -53,7 +53,7 @@ export const renderingGroup = new Group("Rendering", [
 
 		new Bench("undefined attributes", () => {
 			return offscreen({
-				sampleSize: 10_000,
+				sampleSize: 100_000,
 				cycle() {
 					return <div
 						a={undefined}

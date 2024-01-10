@@ -1,9 +1,16 @@
 import { sig } from "@mxjp/gluon";
 
 export interface BenchResult {
-	time: number;
-	ops: number;
 	samples: number;
+	mean: number;
+	deviation: number;
+	ops: number;
+	time: number;
+	gcs: number;
+}
+
+export interface BenchJson extends BenchResult {
+	name: string;
 }
 
 function wait(delay: number) {
@@ -48,12 +55,6 @@ export class Group {
 	}
 }
 
-export interface BenchJson {
-	name: string;
-	opsPerSec: number;
-	samples: number;
-}
-
 export class Bench {
 	#status = sig<Status>({ type: "none" });
 	#run: () => Promise<BenchResult>;
@@ -91,8 +92,7 @@ export class Bench {
 		}
 		return {
 			name: this.name,
-			opsPerSec: Math.round(status.result.ops / status.result.time),
-			samples: status.result.samples,
+			...status.result,
 		};
 	}
 }
@@ -101,7 +101,7 @@ export interface BenchModule {
 	run(): Promise<BenchResult> | BenchResult;
 }
 
-export async function offscreenSync(options: {
+export async function offscreen(options: {
 	cycle: () => void;
 	sampleSize?: number;
 	warmupTime?: number;
@@ -112,30 +112,44 @@ export async function offscreenSync(options: {
 		cycle,
 		sampleSize = 100_000,
 		warmupTime = 100,
-		time = 2_000,
-		cooldown = 500,
+		time = 3_000,
+		cooldown = 100,
 	} = options;
 	await wait(100);
-	benchSync(cycle, sampleSize, warmupTime);
-	const result = benchSync(cycle, sampleSize, time);
+	await bench(cycle, sampleSize, warmupTime);
+	const result = await bench(cycle, sampleSize, time);
 	await wait(cooldown);
 	return result;
 }
 
-function benchSync(cycle: () => void, sampleSize: number, targetTime: number): BenchResult {
+async function bench(cycle: () => void, sampleSize: number, targetTime: number): Promise<BenchResult> {
 	let time = 0;
-	let samples = 0;
+	let samples: number[] = [];
 	while (time < targetTime) {
 		const start = performance.now();
 		for (let i = 0; i < sampleSize; i++) {
 			cycle();
 		}
-		time += performance.now() - start;
-		samples++;
+		const sample = performance.now() - start;
+		samples.push(sample);
+		time += sample;
+		await Promise.resolve();
 	}
+
+	const allSamples = samples.length;
+	const gcLimit = Math.min(...samples) * 2;
+	samples = samples.filter(s => s < gcLimit);
+	time = samples.reduce((a, s) => a + s, 0);
+
+	const mean = time / samples.length;
+	const deviation = Math.sqrt(samples.reduce((a, s) => a + Math.pow(s - mean, 2), 0) / samples.length);
+
 	return {
+		samples: samples.length,
+		mean: mean / 1000,
+		deviation: deviation / mean,
+		ops: samples.length * sampleSize,
 		time: time / 1000,
-		ops: samples * sampleSize,
-		samples,
+		gcs: allSamples - samples.length,
 	};
 }

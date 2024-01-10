@@ -27,9 +27,10 @@ export function example() {
 function Result(props: {
 	result: BenchResult;
 }) {
-	const { ops, time, samples } = props.result;
+	const { ops, time, deviation, samples, gcs: ignored } = props.result;
 	const opsPerSec = Math.round(ops / time);
-	return `~${opsPerSec} ops/s (${samples} samples)`;
+	const devPercent = Math.round(deviation * 1000) / 1000;
+	return `~${opsPerSec} ops/s (samples=${samples}, gcs=${ignored}, deviation=${devPercent}%)`;
 }
 
 function Entry(props: {

@@ -1,9 +1,9 @@
 import { Signal, batch, sig, watch } from "@mxjp/gluon";
-import { Bench, Group, offscreenSync } from "./common";
+import { Bench, Group, offscreen } from "./common";
 
 export const signalsGroup = new Group("Signals", [
 	new Bench("Watch 100x signals & batch update 3x", () => {
-		return offscreenSync({
+		return offscreen({
 			sampleSize: 1_000,
 			cycle() {
 				const sigs: Signal<number>[] = [];
@@ -27,7 +27,7 @@ export const signalsGroup = new Group("Signals", [
 	}),
 
 	new Bench("Watch signal 100x times & update 3x", () => {
-		return offscreenSync({
+		return offscreen({
 			sampleSize: 1_000,
 			cycle() {
 				const signal = sig(0);

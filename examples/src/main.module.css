@@ -32,3 +32,11 @@
 	position: absolute;
 	padding: 1rem;
 }
+
+.source {
+	display: block;
+	--space-above: 3rem;
+	white-space: pre-wrap;
+	tab-size: 3;
+	color: rgb(160, 160, 160);
+}

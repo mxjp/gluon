@@ -85,6 +85,8 @@
 			button.asText {
 				background-color: transparent;
 				border: none;
+				padding: 0;
+				display: inline;
 			}
 
 			a[disabled],
@@ -124,6 +126,21 @@
 
 			* {
 				box-sizing: border-box;
+			}
+
+			.hljs-keyword,
+			.hljs-name {
+				color: var(--accent);
+				font-weight: 600;
+			}
+
+			.hljs-tag,
+			.hljs-title {
+				color: var(--accent);
+			}
+
+			.hljs-comment {
+				color: rgb(100, 150, 256);
 			}
 		</style>
 	</head>

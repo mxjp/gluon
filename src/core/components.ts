@@ -60,7 +60,7 @@ export function DeriveContext(props: {
 	/**
 	 * A function to render content.
 	 */
-	children: (context: Context, parent: ReadonlyContext) => unknown;
+	children: (context: Context, parent?: ReadonlyContext) => unknown;
 }): unknown {
 	return deriveContext(props.children);
 }

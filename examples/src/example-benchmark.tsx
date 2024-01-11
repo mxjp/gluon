@@ -5,6 +5,7 @@ import { Button } from "./components/button";
 import { renderingGroup } from "./benchmarks/rendering";
 import { Row } from "./components/row";
 import { signalsGroup } from "./benchmarks/signals";
+import { contextGroup } from "./benchmarks/context";
 
 export function example() {
 	return <>
@@ -75,4 +76,5 @@ function Entry(props: {
 const root = new Group("All", [
 	renderingGroup,
 	signalsGroup,
+	contextGroup,
 ]);

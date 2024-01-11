@@ -11,6 +11,7 @@ export interface BenchResult {
 
 export interface BenchJson extends BenchResult {
 	name: string;
+	opsPerSec: number;
 }
 
 function wait(delay: number) {
@@ -92,6 +93,7 @@ export class Bench {
 		}
 		return {
 			name: this.name,
+			opsPerSec: Math.round(status.result.ops / status.result.time),
 			...status.result,
 		};
 	}

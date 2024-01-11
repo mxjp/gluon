@@ -103,7 +103,7 @@ export function inject<K, R>(value: ContextPair<K>, fn: () => R): R {
  * @param fn The function to run.
  * @returns The function's return value.
  */
-export function deriveContext<R>(fn: (context: Context, parent: ReadonlyContext) => R): R {
+export function deriveContext<R>(fn: (context: Context, parent?: ReadonlyContext) => R): R {
 	const parent = getContext() as Map<any, any>;
 	const context = new Map(parent) as Context;
 	return runInContext(context, () => fn(context, parent));

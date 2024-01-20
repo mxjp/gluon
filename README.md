@@ -8,7 +8,6 @@ This is a tiny signal based rendering library that aims to be usable with widely
   + [JSX Setup](#jsx-setup)
   + [Basic Usage](#basic-usage)
   + [Examples](#examples)
-+ [Reactivity](#reactivity)
 + [Rendering](#rendering)
   + [Attributes](#attributes)
     + [Classes](#classes)
@@ -28,6 +27,10 @@ This is a tiny signal based rendering library that aims to be usable with widely
     + [Fragments & Arrays](#fragments--arrays)
   + [Namespaces](#namespaces)
   + [Components](#components)
++ [Reactivity](#reactivity)
+  + [Signals](#signals)
+  + [Expressions](#expressions)
+  + [Conversion](#conversion)
 + [Lifecycle](#lifecycle)
 + [Context](#context)
 + [Performance](#performance)
@@ -91,38 +94,6 @@ mount(document.body, e("h1", ["Hello World!"]));
 ## Examples
 There are a bunch of examples in the repositories [examples](./examples/) directory.<br>
 You can also [view them in your browser](https://mxjp.github.io/gluon/).
-
-<br>
-
-
-
-# Reactivity
-Reactivity in gluon is entirely based on signals and expressions.
-
-**Signals** represent values that change over time and keep track of their dependants.
-
-**Expressions** can be static values, signals or functions that re-run when any accessed signal is updated. Expressions can be watched manually or used as attributes and element content to render text.
-
-```tsx
-import { mount, sig, watch } from "@mxjp/gluon";
-
-// Create a signal:
-const count = sig(0);
-
-// Render a button and text that displays the count:
-mount(
-  document.body,
-  <>
-    <button $click={() => { count.value++ }}>Click me!</button>
-    Clicked {count} times!
-  </>
-);
-
-// Watch the count manually:
-watch(count, count => {
-  console.log(`Clicked ${count} times!`);
-});
-```
 
 <br>
 
@@ -504,6 +475,116 @@ mount(
 ```
 
 <br>
+
+
+
+# Reactivity
+Reactivity in gluon is entirely based on [signals](#signals) and [expressions](#expressions).
+
+## Signals
+**Signals** represent values that change over time. They keep track of their dependants when accessed and notify them when updated.
+
+```tsx
+import { sig } from "@mxjp/gluon";
+
+// Create a signal with an initial value:
+const count = sig(0);
+
+// "value" can be used to access and update the value:
+count.value++;
+console.log(count.value); // 1
+
+// Signals can contain any arbitrary value:
+const items = sig<string[]>([]);
+
+// "update" allows modifying the inner value in place:
+items.update(items => {
+  items.push("foo");
+});
+```
+
+## Expressions
+**Expressions** can be static values, signals or functions to access or compute a value. Expressions can be watched manually or used as attributes and element content to render text.
+```tsx
+import { mount, sig, watch } from "@mxjp/gluon";
+
+// Create a signal:
+const count = sig(0);
+
+// Render a button and text that displays the count:
+mount(
+  document.body,
+  <>
+    <button $click={() => { count.value++ }}>Click me!</button>
+    Clicked {count} times!
+  </>
+);
+
+// Watch the count manually:
+watch(count, count => {
+  console.log(`Clicked ${count} times!`);
+});
+
+watch(() => count.value, count => {
+  console.log(`Clicked ${count} times!`);
+});
+```
+Note, that static values will not be reactive, even if they originate from a signal:
+```tsx
+import { sig } from "@mxjp/gluon";
+
+const count = sig(0);
+
+watch(count.value, count => {
+  // This is only called once, even if count is updated:
+  console.log(`Clicked ${count} times!`);
+});
+```
+
+## Conversion
+Sometimes it can be useful to convert user inputs in some way, e.g. trimming whitespace or parsing a number.
+
+The example below shows how signals can be converted while allowing data flow in both directions. Things like the **trim** function below are easy to reuse and compose with other behaviors.
+```tsx
+import { sig, Signal, watch, mount } from "@mxjp/gluon";
+
+export function trim(source: Signal<string>): Signal<string> {
+  const input = sig(source.value);
+
+  // Write the trimmed value back into source when the input is updated:
+  watch(input, value => {
+    source.value = value.trim();
+  }, true);
+
+  // Write the source value into the input if it doesn't match the trimmed input:
+  watch(source, value => {
+    if (value !== input.value.trim()) {
+      input.value = value;
+    }
+  }, true);
+
+  return input;
+}
+
+// Create the source signal:
+// This will contain the trimmed version of the raw input value.
+const text = sig("Hello World!");
+
+// Basic text input component that uses a signal for the value:
+function TextInput(props: { value: Signal<string> }) {
+  return <input
+    prop:value={props.value}
+    $input={event => {
+      props.value.value = event.target.value;
+    }}
+  />;
+}
+
+mount(
+  document.body,
+  <TextInput value={trim(text)} />
+);
+```
 
 
 

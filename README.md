@@ -144,10 +144,13 @@ e("div") instanceof HTMLDivElement; // true
 ```
 
 ## Attributes
-All attributes except **class** and **style** are set using **setAttribute**.
-+ When prefixed with `prop:` or `attr:` are always set as properties or using **setAttribute**.
+Attributes are set using **setAttribute** or **removeAttribute** by default.
 + Attributes set to **null**, **undefined** or **false** are removed.
 + Attributes set to **true** are set as an empty string.
++ All other values are set as strings.
++ The [**class**](#classes) and [**style**](#styles) attributes are set as described below.
++ Attributes prefixed with `prop:` are set as properties.
++ Attributes prefixed with `attr:` are always set using the default behavior.
 
 ```tsx
 import { mount } from "@mxjp/gluon";

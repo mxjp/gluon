@@ -13,7 +13,7 @@ export function jsx(type: any, props: any, key: any): unknown {
 	if (typeof type === "function") {
 		return type(props);
 	}
-	return createElement(type, props, [props.children], true);
+	return createElement(type, props, props.children, true);
 }
 
 export function jsxs(type: any, props: any, key: any): unknown {

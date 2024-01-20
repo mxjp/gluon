@@ -210,11 +210,11 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
  * @param jsx True if the element is created by the jsx runtime.
  * @returns The element.
  */
-export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): HTMLElementTagNameMap[K];
-export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): SVGElementTagNameMap[K];
-export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown[], jsx: boolean): MathMLElementTagNameMap[K];
-export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): E;
-export function createElement(tagName: string, attrs: Attributes, content: unknown[], jsx: boolean): Element {
+export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown, jsx: boolean): HTMLElementTagNameMap[K];
+export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown, jsx: boolean): SVGElementTagNameMap[K];
+export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown, jsx: boolean): MathMLElementTagNameMap[K];
+export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown, jsx: boolean): E;
+export function createElement(tagName: string, attrs: Attributes, content: unknown, jsx: boolean): Element {
 	const ns = extract(XMLNS);
 	const elem = ns === undefined
 		? document.createElement(tagName)

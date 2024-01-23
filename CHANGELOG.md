@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4
++ Add `viewNodes` iterator.
+
 ## 2.3
 + Use hyphen cased style properties. (Exact behavior was previously unspecified)
 

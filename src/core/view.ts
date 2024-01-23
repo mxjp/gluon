@@ -142,6 +142,36 @@ export class View {
 }
 
 /**
+ * Get an iterator over all current top level nodes of a view.
+ *
+ * @param view The view.
+ * @returns The iterator.
+ *
+ * @example
+ * ```tsx
+ * import { render, viewNodes } from "@mxjp/gluon";
+ *
+ * const view = render(<>
+ *   <h1>Hello World!</h1>
+ * </>);
+ *
+ * for (const node of viewNodes(view)) {
+ *   console.log(node);
+ * }
+ * ```
+ */
+export function * viewNodes(view: View): IterableIterator<Node> {
+	let node = view.first;
+	for (;;) {
+		yield node;
+		if (node === view.last) {
+			break;
+		}
+		node = node.nextSibling!;
+	}
+}
+
+/**
  * Create a view that renders content depending on an expression.
  *
  * @param expr An expression that returns a function to create content or null or undefined to render nothing.

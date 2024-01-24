@@ -21,8 +21,8 @@
 			"default": "./dist/es/index.js"
 		},
 		"./jsx": {
-			"types": "./dist/es/core/jsx/default.d.ts",
-			"default": "./dist/es/core/jsx/default.js"
+			"types": "./dist/es/core/jsx/legacy.d.ts",
+			"default": "./dist/es/core/jsx/legacy.js"
 		},
 		"./jsx-runtime": {
 			"types": "./dist/es/core/jsx/r17.d.ts",

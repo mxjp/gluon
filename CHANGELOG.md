@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0
++ Support pre react 17 jsx transform.
+
 ## 2.4
 + Add `viewNodes` iterator.
 

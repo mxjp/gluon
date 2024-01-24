@@ -1,7 +1,11 @@
 # Changelog
 
 ## 3.0
-+ Support pre react 17 jsx transform.
++ **Breaking:** Remove `jsx` argument from `createElement` and `setAttributes`.
++ Support legacy react jsx transform.
++ Notable internal changes, that most likely don't require migration:
+  + Moved JSX runtime modules to `/dist/es/core/jsx/r17.{js,d.ts}`.
+  + The React 17 JSX runtime now deletes the `children` property from the `prop` argument before creating an element.
 
 ## 2.4
 + Add `viewNodes` iterator.

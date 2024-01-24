@@ -158,13 +158,9 @@ function watchStyle(value: StyleValue, handler: StyleHandler) {
  *
  * @param elem The element.
  * @param attrs The attributes to set.
- * @param jsx True if the element is created by the jsx runtime.
  */
-export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): void {
+export function setAttributes(elem: Element, attrs: Attributes): void {
 	attrs: for (const name in attrs) {
-		if (jsx && name === "children") {
-			continue attrs;
-		}
 		const value = attrs[name as keyof Attributes];
 		if (value === undefined) {
 			continue attrs;
@@ -207,20 +203,19 @@ export function setAttributes(elem: Element, attrs: Attributes, jsx: boolean): v
  * @param tagName The tag name.
  * @param attrs The attributes to set.
  * @param content The content to append.
- * @param jsx True if the element is created by the jsx runtime.
  * @returns The element.
  */
-export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown, jsx: boolean): HTMLElementTagNameMap[K];
-export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown, jsx: boolean): SVGElementTagNameMap[K];
-export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown, jsx: boolean): MathMLElementTagNameMap[K];
-export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown, jsx: boolean): E;
-export function createElement(tagName: string, attrs: Attributes, content: unknown, jsx: boolean): Element {
+export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown): HTMLElementTagNameMap[K];
+export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown): SVGElementTagNameMap[K];
+export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown): MathMLElementTagNameMap[K];
+export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown): E;
+export function createElement(tagName: string, attrs: Attributes, content: unknown): Element {
 	const ns = extract(XMLNS);
 	const elem = ns === undefined
 		? document.createElement(tagName)
 		: document.createElementNS(ns, tagName) as HTMLElement | SVGElement | MathMLElement;
 
-	setAttributes(elem, attrs, jsx);
+	setAttributes(elem, attrs);
 	appendContent(elem, content);
 	return elem;
 }
@@ -262,7 +257,7 @@ export function e<E extends Element>(tagName: string, content?: unknown[]): E;
 export function e<E extends Element>(tagName: string, attrs?: Attributes, content?: unknown[]): E;
 export function e(tagName: string, attrs?: unknown, content?: unknown[]): Element {
 	if (Array.isArray(attrs)) {
-		return createElement(tagName, {}, attrs, false);
+		return createElement(tagName, {}, attrs);
 	}
-	return createElement(tagName, attrs as Attributes ?? {}, content ?? [], false);
+	return createElement(tagName, attrs as Attributes ?? {}, content ?? []);
 }

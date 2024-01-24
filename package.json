@@ -20,13 +20,17 @@
 			"types": "./dist/es/index.d.ts",
 			"default": "./dist/es/index.js"
 		},
+		"./jsx": {
+			"types": "./dist/es/core/jsx/default.d.ts",
+			"default": "./dist/es/core/jsx/default.js"
+		},
 		"./jsx-runtime": {
-			"types": "./dist/es/core/jsx-runtime.d.ts",
-			"default": "./dist/es/core/jsx-runtime.js"
+			"types": "./dist/es/core/jsx/r17.d.ts",
+			"default": "./dist/es/core/jsx/r17.js"
 		},
 		"./jsx-dev-runtime": {
-			"types": "./dist/es/core/jsx-dev-runtime.d.ts",
-			"default": "./dist/es/core/jsx-dev-runtime.js"
+			"types": "./dist/es/core/jsx/r17.d.ts",
+			"default": "./dist/es/core/jsx/r17.js"
 		}
 	},
 	"scripts": {

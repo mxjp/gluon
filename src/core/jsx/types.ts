@@ -9,6 +9,6 @@ export namespace JSX {
 		children: {};
 	}
 
-	export type Element = any;
+	export type Element = unknown;
 	export type ElementClass = never;
 }

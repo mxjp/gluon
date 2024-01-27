@@ -7,10 +7,10 @@ import { extract, inject, sig, StyleMap } from "@mxjp/gluon";
 
 await test("render", async ctx => {
 	await ctx.test("element content", () => {
-		strictEqual((<div />).outerHTML, "<div></div>");
-		strictEqual((<div></div>).outerHTML, "<div></div>");
-		strictEqual((<div>test</div>).outerHTML, "<div>test</div>");
-		strictEqual((<div>1{2}</div>).outerHTML, "<div>12</div>");
+		strictEqual((<div /> as HTMLElement).outerHTML, "<div></div>");
+		strictEqual((<div></div> as HTMLElement).outerHTML, "<div></div>");
+		strictEqual((<div>test</div> as HTMLElement).outerHTML, "<div>test</div>");
+		strictEqual((<div>1{2}</div> as HTMLElement).outerHTML, "<div>12</div>");
 	});
 
 	await ctx.test("events", () => {

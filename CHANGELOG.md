@@ -2,6 +2,7 @@
 
 ## 3.0
 + **Breaking:** Remove `jsx` argument from `createElement` and `setAttributes`.
++ JSX element type is now `unknown`.
 + Support legacy react jsx transform.
 + Notable internal changes, that most likely don't require migration:
   + Moved JSX runtime modules to `/dist/es/core/jsx/r17.{js,d.ts}`.

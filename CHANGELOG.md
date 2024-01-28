@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.1
++ Add `watchFor` utility.
+
 ## 3.0
 + **Breaking:** Remove `jsx` argument from `createElement` and `setAttributes`.
 + JSX element type is now `unknown`.

@@ -1,6 +1,7 @@
 /build
 /dist
 /examples
+/templates
 /node_modules
 /tests_out
 *.js

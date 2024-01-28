@@ -1,6 +1,7 @@
 import { Context, ContextPair, ContextValueFor, deriveContext, inject, ReadonlyContext } from "./context.js";
 import { useUniqueId } from "./ids.js";
 import { Expression } from "./signals.js";
+import { Falsy } from "./types.js";
 import { iter, IterContentFn, map, MapContentFn, nest, show, when } from "./view.js";
 
 /**
@@ -64,8 +65,6 @@ export function DeriveContext(props: {
 }): unknown {
 	return deriveContext(props.children);
 }
-
-type Falsy = null | undefined | false | 0 | 0n | "";
 
 /**
  * A component that renders content depending on an expression.

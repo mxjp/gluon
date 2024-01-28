@@ -1,0 +1,13 @@
+{
+	"name": "gluon-quick-start-minimal",
+	"type": "module",
+	"scripts": {
+		"start": "vite",
+		"build": "vite build"
+	},
+	"devDependencies": {
+		"@mxjp/gluon": "^3.0.3",
+		"typescript": "^5.3.3",
+		"vite": "^5.0.12"
+	}
+}

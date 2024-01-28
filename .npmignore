@@ -3,6 +3,7 @@
 /build
 /examples
 /scripts
+/templates
 /tests
 /tests_out
 /.editorconfig

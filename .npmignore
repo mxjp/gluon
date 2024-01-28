@@ -8,6 +8,5 @@
 /.editorconfig
 /.gitignore
 /package-lock.json
-/README_NPM.md
 /rollup*
 /tsconfig*

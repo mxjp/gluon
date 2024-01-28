@@ -5,9 +5,14 @@ This is a tiny signal based rendering library that aims to be usable with widely
 
 ## Documentation
 + [Installation](#installation)
-  + [JSX Setup](#jsx-setup)
-  + [Basic Usage](#basic-usage)
-  + [Examples](#examples)
+  + [JSX](#jsx)
+    + [TypeScript](#typescript)
+    + [Babel](#babel)
+    + [esbuild & Vite](#esbuild--vite)
+    + [Other Build Systems](#other-build-systems)
+  + [Buidless Options](#buildless-options)
+    + [Custom Bundles](#custom-bundles)
++ [Examples](#examples)
 + [Rendering](#rendering)
   + [Attributes](#attributes)
     + [Classes](#classes)
@@ -58,8 +63,11 @@ Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon
 npm i @mxjp/gluon
 ```
 
-## JSX Setup
-Gluon's npm package supports jsx without any special transform and can be used in typescript by adding the two options below:
+## JSX
+Gluon provides a react 17 JSX runtime and a legacy runtime in case your build tool dosn't support the new runtime.
+
+### TypeScript
+To use JSX with typescript, add the following options to your tsconfig:
 ```js
 {
   "compilerOptions": {
@@ -69,30 +77,93 @@ Gluon's npm package supports jsx without any special transform and can be used i
 }
 ```
 
-## Bundles
-Alternatively, you can copy the bundles below directly into your project for use without any build system.
+### Babel
+When using TypeScript, it is recommended to use the [compiler options](#typescript) specified abvove instead.
+
+If you are using Babel with plain JavaScript, you can use the **@babel/plugin-transform-react-jsx** plugin with the following babel options:
+```js
+{
+  "plugins": [
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "runtime": "automatic",
+        "importSource": "@mxjp/gluon"
+      }
+    ]
+  ]
+}
+```
+
+### esbuild & Vite
+When using TypeScript, it is recommended to use the [compiler options](#typescript) specified abvove instead.
+
+If you are using esbuild or vite with plain JavaScript, you can add the options below:
+```js
+// esbuild.config.mjs
+import * as esbuild from "esbuild";
+
+await esbuild.build({
+  jsx: "automatic",
+  jsxImportSource: "@mxjp/gluon",
+});
+```
+```js
+// vite.config.mjs
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  esbuild: {
+    jsx: "automatic",
+    jsxImportSource: "@mxjp/gluon",
+  },
+});
+```
+
+### Other Build Systems
+Although not documented here, you can also use any other build system that supports JSX.
+
+To use the react 17 runtime (also called "automatic runtime"), use **@mxjp/gluon** as the import source.
+
+To use the legacy runtime, you can manually import the `jsx` factory and the `Fragment` factory or automatically inject it using your build tool:
+```jsx
+import { jsx, Fragment } from "@mxjp/gluon/jsx";
+```
+
+## Buildless Options
+You can also use gluon without any build system by directly using one of the es module bundles listed below. Note, that these bundles don't include any JSX related code and components.
 
 | Modules | Human Readable | Minified | Types |
 |-|-|-|-|
 | Core | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
 | Core, Async, Router | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
 
-Note, that the bundles above do not include the JSX runtime and any JSX related components.
+### Custom Bundles
+If the bundles above don't fit your needs, you can build a custom bundle that only includes the modules you need:
+```bash
+git clone https://github.com/mxjp/gluon
+cd gluon
 
-## Basic Usage
-The **mount** function renders any supported content and appends it to an element.
-```tsx
-import { mount, e } from "@mxjp/gluon";
+npm ci
+node scripts/bundle.js [...args]
 
-// Using jsx:
-mount(document.body, <h1>Hello World!</h1>);
-
-// Or without jsx:
-mount(document.body, e("h1", ["Hello World!"]));
+# Bundle "core" and "async" into "./custom.js", "./custom.min.js" and "./custom.d.ts":
+node scripts/bundle.js -m core async -o ./custom
 ```
++ `--modules | -m <...modules>`
+  + Specify what modules to include.
+  + This can be any directory or filename that exists in the [src](https://github.com/mxjp/gluon/tree/main/src) directory without file extension.
+  + Default is `core`
++ `--output | -o <path>`
+  + Specify the output path of the bundle without extension.
+  + Default is `./dist/gluon.custom`
 
-## Examples
-There are a bunch of examples in the repositories [examples](./examples/) directory.<br>
+<br>
+
+
+
+# Examples
+There are a bunch of examples in the repositories [examples](https://github.com/mxjp/gluon/tree/main/examples) directory.<br>
 You can also [view them in your browser](https://mxjp.github.io/gluon/).
 
 <br>

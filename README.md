@@ -4,6 +4,8 @@
 This is a tiny signal based rendering library that aims to be usable with widely adopted build systems to avoid maintenance overhead for long living projects.
 
 ## Documentation
++ [Quick Start](#quick-start)
+  + [Examples](#examples)
 + [Installation](#installation)
   + [JSX](#jsx)
     + [TypeScript](#typescript)
@@ -12,7 +14,6 @@ This is a tiny signal based rendering library that aims to be usable with widely
     + [Other Build Systems](#other-build-systems)
   + [Buidless Options](#buildless-options)
     + [Custom Bundles](#custom-bundles)
-+ [Examples](#examples)
 + [Rendering](#rendering)
   + [Attributes](#attributes)
     + [Classes](#classes)
@@ -52,6 +53,26 @@ This is a tiny signal based rendering library that aims to be usable with widely
   + [Nested Routing](#nested-routing)
 + [Web Components](#web-components)
 + [Security](#security)
+
+<br>
+
+
+
+# Quick Start
+If you want to try gluon, you can use the commands below to setup a minimal gluon project with Vite and TypeScript.
+```bash
+# Download the minimal template into "my-app":
+npx degit mxjp/gluon/templates/minimal my-app
+cd my-app
+# Install dependencies:
+npm install
+# Start a development server:
+npm start
+```
+
+## Examples
+There are a bunch of examples in the repositories [examples](https://github.com/mxjp/gluon/tree/main/examples) directory.<br>
+You can also [view them in your browser](https://mxjp.github.io/gluon/).
 
 <br>
 
@@ -157,14 +178,6 @@ node scripts/bundle.js -m core async -o ./custom
 + `--output | -o <path>`
   + Specify the output path of the bundle without extension.
   + Default is `./dist/gluon.custom`
-
-<br>
-
-
-
-# Examples
-There are a bunch of examples in the repositories [examples](https://github.com/mxjp/gluon/tree/main/examples) directory.<br>
-You can also [view them in your browser](https://mxjp.github.io/gluon/).
 
 <br>
 

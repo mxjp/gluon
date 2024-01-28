@@ -1,4 +1,4 @@
-![gluon banner](./assets/banner.svg)
+![](./assets/banner.svg)
 
 # gluon!
 This is a tiny signal based rendering library that aims to be usable with widely adopted build systems to avoid maintenance overhead for long living projects.

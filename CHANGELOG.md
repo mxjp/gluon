@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.2
++ Add `captureSelf` utility.
+
 ## 3.1
 + Add `watchFor` utility.
 

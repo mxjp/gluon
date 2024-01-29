@@ -62,7 +62,7 @@ This is a tiny signal based rendering library that aims to be usable with widely
 If you want to try gluon, you can use the commands below to setup a minimal gluon project with Vite and TypeScript.
 ```bash
 # Download the minimal template into "my-app":
-npx degit mxjp/gluon/templates/minimal my-app
+npx degit mxjp/gluon/templates/vite-ts my-app
 cd my-app
 # Install dependencies:
 npm install

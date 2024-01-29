@@ -37,6 +37,28 @@ export function capture(fn: () => void): TeardownHook {
 }
 
 /**
+ * Run a function while capturing teardown hooks that may dispose itself.
+ *
+ * @param fn The function to run.
+ * @returns The function's return value.
+ */
+export function captureSelf<T>(fn: (dispose: TeardownHook) => T): T {
+	let disposed = false;
+	let dispose: TeardownHook | undefined = undefined;
+	let value: T;
+	dispose = capture(() => {
+		value = fn(() => {
+			disposed = true;
+			dispose?.();
+		});
+	});
+	if (disposed) {
+		dispose();
+	}
+	return value!;
+}
+
+/**
  * Run a function without capturing any teardown hooks.
  *
  * This is the opposite of {@link capture}.

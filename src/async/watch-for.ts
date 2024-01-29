@@ -1,4 +1,4 @@
-import { capture, teardown, TeardownHook } from "../core/lifecycle.js";
+import { captureSelf, teardown } from "../core/lifecycle.js";
 import { Expression, watch } from "../core/signals.js";
 import { Falsy } from "../core/types.js";
 
@@ -8,7 +8,7 @@ export type WaitCondition<T> = (value: T) => boolean;
 export class WaitForTimeoutError extends Error {}
 
 /**
- * Utility to wait for an expression until it's output satisfies a condition.
+ * Utility to watch an expression until it's output satisfies a condition.
  *
  * @param expr The expression to watch.
  * @param condition The condition to test. By default, all truthy values are matched.
@@ -26,19 +26,16 @@ export function watchFor<T>(expr: Expression<T>, condition?: WaitCondition<T> | 
 		condition = Boolean as unknown as WaitCondition<T>;
 	}
 	return new Promise<T>((resolve, reject) => {
-		let dispose: TeardownHook;
-		// eslint-disable-next-line prefer-const
-		dispose = capture(() => {
+		captureSelf(dispose => {
 			watch(expr, value => {
-				console.log("TEST", value);
 				if ((condition as WaitCondition<T>)(value)) {
-					dispose?.();
+					dispose();
 					resolve(value);
 				}
 			});
 			if (timeout !== undefined) {
 				const handle = setTimeout(() => {
-					dispose?.();
+					dispose();
 					reject(new WaitForTimeoutError());
 				}, timeout);
 				teardown(() => clearTimeout(handle));

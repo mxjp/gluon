@@ -1,5 +1,5 @@
 {
-	"name": "gluon-quick-start-minimal",
+	"name": "gluon-quick-start",
 	"type": "module",
 	"scripts": {
 		"start": "vite --open",

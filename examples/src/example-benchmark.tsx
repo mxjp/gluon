@@ -15,8 +15,8 @@ export function example() {
 				const json = JSON.stringify(root.toJSON().items, null, "\t") + "\n";
 				(<a
 					href={`data:application/json;base64,${btoa(json)}`}
-					download={`bench_${Date.now()}.json`} />
-				).click();
+					download={`bench_${Date.now()}.json`}
+				/> as HTMLAnchorElement).click();
 			}}>Export JSON</Button>
 		</Row>
 		<div class={classes.grid}>

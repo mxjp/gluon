@@ -3,6 +3,9 @@
 # gluon!
 This is a tiny signal based rendering library that aims to be usable with widely adopted build systems to avoid maintenance overhead for long living projects.
 
+## Stability Warning
+This is an early in-development version with [frequent breaking changes](https://github.com/mxjp/gluon/blob/main/CHANGELOG.md).
+
 ## Documentation
 + [Quick Start](#quick-start)
   + [Examples](#examples)

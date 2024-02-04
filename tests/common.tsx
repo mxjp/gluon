@@ -59,8 +59,8 @@ export function boundaryEvents(events: unknown[]): ViewBoundaryOwner {
 	};
 }
 
-type ResolveFn<T> = (value: T | PromiseLike<T>) => void;
-type RejectFn = (error: unknown | void | PromiseLike<unknown | void>) => void;
+export type ResolveFn<T> = (value: T | PromiseLike<T>) => void;
+export type RejectFn = (error: unknown | void | PromiseLike<unknown | void>) => void;
 
 export function future<T = void>(): [Promise<T>, ResolveFn<T>, RejectFn] {
 	let resolve!: ResolveFn<T>;

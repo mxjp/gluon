@@ -6,6 +6,8 @@ export type TaskSource = (() => unknown) | Promise<unknown> | null | undefined;
 
 /**
  * Represents a set of pending tasks in a specific context.
+ *
+ * This is meant to be used for preventing concurrent user interaction in a specific context.
  */
 export class Tasks {
 	#parent: Tasks | undefined;
@@ -96,6 +98,8 @@ export const TASKS = Symbol.for("gluon:tasks") as ContextKey<Tasks>;
  * Check if there are any pending tasks in the current tasks instance.
  *
  * This can be used in conjuction with {@link waitFor} to indicate if there are any pending tasks.
+ *
+ * This is meant to be used for preventing concurrent user interaction in a specific context.
  */
 export function isSelfPending(): boolean {
 	return extract(TASKS)?.selfPending ?? false;
@@ -105,6 +109,8 @@ export function isSelfPending(): boolean {
  * Check if there are any pending tasks in the current tasks instance or any of it's parents.
  *
  * This can be used in conjunction with {@link waitFor} to disable inputs and buttons while there are any pending tasks.
+ *
+ * This is meant to be used for preventing concurrent user interaction in a specific context.
  */
 export function isPending(): boolean {
 	return extract(TASKS)?.pending ?? false;
@@ -112,6 +118,8 @@ export function isPending(): boolean {
 
 /**
  * Pretend, that there is a pending task in the current tasks instance until the current context is disposed.
+ *
+ * This is meant to be used for preventing concurrent user interaction in a specific context.
  *
  * @example
  * ```tsx
@@ -132,6 +140,8 @@ export function setPending(): void {
 
 /**
  * Use the current tasks instance to wait for an async function or promise.
+ *
+ * This is meant to be used for preventing concurrent user interaction in a specific context.
  *
  * @param source The async function or promise to wait for.
  */

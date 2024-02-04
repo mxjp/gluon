@@ -50,7 +50,7 @@ This is an early in-development version with [frequent breaking changes](https:/
     + [Memos](#memos)
 + [Async Utilities](#async-utilities)
   + [Tasks](#tasks)
-  + [Unwrap](#unwrap)
+  + [Async](#async)
   + [Abort Controllers](#abort-controllers)
 + [Routing](#routing)
   + [Navigation](#navigation)
@@ -895,24 +895,24 @@ mount(
 );
 ```
 
-## Unwrap
+## Async
 Render content depending on an async function or promise.
 ```tsx
-import { mount, Unwrap } from "@mxjp/gluon";
+import { mount, Async } from "@mxjp/gluon";
 
 const promise = new Promise(resolve => setTimeout(resolve, 1000));
 
 mount(
   document.body,
-  <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
+  <Async source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
     {value => <>Resolved: {value}</>}
-  </Unwrap>,
+  </Async>,
 );
 ```
 
-To unwrap promises returned from an expression, unwrap can be combined with [when](#when).
+To use promises returned from an expression, this can be combined with [when](#when):
 ```tsx
-import { mount, Unwrap, When, sig } from "@mxjp/gluon";
+import { mount, Async, When, sig } from "@mxjp/gluon";
 
 const promise = sig(undefined);
 setInterval(() => {
@@ -922,9 +922,9 @@ setInterval(() => {
 mount(
   document.body,
   <When value={promise}>
-    {promise => <Unwrap source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
+    {promise => <Async source={promise} pending={() => "Pending..."} rejected={error => `Rejected: ${error}`}>
       {value => <>Resolved: {value}</>}
-    </Unwrap>}
+    </Async>}
   </When>
 );
 ```

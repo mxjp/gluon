@@ -37,4 +37,7 @@ export interface Router {
 
 export type QueryInit = ConstructorParameters<typeof URLSearchParams>[0];
 
+/**
+ * Context key for the current {@link Router} instance.
+ */
 export const ROUTER = Symbol.for("gluon:router") as ContextKey<Router>;

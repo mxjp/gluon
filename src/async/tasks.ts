@@ -13,6 +13,8 @@ export class Tasks {
 
 	/**
 	 * Create a new tasks instance with the specified parent.
+	 *
+	 * @param parent The parent to use. Default is no parent.
 	 */
 	constructor(parent?: Tasks) {
 		this.#parent = parent;
@@ -76,8 +78,18 @@ export class Tasks {
 			});
 		}
 	}
+
+	/**
+	 * Create a new tasks instance using the {@link extract current} instance as parent.
+	 */
+	static fork(): Tasks {
+		return new Tasks(extract(TASKS));
+	}
 }
 
+/**
+ * Context key for the current {@link Tasks} instance.
+ */
 export const TASKS = Symbol.for("gluon:tasks") as ContextKey<Tasks>;
 
 /**

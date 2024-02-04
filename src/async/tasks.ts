@@ -78,7 +78,7 @@ export class Tasks {
 	}
 }
 
-export const TASKS = Symbol.for("gluon:") as ContextKey<Tasks>;
+export const TASKS = Symbol.for("gluon:tasks") as ContextKey<Tasks>;
 
 /**
  * Check if there are any pending tasks in the current tasks instance.

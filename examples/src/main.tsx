@@ -18,6 +18,7 @@ const exampleNames: string[] = [
 	"routing",
 	"movable",
 	"custom-view",
+	"render-to-string",
 	"benchmark",
 ];
 

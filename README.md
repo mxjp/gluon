@@ -929,6 +929,26 @@ mount(
 );
 ```
 
+Async contexts can be used to wait for all async parts of a tree to complete:
+```tsx
+import { mount, Inject, ASYNC, Async, AsyncContext } from "@mxjp/gluon";
+
+// Create a new context with the current one as parent if there is one:
+const context = AsyncContext.fork();
+
+mount(
+  document.body,
+  <Inject key={ASYNC} value={context}>
+    {() => <>
+      <Async ... />
+    </>}
+  </Inject>
+);
+
+// Wait for all async parts to complete:
+await context.complete();
+```
+
 ## Abort Controllers
 Abort controllers can be used in many web APIs to abort things.
 

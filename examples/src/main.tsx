@@ -1,4 +1,4 @@
-import { Inject, Iter, Nest, Tasks, Unwrap, mount, sig } from "@mxjp/gluon";
+import { Inject, Iter, Nest, TASKS, Tasks, Unwrap, mount, sig } from "@mxjp/gluon";
 import { Column } from "./components/column";
 import hljs from 'highlight.js';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -53,7 +53,7 @@ function ExampleView(props: { name: string }) {
 
 mount(
 	document.body,
-	<Inject value={new Tasks()}>
+	<Inject key={TASKS} value={new Tasks()}>
 		{() => {
 			return <div class={classes.app}>
 				<div class={classes.area}>

@@ -2,10 +2,12 @@
 
 ## 4.0
 + Add `Tasks.fork` utility.
++ Add `async` and `Async` for asynchronous rendering with a separate tracking system.
 + **Breaking:** Remove class based context keys.
 + **Breaking:** `inject` now requires a **key** and **value** instead of a **pair** argument.
 + **Breaking:** Renamed `ContextKeyFor` to `ContextKey`.
 + **Breaking:** Renamed `ContextValueFor` to `ContextValue`.
++ **Breaking:** Removed `unwrap` and `Unwrap`. Use `async/Async` instead.
 
 ## 3.2
 + Add `captureSelf` utility.

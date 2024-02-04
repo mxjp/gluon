@@ -1,4 +1,4 @@
-import { Context, ContextPair, ContextValueFor, deriveContext, inject, ReadonlyContext } from "./context.js";
+import { Context, ContextValue, deriveContext, inject, ReadonlyContext } from "./context.js";
 import { useUniqueId } from "./ids.js";
 import { Expression } from "./signals.js";
 import { Falsy } from "./types.js";
@@ -13,30 +13,18 @@ import { iter, IterContentFn, map, MapContentFn, nest, show, when } from "./view
  *
  * mount(
  *   document.body,
- *   <>
- *     <Inject key="message" value="Hello World!">
- *       {() => <h1>{extract("message")}</h1>}
- *     </Inject>
- *
- *     <Inject value={["message", "Hello World!"]}>
- *       {() => <h1>{extract("message")}</h1>}
- *     </Inject>
- *   </>
+ *   <Inject key="message" value="Hello World!">
+ *     {() => <h1>{extract("message")}</h1>}
+ *   </Inject>
  * );
  * ```
  */
 export function Inject<K>(props: {
 	key: K;
-	value: ContextValueFor<K>;
-	children: () => unknown;
-} | {
-	value: ContextPair<K>;
+	value: ContextValue<K>;
 	children: () => unknown;
 }): unknown {
-	if ("key" in props) {
-		return inject([props.key, props.value], props.children);
-	}
-	return inject(props.value, props.children);
+	return inject(props.key, props.value, props.children);
 }
 
 /**

@@ -42,6 +42,8 @@ This is an early in-development version with [frequent breaking changes](https:/
   + [Conversion](#conversion)
 + [Lifecycle](#lifecycle)
 + [Context](#context)
+  + [Typed Keys](#typed-keys)
+  + [Async Code](#async-code)
 + [Performance](#performance)
   + [Update Batching](#update-batching)
   + [Lazy Expressions](#lazy-expressions)
@@ -722,17 +724,9 @@ Contexts can be used to pass key-value pairs along the call stack without requir
 import { inject, extract } from "@mxjp/gluon";
 
 // Inject a key-value pair:
-inject(["message", "Hello World!"], () => {
+inject("message", "Hello World!", () => {
   // Extract a value by key:
   console.log("Message:", extract("message"));
-});
-
-class Example {}
-
-// Inject a class instance:
-inject(new Example(), () => {
-  // Extract an instance by it's constructor:
-  extract(Example) instanceof Example; // true
 });
 ```
 
@@ -749,11 +743,30 @@ mount(
   </Inject>
 );
 ```
+
+## Typed Keys
+Context values are typed as `unknown` by default.
+
+To use typed context values, you can use symbols in combination with the `ContextKey` type as keys:
+```tsx
+import {} from "@mxjp/gluon";
+
+const MESSAGE = Symbol("message") as ContextKey<string>;
+
+inject(MESSAGE, "Hello World!", () => {
+  extract(MESSAGE); // Type: string | undefined
+});
+
+// This is a compiler error:
+inject(MESSAGE, 42, () => { ... });
+```
+
+## Async Code
 To make contexts work with other asynchronous code, you can manually run functions in a different context:
 ```tsx
 import { inject, getContext, runInContext } from "@mxjp/gluon";
 
-inject(["message", "Hello World!"], () => {
+inject("message", "Hello World!", () => {
   const context = getContext();
 
   queueMicrotask(() => {

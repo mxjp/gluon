@@ -168,7 +168,7 @@ export function routes(routes: ContentRoute[]): View {
 	return nest(() => {
 		const match = watched.match;
 		if (match) {
-			return () => inject([ROUTER, new ChildRouter(router, match.path, () => watched.rest)], () => {
+			return () => inject(ROUTER, new ChildRouter(router, match.path, () => watched.rest), () => {
 				return match.route.content(match.params);
 			});
 		}

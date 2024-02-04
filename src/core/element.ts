@@ -1,4 +1,4 @@
-import { ContextKeyFor, extract, wrapContext } from "./context.js";
+import { ContextKey, extract, wrapContext } from "./context.js";
 import { createText } from "./render.js";
 import { Expression, get, watch } from "./signals.js";
 import { View } from "./view.js";
@@ -35,7 +35,7 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  * );
  * ```
  */
-export const XMLNS = Symbol.for("gluon:namespace") as ContextKeyFor<typeof HTML | typeof SVG | typeof MATHML>;
+export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<typeof HTML | typeof SVG | typeof MATHML>;
 
 /**
  * Append content to a node.

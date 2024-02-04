@@ -1,4 +1,4 @@
-import { extract } from "../core/context.js";
+import { ContextKey, extract } from "../core/context.js";
 import { teardown } from "../core/lifecycle.js";
 import { sig } from "../core/signals.js";
 
@@ -78,13 +78,15 @@ export class Tasks {
 	}
 }
 
+export const TASKS = Symbol.for("gluon:") as ContextKey<Tasks>;
+
 /**
  * Check if there are any pending tasks in the current tasks instance.
  *
  * This can be used in conjuction with {@link waitFor} to indicate if there are any pending tasks.
  */
 export function isSelfPending(): boolean {
-	return extract(Tasks)?.selfPending ?? false;
+	return extract(TASKS)?.selfPending ?? false;
 }
 
 /**
@@ -93,7 +95,7 @@ export function isSelfPending(): boolean {
  * This can be used in conjunction with {@link waitFor} to disable inputs and buttons while there are any pending tasks.
  */
 export function isPending(): boolean {
-	return extract(Tasks)?.pending ?? false;
+	return extract(TASKS)?.pending ?? false;
 }
 
 /**
@@ -113,7 +115,7 @@ export function isPending(): boolean {
  * ```
  */
 export function setPending(): void {
-	extract(Tasks)?.setPending();
+	extract(TASKS)?.setPending();
 }
 
 /**
@@ -122,5 +124,5 @@ export function setPending(): void {
  * @param source The async function or promise to wait for.
  */
 export function waitFor(source: TaskSource): void {
-	extract(Tasks)?.waitFor(source);
+	extract(TASKS)?.waitFor(source);
 }

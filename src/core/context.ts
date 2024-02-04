@@ -1,6 +1,6 @@
 
 /**
- * Utility for phantom typed context key-value pairs.
+ * Utility for defining phantom typed context key-value pairs.
  *
  * @example
  * ```ts
@@ -8,25 +8,17 @@
  *
  * const key = Symbol("example") as SymbolFor<"exampleValue">;
  *
- * inject([key, "exampleValue"], () => {
+ * inject(key, "exampleValue", () => {
  *   const value = extract(key); // type = "exampleValue"
  * });
  * ```
  */
-export type ContextKeyFor<V> = symbol & { PHANTOM_CONTEXT_KEY_FOR: V & never };
+export type ContextKey<V> = symbol & { PHANTOM_CONTEXT_KEY_FOR: V & never };
 
 /**
  * The value type for a specific type of key.
  */
-export type ContextValueFor<K>
-	= K extends (new(...args: any) => infer T) ? T
-		: K extends ContextKeyFor<infer V> ? V
-			: unknown;
-
-/**
- * A key value pair or instance for a specific type of key.
- */
-export type ContextPair<K> = K | [K, ContextValueFor<K>];
+export type ContextValue<K> = K extends ContextKey<infer V> ? V : unknown;
 
 /**
  * Interface for a context that should not be modified.
@@ -34,7 +26,7 @@ export type ContextPair<K> = K | [K, ContextValueFor<K>];
  * Note that this is always a {@link Map} instance.
  */
 export interface ReadonlyContext {
-	get<K>(key: K): ContextValueFor<K> | undefined;
+	get<K>(key: K): ContextValue<K> | undefined;
 	has(key: unknown): boolean;
 	readonly size: number;
 }
@@ -47,7 +39,7 @@ export interface ReadonlyContext {
 export interface Context extends ReadonlyContext {
 	clear(): void;
 	delete(key: unknown): boolean;
-	set<K>(key: K, value: ContextValueFor<K>): void;
+	set<K>(key: K, value: ContextValue<K>): void;
 }
 
 /**
@@ -70,7 +62,7 @@ export function getContext(): ReadonlyContext | undefined {
  * @param key The key to find.
  * @returns The value or undefined if not found.
  */
-export function extract<K>(key: K): ContextValueFor<K> | undefined {
+export function extract<K>(key: K): ContextValue<K> | undefined {
 	return getContext()?.get(key);
 }
 
@@ -83,17 +75,9 @@ export function extract<K>(key: K): ContextValueFor<K> | undefined {
  * @param fn The function to run.
  * @returns The function's return value.
  */
-export function inject<K, R>(value: ContextPair<K>, fn: () => R): R {
+export function inject<K, R>(key: K, value: ContextValue<K>, fn: () => R): R {
 	const context = new Map(getContext() as Map<any, any>) as Context;
-	if (Array.isArray(value)) {
-		context.set(value[0], value[1]);
-	} else {
-		const constructor = (value as any).constructor as unknown;
-		if (typeof constructor !== "function") {
-			throw new TypeError("value must have a constructor");
-		}
-		context.set(constructor, value);
-	}
+	context.set(key, value);
 	return runInContext(context, fn);
 }
 

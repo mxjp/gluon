@@ -179,7 +179,7 @@ await test("signals", async ctx => {
 		await ctx.test("context", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
-			inject(["test", 42], () => {
+			inject("test", 42, () => {
 				watch(() => {
 					events.push(`e${extract("test")}`);
 					signal.access();
@@ -188,7 +188,7 @@ await test("signals", async ctx => {
 				});
 			});
 			assertEvents(events, ["e42", "c42"]);
-			inject(["test", 7], () => {
+			inject("test", 7, () => {
 				signal.notify();
 			});
 			assertEvents(events, ["e42", "c42"]);

@@ -1,4 +1,4 @@
-import { ContextKeyFor } from "../core/context.js";
+import { ContextKey } from "../core/context.js";
 
 export interface Router {
 	/**
@@ -37,4 +37,4 @@ export interface Router {
 
 export type QueryInit = ConstructorParameters<typeof URLSearchParams>[0];
 
-export const ROUTER = Symbol.for("gluon:router") as ContextKeyFor<Router>;
+export const ROUTER = Symbol.for("gluon:router") as ContextKey<Router>;

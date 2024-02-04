@@ -15,7 +15,7 @@ await test("render", async ctx => {
 
 	await ctx.test("events", () => {
 		const events: any[] = [];
-		const elem = inject(["foo", "bar"], () => {
+		const elem = inject("foo", "bar", () => {
 			return <div
 				$click={event => {
 					strictEqual(extract("foo"), "bar");
@@ -39,7 +39,7 @@ await test("render", async ctx => {
 
 	await ctx.test("capture events", () => {
 		const events: any[] = [];
-		const elem = inject(["foo", "bar"], () => {
+		const elem = inject("foo", "bar", () => {
 			return <div
 				$$click={event => {
 					strictEqual(extract("foo"), "bar");

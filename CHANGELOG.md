@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0
++ **Breaking:** Remove class based context keys.
++ **Breaking:** `inject` now requires a **key** and **value** instead of a **pair** argument.
++ **Breaking:** Renamed `ContextKeyFor` to `ContextKey`.
++ **Breaking:** Renamed `ContextValueFor` to `ContextValue`.
+
 ## 3.2
 + Add `captureSelf` utility.
 

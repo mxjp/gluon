@@ -1,4 +1,4 @@
-import { Inject, Iter, Nest, TASKS, Tasks, Unwrap, mount, sig } from "@mxjp/gluon";
+import { Inject, Iter, Nest, TASKS, Tasks, Async, mount, sig } from "@mxjp/gluon";
 import { Column } from "./components/column";
 import hljs from 'highlight.js';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -33,13 +33,13 @@ interface ExampleModule {
 function ExampleView(props: { name: string }) {
 	return <Column>
 		<h1>{props.name}</h1>
-		<Unwrap<ExampleModule>
+		<Async<ExampleModule>
 			source={() => import(`./example-${props.name}.tsx`)}
 			pending={() => "Loading example..."}
 		>
 			{module => <module.example />}
-		</Unwrap>
-		<Unwrap<any>
+		</Async>
+		<Async<any>
 			source={() => import(`./example-${props.name}.tsx?raw`)}
 			pending={() => "Loading source code..."}
 		>
@@ -47,7 +47,7 @@ function ExampleView(props: { name: string }) {
 				const res = hljs.highlight(source.default, { language: "tsx", ignoreIllegals: true });
 				return <div class={classes.source} prop:innerHTML={res.value}></div>;
 			}}
-		</Unwrap>
+		</Async>
 	</Column>;
 }
 

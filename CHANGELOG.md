@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1
++ Add watchable `pending` property to async contexts.
+
 ## 4.0
 + Add `Tasks.fork` utility.
 + Add `async` and `Async` for asynchronous rendering with a separate tracking system.

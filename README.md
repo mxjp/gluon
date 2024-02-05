@@ -11,6 +11,7 @@ This is an early in-development version with [frequent breaking changes](https:/
 
 ## Documentation
 + [Quick Start](#quick-start)
+  + [Introduction](#introduction)
   + [Examples](#examples)
 + [Installation](#installation)
   + [JSX](#jsx)
@@ -76,6 +77,140 @@ cd my-app
 npm install
 # Start a development server:
 npm start
+```
+
+## Introduction
+After setting up the quick start template, you can find the main entry point in **src/main.tsx**:
+```tsx
+import { mount } from "@mxjp/gluon";
+
+// This renders content and appends it to the document body:
+mount(
+  document.body,
+  <h1>Hello World!</h1>
+);
+```
+
+Reactivity is entirely based on [signals](#signals) which are just objects with a value that can be watched for changes. Signals or functions that access a signal value can be used as attributes and content.<br>
+The example below renders a button that increments a counter when clicked:
+```tsx
+import { mount, sig } from "@mxjp/gluon";
+
+// Create a signal with the initial value "0":
+const count = sig(0);
+
+mount(
+  document.body,
+  <button $click={() => {
+    // Setting the value updates all places it's used at:
+    count.value++;
+  }}>
+    Clicked {count} times
+  </button>
+);
+```
+
+Instead of using the **count** signal directly, you can also use it in a function that accesses it's value for arbitrary computations:
+```tsx
+import { mount, sig } from "@mxjp/gluon";
+
+const count = sig(0);
+
+mount(
+  document.body,
+  <button $click={() => { count.value++ }}>
+    Clicked {() => count.value} times
+  </button>
+);
+```
+
+To render conditional or repeated content, [views](#views) are used which are sequences of nodes that may change themselves.<br>
+The example below creates a button to show or hide a message. The function inside the **When** component renders content every time, it's **value** property evaluates to some truthy value:
+```tsx
+import { mount, sig, When } from "@mxjp/gluon";
+
+const show = sig(false);
+
+mount(
+  document.body,
+  <>
+    <button $click={() => { show.value = !show.value }}>Toggle message</button>
+    <When value={show}>
+      {() => <h1>Hello World!</h1>}
+    </When>
+  </>
+);
+```
+
+To organize your code in [components](#components), you can create a function that returns rendered content. Properties are passed with the first **props** argument.<br>
+The example below shows a counter component with an optional initial value:
+```tsx
+import { mount, sig } from "@mxjp/gluon";
+
+function Counter(props: { start?: number }) {
+  const count = sig(props.start ?? 0);
+  return <button $click={() => { count.value++ }}>
+    Clicked {count} times
+  </button>;
+}
+
+mount(
+  document.body,
+  <>
+    <Counter />
+    <Counter start={7} />
+  </>
+);
+```
+
+Note, that the **start** property in the example above is not reactive. To accept reactive properties, the [Expression](#expressions) type can be used.<br>
+The example below shows a component that reactively displays a count:
+```tsx
+import { mount, sig, Expression } from "@mxjp/gluon";
+
+function Count(props: { count: Expression<number> }) {
+  return <>
+    Current count: {props.count}
+  </>;
+}
+
+const count = sig(0);
+
+mount(
+  document.body,
+  <>
+    <button $click={() => { count.value++ }}>Increment</button>
+    <Count count={count} />
+  </>
+);
+```
+
+To access the current value of an expression, the **get** function can be used:
+```tsx
+import { Expression, get } from "@mxjp/gluon";
+
+function Count(props: { count: Expression<number> }) {
+  return <>Current count: {() => get(props.count)}</>;
+}
+```
+
+To allow a component to change a value, you can either use signals or callbacks:
+```tsx
+import { mount, sig, Signal } from "@mxjp/gluon";
+
+function IncrementButton(props: { value: Signal<number> }) {
+  return <button $click={() => { props.count.value++ }}>Increment</button>;
+}
+
+const count = sig(0);
+
+mount(
+  document.body,
+  <>
+    <IncrementButton count={count} />
+    Clicked {count} times
+  </>
+)
 ```
 
 ## Examples

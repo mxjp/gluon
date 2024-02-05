@@ -1,4 +1,5 @@
 import { ContextKey, extract } from "../core/context.js";
+import { sig } from "../core/signals.js";
 
 /**
  * Represents pending operations in an asynchronously rendered tree.
@@ -7,7 +8,7 @@ import { ContextKey, extract } from "../core/context.js";
  */
 export class AsyncContext {
 	#parent: AsyncContext | undefined;
-	#tasks = new Set<Promise<unknown>>();
+	#tasks = sig(new Set<Promise<unknown>>());
 	#errors = new Set<unknown[]>();
 
 	constructor(parent?: AsyncContext) {
@@ -15,18 +16,31 @@ export class AsyncContext {
 	}
 
 	/**
+	 * Reactively check if there are any pending tasks in this context.
+	 */
+	get pending(): boolean {
+		return this.#tasks.value.size > 0;
+	}
+
+	/**
 	 * Track the specified task in this and all parent contexts.
 	 */
 	track(task: Promise<unknown>): void {
 		this.#parent?.track(task);
-		this.#tasks.add(task);
+		this.#tasks.update(tasks => {
+			tasks.add(task);
+		});
 		task.then(() => {
-			this.#tasks.delete(task);
+			this.#tasks.update(tasks => {
+				tasks.delete(task);
+			});
 		}, error => {
 			for (const errors of this.#errors) {
 				errors.push(error);
 			}
-			this.#tasks.delete(task);
+			this.#tasks.update(tasks => {
+				tasks.delete(task);
+			});
 		});
 	}
 
@@ -40,8 +54,8 @@ export class AsyncContext {
 	async complete(): Promise<void> {
 		const errors: unknown[] = [];
 		this.#errors.add(errors);
-		while (this.#tasks.size > 0) {
-			await Promise.allSettled(this.#tasks);
+		while (this.#tasks.value.size > 0) {
+			await Promise.allSettled(this.#tasks.value);
 		}
 		this.#errors.delete(errors);
 		if (errors.length === 1) {

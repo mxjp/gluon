@@ -1,9 +1,9 @@
 import { deepStrictEqual, fail, rejects, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { AsyncContext, AsyncError } from "@mxjp/gluon";
+import { AsyncContext, AsyncError, watch } from "@mxjp/gluon";
 
-import { future } from "../common.js";
+import { assertEvents, future } from "../common.js";
 
 await test("async/async-context", async ctx => {
 	async function assertErrors(promise: Promise<unknown>, expected: unknown[]) {
@@ -84,4 +84,21 @@ await test("async/async-context", async ctx => {
 			await assertErrors(complete, ["a", "b"]);
 		});
 	}
+
+	await ctx.test("pending", async () => {
+		const events: unknown[] = [];
+		const ac = new AsyncContext();
+		watch(() => ac.pending, pending => {
+			events.push(pending);
+		});
+		assertEvents(events, [false]);
+		ac.track(Promise.resolve());
+		assertEvents(events, [true]);
+		await Promise.resolve();
+		assertEvents(events, [false]);
+		ac.track(Promise.reject());
+		assertEvents(events, [true]);
+		await Promise.resolve();
+		assertEvents(events, [false]);
+	});
 });

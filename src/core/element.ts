@@ -74,7 +74,10 @@ export type StyleMap = {
 
 export type StyleValue = Expression<undefined | StyleMap | StyleValue[]>;
 
-type SpecialAttributes = {
+/**
+ * Represents an object with element attributes.
+ */
+export type Attributes = {
 	class?: ClassValue;
 	style?: StyleValue;
 } & {
@@ -83,16 +86,9 @@ type SpecialAttributes = {
 	[K in `prop:${string}`]?: Expression<unknown>;
 } & {
 	[K in `attr:${string}`]?: Expression<unknown>;
-};
-
-type GenericAttributes = {
+} & {
 	[K in string]?: Expression<unknown>;
 };
-
-/**
- * Represents an object with element attributes.
- */
-export type Attributes = SpecialAttributes & GenericAttributes;
 
 function setAttr(elem: Element, name: string, value: unknown): void {
 	if (value === null || value === undefined || value === false) {

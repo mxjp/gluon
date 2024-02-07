@@ -5,6 +5,7 @@
 /node_modules
 /tests_out
 *.js
+*.jsx
 *.cjs
 *.mjs
 *.html

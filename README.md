@@ -133,12 +133,25 @@ mount(
 );
 ```
 
-To access the current value of an expression, the **get** function can be used:
+To map the value of an expression, use the **map** function:
 ```tsx
 import { Expression, get } from "@mxjp/gluon";
 
 function Count(props: { count: Expression<number> }) {
-  return <>Current count: {() => get(props.count)}</>;
+  return <>Current count: {map(props.count, count => {
+    return "0x" + count.toString(16);
+  })}</>;
+}
+```
+
+To access the value of an expression at any time, use the **get** function:
+```tsx
+import { Expression, get } from "@mxjp/gluon";
+
+function Count(props: { count: Expression<number> }) {
+  console.log("Initial count:", get(props.count));
+
+  return <>Current count: {props.count}</>;
 }
 ```
 
@@ -679,7 +692,9 @@ mount(
 );
 ```
 
-By default, properties are non-reactive. To accept reactive properties, you can use [expressions](#reactivity) and the **get** function to evaluate them when needed:
+By default, properties are non-reactive. To accept reactive properties, you can use [expressions](#reactivity).
+
+To map an expression value, use the **map** function, to access an expression value at any time use the **get** function:
 ```tsx
 import { mount, get, Expression } from "@mxjp/gluon";
 
@@ -689,7 +704,9 @@ function Hint(props: {
   variant: Expression<"error" | "info">,
   children: unknown,
 }) {
-  return <div class={() => classes[get(props.variant)]}>
+  console.log("Initial value:", get(props.variant));
+
+  return <div class={map(props.variant, variant => classes[variant])}>
     {props.children}
   </div>;
 }

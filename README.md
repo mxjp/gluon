@@ -189,7 +189,7 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
     + [Views](#views)
       + [when](#when)
       + [nest](#nest)
-      + [map](#map)
+      + [iterUnique](#iterunique)
       + [iter](#iter)
       + [show](#show)
       + [movable](#movable)
@@ -527,23 +527,23 @@ mount(
 );
 ```
 
-#### `<Map>`
+#### `<IterUnique>`
 Render content for each unique value in an iterable.
 
 Items are rendered in iteration order and duplicates are silently ignored.
 
 The **index** parameter is a function that can be used to reactively get the current index.
 ```tsx
-import { mount, Map, sig } from "@mxjp/gluon";
+import { mount, IterUnique, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
 mount(
   document.body,
   <ul>
-    <Map each={items}>
+    <IterUnique each={items}>
       {(value, index) => <li>{() => index() + 1}: {value}</li>}
-    </Map>
+    </IterUnique>
   </ul>
 );
 ```
@@ -837,13 +837,13 @@ dispose();
 
 Teardown hooks can be used in **watch** and **view** callbacks.
 ```tsx
-import { mount, sig, Map, teardown } from "@mxjp/gluon";
+import { mount, sig, IterUnique, teardown } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "baz"]);
 
 mount(
   document.body,
-  <Map each={items}>
+  <IterUnique each={items}>
     {item => {
       console.log("Rendering:", item);
       teardown(() => {
@@ -851,7 +851,7 @@ mount(
       });
       return <li>{item}</li>;
     }}
-  </Map>
+  </IterUnique>
 );
 ```
 

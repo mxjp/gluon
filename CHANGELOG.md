@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.0
++ Rename `map/Map` to `iterUnique/IterUnique`.
+
 ## 4.1
 + Add watchable `pending` property to async contexts.
 

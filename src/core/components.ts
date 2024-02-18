@@ -2,7 +2,7 @@ import { Context, ContextValue, deriveContext, inject, ReadonlyContext } from ".
 import { useUniqueId } from "./ids.js";
 import { Expression } from "./signals.js";
 import { Falsy } from "./types.js";
-import { iter, IterContentFn, map, MapContentFn, nest, show, when } from "./view.js";
+import { iter, IterContentFn, iterUnique, IterUniqueContentFn, nest, show, when } from "./view.js";
 
 /**
  * Inject an entry.
@@ -128,19 +128,19 @@ export function When<T>(props: {
  *
  * @example
  * ```tsx
- * import { Map, mount, sig } from "@mxjp/gluon";
+ * import { IterUnique, mount, sig } from "@mxjp/gluon";
  *
  * const items = sig([1, 2, 3]);
  *
  * mount(
  *   document.body,
- *   <Map each={items}>
+ *   <IterUnique each={items}>
  *     {value => <li>{value}</li>}
- *   </Map>
+ *   </IterUnique>
  * );
  * ```
  */
-export function Map<T>(props: {
+export function IterUnique<T>(props: {
 	/**
 	 * The expression.
 	 */
@@ -149,9 +149,9 @@ export function Map<T>(props: {
 	/**
 	 * A function to create content for a specific value.
 	 */
-	children: MapContentFn<T>;
+	children: IterUniqueContentFn<T>;
 }): unknown {
-	return map(props.each, props.children);
+	return iterUnique(props.each, props.children);
 }
 
 /**

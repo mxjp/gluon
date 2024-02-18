@@ -3,7 +3,7 @@ import "./env.js";
 import { notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { capture, iter, map, mount, movable, nest, render, show, sig, teardown, View, watch, when } from "@mxjp/gluon";
+import { capture, iter, iterUnique, mount, movable, nest, render, show, sig, teardown, View, watch, when } from "@mxjp/gluon";
 
 import { assertEvents, boundaryEvents, TestView, testView, text } from "./common.js";
 
@@ -252,12 +252,12 @@ await test("view", async ctx => {
 		})();
 	});
 
-	await ctx.test("map", async ctx => {
+	await ctx.test("iterUnique", async ctx => {
 		function sequenceTest(sequence: unknown[][]) {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
-			const view = map(signal, (value, index) => {
+			const view = iterUnique(signal, (value, index) => {
 				events.push(`+${value}`);
 				teardown(() => {
 					events.push(`-${value}`);

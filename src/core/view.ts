@@ -215,7 +215,7 @@ export function when<T>(value: Expression<T | Falsy>, thenFn: (value: T) => unkn
 /**
  * A function to create content for a specific value.
  */
-export interface MapContentFn<T> {
+export interface IterUniqueContentFn<T> {
 	/**
 	 * @param value The value.
 	 * @param index An expression to get the current index.
@@ -233,7 +233,7 @@ export interface MapContentFn<T> {
  * @param content A function to create content for a specific value.
  * @returns The view.
  */
-export function map<T>(expr: Expression<Iterable<T>>, content: MapContentFn<T>): View {
+export function iterUnique<T>(expr: Expression<Iterable<T>>, content: IterUniqueContentFn<T>): View {
 	return new View((setBoundary, self) => {
 		interface Instance {
 			value: T;

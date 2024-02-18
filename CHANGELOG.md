@@ -1,7 +1,9 @@
 # Changelog
 
 ## 5.0
-+ Rename `map/Map` to `iterUnique/IterUnique`.
++ **Breaking:** Rename `map/Map` to `iterUnique/IterUnique`.
++ **Breaking:** Remove `mapper` utility.
++ **Breaking:** Add `map` utility for mapping expression values.
 
 ## 4.1
 + Add watchable `pending` property to async contexts.

@@ -560,32 +560,40 @@ export function get<T>(expr: Expression<T>): T {
 	return expr;
 }
 
+export type MapFn<I, O> = (input: I) => O;
+
 /**
- * Create a function that maps an expression value.
+ * Map an expression value while preserving if the expression is static or not.
  */
-export function mapper<I, O>(map: (input: I) => O): (input: Expression<I>) => Expression<O> {
-	return input => {
-		if (input instanceof Signal) {
-			return () => map(input.value);
-		}
-		if (typeof input === "function") {
-			return () => map((input as () => I)());
-		}
-		return map(input);
-	};
+export function map<I, O>(input: Expression<I>, mapFn: MapFn<I, O>): Expression<O> {
+	if (input instanceof Signal) {
+		return () => mapFn(input.value);
+	}
+	if (typeof input === "function") {
+		return () => mapFn((input as () => I)());
+	}
+	return mapFn(input);
 }
 
 /**
- * Convert all expression values to strings.
+ * Map an expression value to strings.
+ *
+ * See {@link map}.
  */
-export const string = mapper((input: unknown) => String(input));
+export function string(input: Expression<unknown>): Expression<string> {
+	return map(input, value => String(value));
+}
 
 /**
- * Convert all expression values to strings except **null** or **undefined**.
+ * Map an expression value to strings unless it's null or undefined.
+ *
+ * See {@link map}.
  */
-export const optionalString = mapper((input: unknown) => {
-	if (input === null || input === undefined) {
-		return input;
-	}
-	return String(input);
-});
+export function optionalString<T>(input: Expression<T>): Expression<string | Exclude<T, Exclude<T, null | undefined>>> {
+	return map<T, unknown>(input, value => {
+		if (value === null || value === undefined) {
+			return value;
+		}
+		return String(value);
+	}) as Expression<string | Exclude<T, Exclude<T, null | undefined>>>;
+}

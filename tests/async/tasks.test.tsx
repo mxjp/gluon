@@ -1,7 +1,9 @@
+import "../env.js";
+
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { capture, extract, inject, isPending, isSelfPending, TASKS, Tasks, waitFor, watch, wrapContext } from "@mxjp/gluon";
+import { capture, extract, inject, isPending, isSelfPending, mount, TASKS, Tasks, waitFor, watch, wrapContext } from "@mxjp/gluon";
 
 import { assertEvents, future } from "../common.js";
 
@@ -117,5 +119,27 @@ await test("async/tasks", async ctx => {
 					strictEqual(isSelfPending(), false);
 				}));
 		});
+	});
+
+	await ctx.test("manage focus", async () => {
+		const input = <input /> as HTMLInputElement;
+		const dispose = capture(() => mount(document.body, input));
+		try {
+			const tasks = new Tasks();
+
+			input.focus();
+			strictEqual(document.activeElement, input);
+
+			const done = capture(() => tasks.setPending());
+
+			input.blur();
+			strictEqual(document.activeElement, document.body);
+
+			done();
+			strictEqual(document.activeElement, input);
+		} finally {
+			dispose();
+		}
+		strictEqual(document.activeElement, document.body);
 	});
 });

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 5.0
++ **Breaking:** Restore focus on the last active element by default when there are no more pending tasks.
 + **Breaking:** Rename `map/Map` to `iterUnique/IterUnique`.
 + **Breaking:** Remove `mapper` utility.
 + **Breaking:** Add `map` utility for mapping expression values.

@@ -1,8 +1,17 @@
 import { ContextKey, extract } from "../core/context.js";
 import { teardown } from "../core/lifecycle.js";
-import { sig } from "../core/signals.js";
+import { sig, watch } from "../core/signals.js";
 
 export type TaskSource = (() => unknown) | Promise<unknown> | null | undefined;
+
+export interface TasksOptions {
+	/**
+	 * If true, focus is restored on the last active element when there are no more pending tasks in this instance.
+	 *
+	 * By default, this is inherited from the parent or true of there is none.
+	 */
+	manageFocus?: boolean;
+}
 
 /**
  * Represents a set of pending tasks in a specific context.
@@ -10,16 +19,40 @@ export type TaskSource = (() => unknown) | Promise<unknown> | null | undefined;
  * This is meant to be used for preventing concurrent user interaction in a specific context.
  */
 export class Tasks {
+	#pendingCount = 0;
+	#pending = sig(false);
+	#manageFocus: boolean;
 	#parent: Tasks | undefined;
-	#pending = sig(0);
 
 	/**
 	 * Create a new tasks instance with the specified parent.
 	 *
 	 * @param parent The parent to use. Default is no parent.
 	 */
-	constructor(parent?: Tasks) {
+	constructor(parent?: Tasks, options?: TasksOptions) {
 		this.#parent = parent;
+		this.#manageFocus = options?.manageFocus ?? (parent ? parent.#manageFocus : true);
+
+		if (this.#manageFocus) {
+			let last: Element | null = null;
+			watch(this.#pending, pending => {
+				if (pending) {
+					last = document.activeElement;
+				} else if (last && (last !== document.activeElement || document.activeElement === document.body)) {
+					(last as HTMLElement).focus?.();
+				}
+			});
+		}
+	}
+
+	#setPending(): void {
+		this.#pendingCount++;
+		this.#pending.value = true;
+	}
+
+	#unsetPending(): void {
+		this.#pendingCount--;
+		this.#pending.value = this.#pendingCount > 0;
 	}
 
 	/**
@@ -33,26 +66,26 @@ export class Tasks {
 	 * True if this instance has any pending tasks.
 	 */
 	get selfPending(): boolean {
-		return this.#pending.value > 0;
+		return this.#pending.value;
 	}
 
 	/**
 	 * True if this instance or any of it's parents has any pending tasks.
 	 */
 	get pending(): boolean {
-		return (this.#parent?.pending ?? false) || this.#pending.value > 0;
+		return (this.#parent?.pending ?? false) || this.#pending.value;
 	}
 
 	/**
 	 * Pretend, that there is a pending task until the current context is disposed.
 	 */
 	setPending(): void {
-		this.#pending.value++;
+		this.#setPending();
 		let disposed = false;
 		teardown(() => {
 			if (!disposed) {
 				disposed = true;
-				this.#pending.value--;
+				this.#unsetPending();
 			}
 		});
 	}
@@ -64,19 +97,19 @@ export class Tasks {
 	 */
 	waitFor(source: TaskSource): void {
 		if (typeof source === "function") {
-			this.#pending.value++;
+			this.#setPending();
 			void (async () => {
 				try {
-					await source();
+					return await source();
 				} catch {}
-				this.#pending.value--;
+				this.#unsetPending();
 			})();
 		} else if (source instanceof Promise) {
-			this.#pending.value++;
-			source.then(() => {
-				this.#pending.value--;
+			this.#setPending();
+			void source.then(() => {
+				this.#unsetPending();
 			}, () => {
-				this.#pending.value--;
+				this.#unsetPending();
 			});
 		}
 	}
@@ -84,8 +117,8 @@ export class Tasks {
 	/**
 	 * Create a new tasks instance using the {@link extract current} instance as parent.
 	 */
-	static fork(): Tasks {
-		return new Tasks(extract(TASKS));
+	static fork(options?: TasksOptions): Tasks {
+		return new Tasks(extract(TASKS), options);
 	}
 }
 
@@ -123,9 +156,9 @@ export function isPending(): boolean {
  *
  * @example
  * ```tsx
- * import { inject, Tasks, capture, setPending, isPending } from "@mxjp/gluon";
+ * import { inject, TASKS, Tasks, capture, setPending, isPending } from "@mxjp/gluon";
  *
- * inject(new Tasks(), () => {
+ * inject(TASKS, new Tasks(), () => {
  *   isPending(); // => false
  *   const stop = capture(setPending);
  *   isPending(); // => true

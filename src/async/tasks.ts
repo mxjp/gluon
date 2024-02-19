@@ -10,7 +10,7 @@ export interface TasksOptions {
 	 *
 	 * By default, this is inherited from the parent or true of there is none.
 	 */
-	manageFocus?: boolean;
+	restoreFocus?: boolean;
 }
 
 /**
@@ -21,7 +21,7 @@ export interface TasksOptions {
 export class Tasks {
 	#pendingCount = 0;
 	#pending = sig(false);
-	#manageFocus: boolean;
+	#restoreFocus: boolean;
 	#parent: Tasks | undefined;
 
 	/**
@@ -31,15 +31,20 @@ export class Tasks {
 	 */
 	constructor(parent?: Tasks, options?: TasksOptions) {
 		this.#parent = parent;
-		this.#manageFocus = options?.manageFocus ?? (parent ? parent.#manageFocus : true);
+		this.#restoreFocus = options?.restoreFocus ?? (parent ? parent.#restoreFocus : true);
 
-		if (this.#manageFocus) {
+		if (this.#restoreFocus) {
 			let last: Element | null = null;
 			watch(this.#pending, pending => {
 				if (pending) {
 					last = document.activeElement;
-				} else if (last && (last !== document.activeElement || document.activeElement === document.body)) {
-					(last as HTMLElement).focus?.();
+				} else if (last && document.activeElement === document.body) {
+					const target = last;
+					queueMicrotask(() => {
+						if (last === target && document.activeElement === document.body) {
+							(target as HTMLElement).focus?.();
+						}
+					});
 				}
 			});
 		}

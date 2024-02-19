@@ -136,6 +136,8 @@ await test("async/tasks", async ctx => {
 			strictEqual(document.activeElement, document.body);
 
 			done();
+			strictEqual(document.activeElement, document.body);
+			await Promise.resolve();
 			strictEqual(document.activeElement, input);
 		} finally {
 			dispose();

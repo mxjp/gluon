@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1
++ The following APIs now cause unhandled rejections if an error isn't handled at all:
+  + `waitFor(..)` and `Tasks.waitFor(..)`
+  + `async(..)` and `<Async>` if there is no rejection callback and no `AsyncContext`.
+  + `AsyncContext.track(..)` if the error wasn't handled by an `AsyncContext.complete(..)` call.
+
 ## 5.0
 + **Breaking:** Restore focus on the last active element by default when there are no more pending tasks.
 + **Breaking:** Rename `map/Map` to `iterUnique/IterUnique`.

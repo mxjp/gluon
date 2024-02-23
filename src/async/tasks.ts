@@ -106,7 +106,9 @@ export class Tasks {
 			void (async () => {
 				try {
 					return await source();
-				} catch {}
+				} catch (error) {
+					void Promise.reject(error);
+				}
 				this.#unsetPending();
 			})();
 		} else if (source instanceof Promise) {

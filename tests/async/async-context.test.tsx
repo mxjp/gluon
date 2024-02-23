@@ -96,9 +96,14 @@ await test("async/async-context", async ctx => {
 		assertEvents(events, [true]);
 		await Promise.resolve();
 		assertEvents(events, [false]);
-		ac.track(Promise.reject());
+
+		const [promise,, reject] = future();
+		ac.track(promise);
 		assertEvents(events, [true]);
-		await Promise.resolve();
+		const complete = ac.complete();
+		reject(42);
+		const error = await complete.catch(e => e) as unknown;
+		strictEqual(error, 42);
 		assertEvents(events, [false]);
 	});
 });

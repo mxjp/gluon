@@ -60,13 +60,16 @@ export function async<T>(options: AsyncOptions<T>): View {
 		promise = source;
 	}
 
+	const ac = extract(ASYNC);
 	promise.then(value => {
 		state.value = { type: "resolved", value };
 	}, (value: unknown) => {
 		state.value = { type: "rejected", value };
+		if (ac === undefined && rejected === undefined) {
+			void Promise.reject(value);
+		}
 	});
-
-	extract(ASYNC)?.track(promise);
+	ac?.track(promise);
 
 	return nest(() => {
 		switch (state.value.type) {

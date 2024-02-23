@@ -9,7 +9,7 @@ import { sig } from "../core/signals.js";
 export class AsyncContext {
 	#parent: AsyncContext | undefined;
 	#tasks = sig(new Set<Promise<unknown>>());
-	#errors = new Set<unknown[]>();
+	#errorHandlers = new Set<unknown[]>();
 
 	constructor(parent?: AsyncContext) {
 		this.#parent = parent;
@@ -35,8 +35,12 @@ export class AsyncContext {
 				tasks.delete(task);
 			});
 		}, error => {
-			for (const errors of this.#errors) {
-				errors.push(error);
+			if (this.#errorHandlers.size > 0) {
+				for (const errorHandler of this.#errorHandlers) {
+					errorHandler.push(error);
+				}
+			} else {
+				void Promise.reject(error);
 			}
 			this.#tasks.update(tasks => {
 				tasks.delete(task);
@@ -53,11 +57,11 @@ export class AsyncContext {
 	 */
 	async complete(): Promise<void> {
 		const errors: unknown[] = [];
-		this.#errors.add(errors);
+		this.#errorHandlers.add(errors);
 		while (this.#tasks.value.size > 0) {
 			await Promise.allSettled(this.#tasks.value);
 		}
-		this.#errors.delete(errors);
+		this.#errorHandlers.delete(errors);
 		if (errors.length === 1) {
 			throw errors[0];
 		} else if (errors.length > 1) {

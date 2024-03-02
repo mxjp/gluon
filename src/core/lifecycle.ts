@@ -1,13 +1,11 @@
+import { GLOBALS } from "./globals.js";
+
+const TEARDOWN_STACK = GLOBALS.teardownStack;
 
 /**
  * A function that can be called to dispose something.
  */
 export type TeardownHook = () => void;
-
-/**
- * Internal stack where the last item may be an array which teardown hooks are captured in.
- */
-const TEARDOWN_STACK: (TeardownHook[] | undefined)[] = [];
 
 /**
  * Run a function while capturing teardown hooks.

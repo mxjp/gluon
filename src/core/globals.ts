@@ -1,4 +1,5 @@
 import type { ReadonlyContext } from "./context.js";
+import type { TeardownHook } from "./lifecycle.js";
 
 export interface Globals {
 	/**
@@ -10,6 +11,11 @@ export interface Globals {
 	 * Internal stack where the last item is the current context.
 	 */
 	contextStack: (ReadonlyContext | undefined)[];
+
+	/**
+	 * Internal stack where the last item may be an array which teardown hooks are captured in.
+	 */
+	teardownStack: (TeardownHook[] | undefined)[];
 }
 
 const KEY = Symbol.for("gluon:globals");
@@ -26,4 +32,8 @@ if (GLOBALS.nextId === undefined) {
 
 if (GLOBALS.contextStack === undefined) {
 	GLOBALS.contextStack = [];
+}
+
+if (GLOBALS.teardownStack === undefined) {
+	GLOBALS.teardownStack = [];
 }

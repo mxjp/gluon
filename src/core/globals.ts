@@ -1,9 +1,15 @@
+import type { ReadonlyContext } from "./context.js";
 
 export interface Globals {
 	/**
 	 * The next suffix for generating unique ids in the current thread.
 	 */
 	nextId: { value: number };
+
+	/**
+	 * Internal stack where the last item is the current context.
+	 */
+	contextStack: (ReadonlyContext | undefined)[];
 }
 
 const KEY = Symbol.for("gluon:globals");
@@ -16,4 +22,8 @@ export const GLOBALS: Globals = (globalThis as any)[KEY] ?? ((globalThis as any)
 
 if (GLOBALS.nextId === undefined) {
 	GLOBALS.nextId = { value: 0 };
+}
+
+if (GLOBALS.contextStack === undefined) {
+	GLOBALS.contextStack = [];
 }

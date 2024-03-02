@@ -1,3 +1,6 @@
+import { GLOBALS } from "./globals.js";
+
+const CONTEXT_STACK = GLOBALS.contextStack;
 
 /**
  * Utility for defining phantom typed context key-value pairs.
@@ -41,11 +44,6 @@ export interface Context extends ReadonlyContext {
 	delete(key: unknown): boolean;
 	set<K>(key: K, value: ContextValue<K>): void;
 }
-
-/**
- * Internal stack where the last item is the current context.
- */
-const CONTEXT_STACK: (ReadonlyContext | undefined)[] = [];
 
 /**
  * Get the current context.

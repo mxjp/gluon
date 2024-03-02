@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.2
++ Add `TaskSlot`.
+
 ## 5.1
 + The following APIs now cause unhandled rejections if an error isn't handled at all:
   + `waitFor(..)` and `Tasks.waitFor(..)`

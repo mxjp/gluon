@@ -1,37 +1,12 @@
 import { getContext, runInContext, wrapContext } from "./context.js";
+import { GLOBALS } from "./globals.js";
 import { capture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
+import type { Dependant, DependantFn } from "./signal-types.js";
 
-/**
- * A function that is stored inside any accessed signals alongside a cycle.
- */
-interface DependantFn {
-	(cycle: number): void;
-}
-
-/**
- * A pair of dependant function and the cycle it was captured at.
- */
-type Dependant = [fn: DependantFn, cycle: number];
-
-/**
- * Internal stack where the last item is the current batch. This may be empty.
- */
-const BATCH_STACK: Dependant[][] = [];
-
-/**
- * Internal stack where the last item indicates if signal access is currently tracked. This is never empty.
- */
-const TRACKING_STACK: boolean[] = [true];
-
-/**
- * Internal stack where the last item is an array of triggers to capture in any accessed signals.
- */
-const TRIGGERS_STACK: Dependant[][] = [[]];
-
-/**
- * Internal stack where the last item is an array of dependants to capture in any accessed signals.
- */
-const DEPENDANTS_STACK: Dependant[][] = [[]];
+const BATCH_STACK = GLOBALS.batchStack;
+const TRACKING_STACK = GLOBALS.trackingStack;
+const TRIGGERS_STACK = GLOBALS.triggersStack;
+const DEPENDANTS_STACK = GLOBALS.dependantsStack;
 
 /**
  * A function used in signals to determine if the signal should update during a value assignment.

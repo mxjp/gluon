@@ -1,5 +1,6 @@
 import type { ReadonlyContext } from "./context.js";
 import type { TeardownHook } from "./lifecycle.js";
+import { Dependant } from "./signal-types.js";
 
 export interface Globals {
 	/**
@@ -8,14 +9,34 @@ export interface Globals {
 	nextId: { value: number };
 
 	/**
-	 * Internal stack where the last item is the current context.
+	 * A stack where the last item is the current context.
 	 */
 	contextStack: (ReadonlyContext | undefined)[];
 
 	/**
-	 * Internal stack where the last item may be an array which teardown hooks are captured in.
+	 * A stack where the last item may be an array which teardown hooks are captured in.
 	 */
 	teardownStack: (TeardownHook[] | undefined)[];
+
+	/**
+	 * A stack where the last item is the current signal batch. This may be empty.
+	 */
+	batchStack: Dependant[][];
+
+	/**
+	 * A stack where the last item indicates if signal access is currently tracked. This contains at least `true` by default.
+	 */
+	trackingStack: boolean[];
+
+	/**
+	 * A stack where the last item is an array of triggers to capture in any accessed signals. This is never empty.
+	 */
+	triggersStack: Dependant[][];
+
+	/**
+	 * A stack where the last item is an array of dependants to capture in any accessed signals. This is never empty.
+	 */
+	dependantsStack: Dependant[][];
 }
 
 const KEY = Symbol.for("gluon:globals");
@@ -36,4 +57,20 @@ if (GLOBALS.contextStack === undefined) {
 
 if (GLOBALS.teardownStack === undefined) {
 	GLOBALS.teardownStack = [];
+}
+
+if (GLOBALS.batchStack === undefined) {
+	GLOBALS.batchStack = [];
+}
+
+if (GLOBALS.trackingStack === undefined) {
+	GLOBALS.trackingStack = [true];
+}
+
+if (GLOBALS.triggersStack === undefined) {
+	GLOBALS.triggersStack = [[]];
+}
+
+if (GLOBALS.dependantsStack === undefined) {
+	GLOBALS.dependantsStack = [[]];
 }

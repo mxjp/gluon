@@ -3,7 +3,7 @@ export interface Globals {
 	/**
 	 * The next suffix for generating unique ids in the current thread.
 	 */
-	nextId: number;
+	nextId: { value: number };
 }
 
 const KEY = Symbol.for("gluon:globals");
@@ -15,5 +15,5 @@ const KEY = Symbol.for("gluon:globals");
 export const GLOBALS: Globals = (globalThis as any)[KEY] ?? ((globalThis as any)[KEY] = {});
 
 if (GLOBALS.nextId === undefined) {
-	GLOBALS.nextId = 0;
+	GLOBALS.nextId = { value: 0 };
 }

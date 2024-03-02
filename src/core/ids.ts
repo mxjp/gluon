@@ -1,12 +1,14 @@
 import { GLOBALS } from "./globals.js";
 
+const NEXT_ID = GLOBALS.nextId;
+
 /**
  * Allocate an ID that is unique in the current thread.
  *
  * @returns The unique id.
  */
 export function uniqueId(): string {
-	return "gluon_" + String(GLOBALS.nextId++);
+	return "gluon_" + String(NEXT_ID.value++);
 }
 
 /**

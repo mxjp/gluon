@@ -1,6 +1,6 @@
 import { GLOBALS } from "./globals.js";
 
-const TEARDOWN_STACK = GLOBALS.teardownStack;
+const { TEARDOWN_STACK } = GLOBALS;
 
 /**
  * A function that can be called to dispose something.

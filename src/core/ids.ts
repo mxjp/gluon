@@ -1,6 +1,6 @@
 import { GLOBALS } from "./globals.js";
 
-const NEXT_ID = GLOBALS.nextId;
+const { NEXT_ID } = GLOBALS;
 
 /**
  * Allocate an ID that is unique in the current thread.

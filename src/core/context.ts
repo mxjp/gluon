@@ -1,6 +1,6 @@
 import { GLOBALS } from "./globals.js";
 
-const CONTEXT_STACK = GLOBALS.contextStack;
+const { CONTEXT_STACK } = GLOBALS;
 
 /**
  * Utility for defining phantom typed context key-value pairs.

@@ -6,37 +6,37 @@ export interface Globals {
 	/**
 	 * The next suffix for generating unique ids in the current thread.
 	 */
-	nextId: { value: number };
+	NEXT_ID: { value: number };
 
 	/**
 	 * A stack where the last item is the current context.
 	 */
-	contextStack: (ReadonlyContext | undefined)[];
+	CONTEXT_STACK: (ReadonlyContext | undefined)[];
 
 	/**
 	 * A stack where the last item may be an array which teardown hooks are captured in.
 	 */
-	teardownStack: (TeardownHook[] | undefined)[];
+	TEARDOWN_STACK: (TeardownHook[] | undefined)[];
 
 	/**
 	 * A stack where the last item is the current signal batch. This may be empty.
 	 */
-	batchStack: Dependant[][];
+	BATCH_STACK: Dependant[][];
 
 	/**
 	 * A stack where the last item indicates if signal access is currently tracked. This contains at least `true` by default.
 	 */
-	trackingStack: boolean[];
+	TRACKING_STACK: boolean[];
 
 	/**
 	 * A stack where the last item is an array of triggers to capture in any accessed signals. This is never empty.
 	 */
-	triggersStack: Dependant[][];
+	TRIGGERS_STACK: Dependant[][];
 
 	/**
 	 * A stack where the last item is an array of dependants to capture in any accessed signals. This is never empty.
 	 */
-	dependantsStack: Dependant[][];
+	DEPENDANTS_STACK: Dependant[][];
 }
 
 const KEY = Symbol.for("gluon:globals");
@@ -47,30 +47,10 @@ const KEY = Symbol.for("gluon:globals");
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const GLOBALS: Globals = (globalThis as any)[KEY] ?? ((globalThis as any)[KEY] = {});
 
-if (GLOBALS.nextId === undefined) {
-	GLOBALS.nextId = { value: 0 };
-}
-
-if (GLOBALS.contextStack === undefined) {
-	GLOBALS.contextStack = [];
-}
-
-if (GLOBALS.teardownStack === undefined) {
-	GLOBALS.teardownStack = [];
-}
-
-if (GLOBALS.batchStack === undefined) {
-	GLOBALS.batchStack = [];
-}
-
-if (GLOBALS.trackingStack === undefined) {
-	GLOBALS.trackingStack = [true];
-}
-
-if (GLOBALS.triggersStack === undefined) {
-	GLOBALS.triggersStack = [[]];
-}
-
-if (GLOBALS.dependantsStack === undefined) {
-	GLOBALS.dependantsStack = [[]];
-}
+GLOBALS.NEXT_ID ??= { value: 0 };
+GLOBALS.CONTEXT_STACK ??= [];
+GLOBALS.TEARDOWN_STACK ??= [];
+GLOBALS.BATCH_STACK ??= [];
+GLOBALS.TRACKING_STACK ??= [true];
+GLOBALS.TRIGGERS_STACK ??= [[]];
+GLOBALS.DEPENDANTS_STACK ??= [[]];

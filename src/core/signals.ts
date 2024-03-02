@@ -3,10 +3,7 @@ import { GLOBALS } from "./globals.js";
 import { capture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 import type { Dependant, DependantFn } from "./signal-types.js";
 
-const BATCH_STACK = GLOBALS.batchStack;
-const TRACKING_STACK = GLOBALS.trackingStack;
-const TRIGGERS_STACK = GLOBALS.triggersStack;
-const DEPENDANTS_STACK = GLOBALS.dependantsStack;
+const { BATCH_STACK, TRACKING_STACK, TRIGGERS_STACK, DEPENDANTS_STACK } = GLOBALS;
 
 /**
  * A function used in signals to determine if the signal should update during a value assignment.

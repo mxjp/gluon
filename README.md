@@ -4,7 +4,7 @@
 This is a tiny signal based rendering library which aims to:
 + be usable with widely adopted build systems
 + be as simple as possible without breaking at edge cases
-+ avoid maintenance overhead for long living projects
++ avoid [maintenance overhead](#shared-globals--compatibility) for long living projects
 
 ## Stability Warning
 This is an early in-development version with [frequent breaking changes](https://github.com/mxjp/gluon/blob/main/CHANGELOG.md).
@@ -231,6 +231,7 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
   + [Route Matching](#route-matching)
   + [Nested Routing](#nested-routing)
 + [Web Components](#web-components)
++ [Shared Globals & Compatibility](#shared-globals--compatibility)
 + [Security](#security)
 
 <br>
@@ -1277,6 +1278,23 @@ class ExampleComponent extends HTMLElement {
   }
 }
 ```
+
+<br>
+
+
+
+# Shared Globals & Compatibility
+Gluon's signal, context and lifecycle APIs are based on globals and the synchronous call stack.
+
+**Example:** To capture lifecycle teardown hooks, the capture function pushes a new array onto a global stack and then runs a synchronous function which may add teardown hooks to that array. After this the array is removed from the stack and will contain all the registered teardown hooks which can be called later.
+
+From **gluon v5.2** and upwards, these globals are shared between different versions of gluon that run on the same thread. This makes it possible to use newer versions of gluon without being forced to update dependencies. For instance, when using gluon v6, you could still use a UI library based on gluon v5.2 just fine.
+
+The list below shows all APIs that work across different gluon versions:
++ Context
++ Lifecycle
++ Signal tracking, batching, dependencies & triggers
++ Unique IDs
 
 <br>
 

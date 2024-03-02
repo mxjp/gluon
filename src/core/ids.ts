@@ -1,12 +1,4 @@
-
-interface Shared {
-	next: number;
-}
-
-const KEY = Symbol.for("gluon:next_id_container");
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const SHARED: Shared = (globalThis as any)[KEY] ?? ((globalThis as any)[KEY] = { next: 0 });
-const PREFIX = "gluon_";
+import { GLOBALS } from "./globals.js";
 
 /**
  * Allocate an ID that is unique in the current thread.
@@ -14,7 +6,7 @@ const PREFIX = "gluon_";
  * @returns The unique id.
  */
 export function uniqueId(): string {
-	return PREFIX + String(SHARED.next++);
+	return "gluon_" + String(GLOBALS.nextId++);
 }
 
 /**

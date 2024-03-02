@@ -5,9 +5,13 @@ import test from "node:test";
 
 import { capture, iter, iterUnique, mount, movable, nest, render, show, sig, teardown, View, watch, when } from "@mxjp/gluon";
 
-import { assertEvents, boundaryEvents, TestView, testView, text } from "./common.js";
+import { assertEvents, assertSharedInstance, boundaryEvents, TestView, testView, text } from "./common.js";
 
 await test("view", async ctx => {
+	await ctx.test("shared instances", () => {
+		assertSharedInstance(View, "gluon:view_instance", nest(() => {}));
+	});
+
 	await ctx.test("init incomplete", () => {
 		throws(() => new View(() => {}));
 		throws(() => new View(setBoundary => {

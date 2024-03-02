@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "node:assert";
+import { deepStrictEqual, strictEqual } from "node:assert";
 
 import { View, ViewBoundaryOwner } from "@mxjp/gluon";
 
@@ -70,4 +70,9 @@ export function future<T = void>(): [Promise<T>, ResolveFn<T>, RejectFn] {
 		reject = rej;
 	});
 	return [promise, resolve, reject];
+}
+
+export function assertSharedInstance<T extends new(...args: any) => unknown>(targetClass: T, symbolKey: string, real: InstanceType<T>): void {
+	strictEqual(real instanceof targetClass, true, "invalid real instance");
+	strictEqual({ [Symbol.for(symbolKey)]: true } instanceof targetClass, true, "invalid dummy instance");
 }

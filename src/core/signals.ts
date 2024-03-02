@@ -253,7 +253,7 @@ export type Expression<T> = T | Signal<T> | (() => T);
 export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
 
 /**
- * Watch an expression until the current context is disposed.
+ * Watch an expression until the current lifecycle is disposed.
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately.

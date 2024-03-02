@@ -54,7 +54,7 @@ function RotateOrder(props: {
 		for (const view of views) {
 			// The boundary owner callback is called every time, the
 			// child view has updated it's boundary nodes until the current
-			// context is disposed:
+			// lifecycle is disposed:
 			view.setBoundaryOwner((first, last) => {
 				// Update the first node of the current view if
 				// this child view is currently the first one:

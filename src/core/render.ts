@@ -113,7 +113,7 @@ export function render(content: unknown): View {
 }
 
 /**
- * Render arbitrary content and append it to the specified parent until the current context is disposed.
+ * Render arbitrary content and append it to the specified parent until the current lifecycle is disposed.
  *
  * @param parent The parent node.
  * @param content The content to render. See {@link render} for supported types.
@@ -129,7 +129,7 @@ export function render(content: unknown): View {
  * );
  * ```
  *
- * Since the content is removed when the current context is disposed, this can also be used to temporarily append
+ * Since the content is removed when the current lifecycle is disposed, this can also be used to temporarily append
  * content to different elements while some component is rendered:
  * ```tsx
  * import { mount } from "@mxjp/gluon";

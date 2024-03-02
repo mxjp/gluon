@@ -82,7 +82,7 @@ export class Tasks {
 	}
 
 	/**
-	 * Pretend, that there is a pending task until the current context is disposed.
+	 * Pretend, that there is a pending task until the current lifecycle is disposed.
 	 */
 	setPending(): void {
 		this.#setPending();
@@ -157,7 +157,7 @@ export function isPending(): boolean {
 }
 
 /**
- * Pretend, that there is a pending task in the current tasks instance until the current context is disposed.
+ * Pretend, that there is a pending task in the current tasks instance until the current lifecycle is disposed.
  *
  * This is meant to be used for preventing concurrent user interaction in a specific context.
  *

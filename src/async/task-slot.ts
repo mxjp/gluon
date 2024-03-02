@@ -31,7 +31,7 @@ export class TaskSlot {
 	/**
 	 * Create a new task slot.
 	 *
-	 * When the current lifecycle context is disposed, all side effects are aborted and removed from the queue.
+	 * When the current lifecycle is disposed, all side effects are aborted and removed from the queue.
 	 */
 	constructor() {
 		teardown(() => this.#abort());

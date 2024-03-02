@@ -96,7 +96,7 @@ export class View {
 	}
 
 	/**
-	 * Set the boundary owner for this view until the current context is disposed.
+	 * Set the boundary owner for this view until the current lifecycle is disposed.
 	 *
 	 * @throws An error if there currently is a boundary owner.
 	 */

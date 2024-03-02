@@ -1,7 +1,7 @@
 import { teardown } from "../core/lifecycle.js";
 
 /**
- * Create a new abort controller that aborts when the current context is disposed.
+ * Create a new abort controller that aborts when the current lifecycle is disposed.
  */
 export function useAbortController(reason?: unknown): AbortController {
 	const controller = new AbortController();
@@ -10,7 +10,7 @@ export function useAbortController(reason?: unknown): AbortController {
 }
 
 /**
- * Get an abort signal that aborts when the current context is disposed.
+ * Get an abort signal that aborts when the current lifecycle is disposed.
  */
 export function useAbortSignal(reason?: unknown): AbortSignal {
 	return useAbortController(reason).signal;

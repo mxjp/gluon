@@ -1,5 +1,5 @@
 import { getContext, runInContext, wrapContext } from "./context.js";
-import { GLOBALS } from "./globals.js";
+import { GLOBALS, shareInstancesOf } from "./globals.js";
 import { capture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 import type { Dependant, DependantFn } from "./signal-types.js";
 
@@ -57,6 +57,10 @@ function callDependant(cycle: number, fn: DependantFn) {
  * Represents a value that changes over time.
  */
 export class Signal<T> {
+	static {
+		shareInstancesOf(this, "gluon:signal_instance");
+	}
+
 	/**
 	 * The current value.
 	 */

@@ -1,3 +1,4 @@
+import { shareInstancesOf } from "./globals.js";
 import { capture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
 import { Expression, get, memo, sig, Signal, watch } from "./signals.js";
@@ -46,6 +47,10 @@ export interface ViewInitFn {
  * + If there are multiple nodes, all nodes must have a single parent node.
  */
 export class View {
+	static {
+		shareInstancesOf(this, "gluon:view_instance");
+	}
+
 	#first!: Node;
 	#last!: Node;
 	#owner: ViewBoundaryOwner | undefined;

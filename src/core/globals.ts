@@ -54,3 +54,22 @@ GLOBALS.BATCH_STACK ??= [];
 GLOBALS.TRACKING_STACK ??= [true];
 GLOBALS.TRIGGERS_STACK ??= [[]];
 GLOBALS.DEPENDANTS_STACK ??= [[]];
+
+/**
+ * Ensure that instances of the target class are also recognized as instances of the same target class from other library versions.
+ *
+ * When using this, the caller must guarantee, that all future versions of the target class are compatible with the earliest version this has been used on.
+ */
+export function shareInstancesOf(targetClass: { prototype: object }, symbolKey: string): void {
+	const marker = Symbol.for(symbolKey);
+	(targetClass.prototype as any)[marker] = true;
+	const native = (targetClass as any)[Symbol.hasInstance] as (target: any) => boolean;
+	Object.defineProperty(targetClass, Symbol.hasInstance, {
+		configurable: true,
+		enumerable: false,
+		writable: false,
+		value: function hasInstance(target: any): boolean {
+			return target?.[marker] ?? native.call(this, target);
+		},
+	});
+}

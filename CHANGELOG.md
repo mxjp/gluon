@@ -2,6 +2,7 @@
 
 ## 5.2
 + Add `TaskSlot`.
++ Make all internal globals shared between different gluon versions in the same thread.
 
 ## 5.1
 + The following APIs now cause unhandled rejections if an error isn't handled at all:

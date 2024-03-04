@@ -2,6 +2,8 @@ import { deepStrictEqual, strictEqual } from "node:assert";
 
 import { View, ViewBoundaryOwner } from "@mxjp/gluon";
 
+import { shareInstancesOf } from "../dist/es/core/globals.js";
+
 export function assertEvents(events: unknown[], expected: unknown[]): void {
 	deepStrictEqual(events, expected);
 	events.length = 0;
@@ -72,7 +74,16 @@ export function future<T = void>(): [Promise<T>, ResolveFn<T>, RejectFn] {
 	return [promise, resolve, reject];
 }
 
-export function assertSharedInstance<T extends new(...args: any) => unknown>(targetClass: T, symbolKey: string, real: InstanceType<T>): void {
-	strictEqual(real instanceof targetClass, true, "invalid real instance");
-	strictEqual({ [Symbol.for(symbolKey)]: true } instanceof targetClass, true, "invalid dummy instance");
+export function assertSharedInstance<T extends new(...args: any) => unknown>(targetClass: T, symbolKey: string, sampleInstance: InstanceType<T>): void {
+	// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+	class Dummy {
+		static {
+			shareInstancesOf(this, symbolKey);
+		}
+	}
+
+	strictEqual(sampleInstance instanceof targetClass, true);
+	strictEqual({ [Symbol.for(symbolKey)]: true } instanceof targetClass, true);
+	strictEqual(new Dummy() instanceof targetClass, true);
+	strictEqual(sampleInstance instanceof Dummy, true);
 }

@@ -1316,7 +1316,7 @@ runTest(ctx => {
 ```
 
 ## Asynchronous Tests
-Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context] will not work after awaiting something:
+Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context](#context) will not work after awaiting something:
 ```tsx
 inject("foo", "bar", async () => {
   extract("foo"); // => "bar"

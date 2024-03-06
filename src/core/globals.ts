@@ -1,5 +1,5 @@
 import type { ReadonlyContext } from "./context.js";
-import type { TeardownHook } from "./lifecycle.js";
+import { TeardownFrame } from "./lifecycle-types.js";
 import { Dependant } from "./signal-types.js";
 
 export interface Globals {
@@ -16,7 +16,7 @@ export interface Globals {
 	/**
 	 * A stack where the last item may be an array which teardown hooks are captured in.
 	 */
-	TEARDOWN_STACK: (TeardownHook[] | undefined)[];
+	TEARDOWN_STACK: (TeardownFrame | undefined)[];
 
 	/**
 	 * A stack where the last item is the current signal batch. This may be empty.

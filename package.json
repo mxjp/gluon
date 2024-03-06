@@ -31,6 +31,10 @@
 		"./jsx-dev-runtime": {
 			"types": "./dist/es/core/jsx/r17.d.ts",
 			"default": "./dist/es/core/jsx/r17.js"
+		},
+		"./test": {
+			"types": "./dist/es/test/index.d.ts",
+			"default": "./dist/es/test/index.js"
 		}
 	},
 	"scripts": {

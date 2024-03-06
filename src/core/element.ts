@@ -1,6 +1,7 @@
 import { ContextKey, extract, wrapContext } from "./context.js";
 import { createText } from "./render.js";
 import { Expression, get, watch } from "./signals.js";
+import { TagNameMap } from "./types.js";
 import { View } from "./view.js";
 
 /**
@@ -201,9 +202,7 @@ export function setAttributes(elem: Element, attrs: Attributes): void {
  * @param content The content to append.
  * @returns The element.
  */
-export function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown): HTMLElementTagNameMap[K];
-export function createElement<K extends keyof SVGElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown): SVGElementTagNameMap[K];
-export function createElement<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs: Attributes, content: unknown): MathMLElementTagNameMap[K];
+export function createElement<K extends keyof TagNameMap>(tagName: K, attrs: Attributes, content: unknown): TagNameMap[K];
 export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown): E;
 export function createElement(tagName: string, attrs: Attributes, content: unknown): Element {
 	const ns = extract(XMLNS);
@@ -243,12 +242,8 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
  * );
  * ```
  */
-export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, content?: unknown[]): HTMLElementTagNameMap[K];
-export function e<K extends keyof HTMLElementTagNameMap>(tagName: K, attrs?: Attributes, content?: unknown[]): HTMLElementTagNameMap[K];
-export function e<K extends keyof SVGElementTagNameMap>(tagName: K, content?: unknown[]): SVGElementTagNameMap[K];
-export function e<K extends keyof SVGElementTagNameMap>(tagName: K, attrs?: Attributes, content?: unknown[]): SVGElementTagNameMap[K];
-export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, content?: unknown[]): MathMLElementTagNameMap[K];
-export function e<K extends keyof MathMLElementTagNameMap>(tagName: K, attrs?: Attributes, content?: unknown[]): MathMLElementTagNameMap[K];
+export function e<K extends keyof TagNameMap>(tagName: K, content?: unknown[]): TagNameMap[K];
+export function e<K extends keyof TagNameMap>(tagName: K, attrs?: Attributes, content?: unknown[]): TagNameMap[K];
 export function e<E extends Element>(tagName: string, content?: unknown[]): E;
 export function e<E extends Element>(tagName: string, attrs?: Attributes, content?: unknown[]): E;
 export function e(tagName: string, attrs?: unknown, content?: unknown[]): Element {

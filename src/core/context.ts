@@ -46,6 +46,13 @@ export interface Context extends ReadonlyContext {
 }
 
 /**
+ * Create a new empty context.
+ */
+export function createContext(): Context {
+	return new Map();
+}
+
+/**
  * Get the current context.
  *
  * @returns The current context or undefined if there is no context.

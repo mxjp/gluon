@@ -3,7 +3,7 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { ASYNC, Async, AsyncContext, Inject } from "@mxjp/gluon";
+import { ASYNC, Async, AsyncContext, Inject, uncapture } from "@mxjp/gluon";
 
 import { assertEvents, future, text } from "../common.js";
 
@@ -12,11 +12,11 @@ await test("async/async", async ctx => {
 		const events: unknown[] = [];
 		const [promise, resolve] = future();
 		const ac = new AsyncContext();
-		const root = <div>
+		const root = uncapture(() => <div>
 			<Inject key={ASYNC} value={ac}>
 				{() => <Async source={promise} />}
 			</Inject>
-		</div> as HTMLElement;
+		</div>) as HTMLElement;
 		strictEqual(text(root), "");
 		const complete = ac.complete().then(() => {
 			events.push("complete");
@@ -32,11 +32,11 @@ await test("async/async", async ctx => {
 		const events: unknown[] = [];
 		const [promise,, reject] = future();
 		const ac = new AsyncContext();
-		const root = <div>
+		const root = uncapture(() => <div>
 			<Inject key={ASYNC} value={ac}>
 				{() => <Async source={promise} />}
 			</Inject>
-		</div> as HTMLElement;
+		</div>) as HTMLElement;
 		strictEqual(text(root), "");
 		const complete = ac.complete().catch(error => {
 			events.push(error);
@@ -50,11 +50,11 @@ await test("async/async", async ctx => {
 
 	await ctx.test("content, resolve", async () => {
 		const [promise, resolve] = future<number>();
-		const root = <div>
+		const root = uncapture(() => <div>
 			<Async source={promise} pending={() => "pending"}>
 				{value => `resolved: ${value}`}
 			</Async>
-		</div> as HTMLElement;
+		</div>) as HTMLElement;
 		strictEqual(text(root), "pending");
 		resolve(42);
 		await Promise.resolve();
@@ -63,13 +63,13 @@ await test("async/async", async ctx => {
 
 	await ctx.test("content, reject", async () => {
 		const [promise,, reject] = future<number>();
-		const root = <div>
+		const root = uncapture(() => <div>
 			<Async
 				source={promise}
 				pending={() => "pending"}
 				rejected={error => `rejected: ${error}`}
 			/>
-		</div> as HTMLElement;
+		</div>) as HTMLElement;
 		strictEqual(text(root), "pending");
 		reject(42);
 		await Promise.resolve();

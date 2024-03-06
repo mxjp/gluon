@@ -3,13 +3,16 @@ import "./env.js";
 import { notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { capture, iter, iterUnique, mount, movable, nest, render, show, sig, teardown, View, watch, when } from "@mxjp/gluon";
+import { capture, iter, iterUnique, mount, movable, nest, render, show, sig, teardown, uncapture, View, watch, when } from "@mxjp/gluon";
 
 import { assertEvents, assertSharedInstance, boundaryEvents, TestView, testView, text } from "./common.js";
 
 await test("view", async ctx => {
 	await ctx.test("shared instances", () => {
-		assertSharedInstance(View, "gluon:view_instance", nest(() => {}));
+		assertSharedInstance(View, "gluon:view_instance", new View(setBoundary => {
+			const boundary = document.createComment("");
+			setBoundary(boundary, boundary);
+		}));
 	});
 
 	await ctx.test("init incomplete", () => {
@@ -59,7 +62,7 @@ await test("view", async ctx => {
 
 		throws(() => view.view.setBoundaryOwner(() => {}));
 		unset();
-		view.view.setBoundaryOwner(() => {});
+		uncapture(() => view.view.setBoundaryOwner(() => {}));
 
 		const c = view.nextFirst();
 		strictEqual(view.view.first, c);
@@ -208,7 +211,7 @@ await test("view", async ctx => {
 		const events: unknown[] = [];
 
 		const signal = sig(0, false);
-		const view = when(signal, value => {
+		const view = uncapture(() => when(signal, value => {
 			events.push(`+${value}`);
 			teardown(() => {
 				events.push(`-${value}`);
@@ -220,7 +223,7 @@ await test("view", async ctx => {
 				events.push("-f");
 			});
 			return "f";
-		});
+		}));
 
 		strictEqual(text(view.take()), "f");
 		assertEvents(events, ["+f"]);
@@ -261,13 +264,13 @@ await test("view", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
-			const view = iterUnique(signal, (value, index) => {
+			const view = uncapture(() => iterUnique(signal, (value, index) => {
 				events.push(`+${value}`);
 				teardown(() => {
 					events.push(`-${value}`);
 				});
 				return <>[{value}:{index}]</>;
-			});
+			}));
 
 			let lastValues = new Set<unknown>();
 			function assertItems(values: unknown[]) {
@@ -363,13 +366,13 @@ await test("view", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
-			const view = iter(signal, (value, index) => {
+			const view = uncapture(() => iter(signal, (value, index) => {
 				events.push(`+${value}`);
 				teardown(() => {
 					events.push(`-${value}`);
 				});
 				return <>[{value}:{index}]</>;
-			});
+			}));
 
 			let lastValues: unknown[] = [];
 			function assertItems(values: unknown[]) {
@@ -413,9 +416,9 @@ await test("view", async ctx => {
 
 	await ctx.test("movable", async () => {
 		const inner = sig(1);
-		const view = movable(<>
+		const view = uncapture(() => movable(<>
 			inner: {inner}
-		</>);
+		</>));
 
 		const a = render(view.move());
 		strictEqual(text(a.take()), "inner: 1");
@@ -443,9 +446,9 @@ await test("view", async ctx => {
 		const signal = sig(false);
 		const inner = sig(1);
 
-		const view = show(signal, <>
+		const view = uncapture(() => show(signal, <>
 			inner: {inner}
-		</>);
+		</>));
 
 		inner.value = 2;
 		strictEqual(text(view.take()), "");

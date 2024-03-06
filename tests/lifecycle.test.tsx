@@ -1,3 +1,5 @@
+import "./env.js";
+
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
@@ -7,8 +9,10 @@ import { assertEvents } from "./common.js";
 
 await test("lifecycle", async ctx => {
 	await ctx.test("inert use", () => {
-		teardown(() => {
-			throw new Error("this should not happen");
+		uncapture(() => {
+			teardown(() => {
+				throw new Error("this should not happen");
+			});
 		});
 	});
 

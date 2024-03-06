@@ -1,3 +1,5 @@
+import "../env.js";
+
 import { rejects, strictEqual } from "node:assert";
 import test from "node:test";
 

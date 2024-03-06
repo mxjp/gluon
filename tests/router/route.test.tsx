@@ -1,7 +1,9 @@
+import "../env.js";
+
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { matchRoute, Route, sig, watch, watchRoutes } from "@mxjp/gluon";
+import { matchRoute, Route, sig, uncapture, watch, watchRoutes } from "@mxjp/gluon";
 
 import { assertEvents } from "../common.js";
 
@@ -76,9 +78,11 @@ await test("router/route", async ctx => {
 		];
 
 		const path = sig("");
-		const watched = watchRoutes(path, routes);
-		watch(() => watched.match, () => events.push("match"));
-		watch(() => watched.rest, () => events.push("rest"));
+		const watched = uncapture(() => watchRoutes(path, routes));
+		uncapture(() => {
+			watch(() => watched.match, () => events.push("match"));
+			watch(() => watched.rest, () => events.push("rest"));
+		});
 		assertEvents(events, ["match", "rest"]);
 
 		strictEqual(watched.match?.route, routes[0]);

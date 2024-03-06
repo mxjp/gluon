@@ -1,3 +1,5 @@
+import "./env.js";
+
 import { deepStrictEqual, strictEqual } from "node:assert";
 
 import { View, ViewBoundaryOwner } from "@mxjp/gluon";

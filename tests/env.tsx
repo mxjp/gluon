@@ -1,4 +1,9 @@
+import { onTeardownLeak } from "@mxjp/gluon/test";
 import { JSDOM } from "jsdom";
+
+onTeardownLeak(() => {
+	throw new Error("teardown leak");
+});
 
 const dom = new JSDOM(`
 	<!DOCTYPE html>

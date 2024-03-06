@@ -3,7 +3,7 @@ import "./env.js";
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { extract, inject, sig, StyleMap } from "@mxjp/gluon";
+import { extract, inject, sig, StyleMap, uncapture } from "@mxjp/gluon";
 
 await test("render", async ctx => {
 	await ctx.test("element content", () => {
@@ -63,13 +63,13 @@ await test("render", async ctx => {
 	});
 
 	await ctx.test("attributes", () => {
-		const elem = <div
+		const elem = uncapture(() => <div
 			foo="bar"
 			class="a b"
 			data-bar="baz"
 			attr:data-baz="boo"
 			prop:title="example"
-		/> as HTMLElement;
+		/>) as HTMLElement;
 		strictEqual(elem.getAttribute("foo"), "bar");
 		deepStrictEqual(Array.from(elem.classList), ["a", "b"]);
 		strictEqual(elem.dataset.bar, "baz");
@@ -79,7 +79,7 @@ await test("render", async ctx => {
 
 	await ctx.test("removed attribute", () => {
 		const signal = sig<any>(false);
-		const elem = <div test-attr={signal} /> as HTMLElement;
+		const elem = uncapture(() => <div test-attr={signal} />) as HTMLElement;
 		strictEqual(elem.getAttribute("test-attr"), null);
 
 		signal.value = true;
@@ -101,7 +101,7 @@ await test("render", async ctx => {
 	await ctx.test("class attribute", () => {
 		const a = sig("a");
 		const d = sig(false);
-		const elem = <div class={() => [
+		const elem = uncapture(() => <div class={() => [
 			a.value,
 			"b",
 			undefined,
@@ -111,7 +111,7 @@ await test("render", async ctx => {
 				c: true,
 				d,
 			},
-		]} /> as HTMLElement;
+		]} />) as HTMLElement;
 		deepStrictEqual(Array.from(elem.classList), ["a", "b", "c"]);
 		a.value = "foo";
 		deepStrictEqual(Array.from(elem.classList), ["foo", "b", "c"]);
@@ -123,7 +123,7 @@ await test("render", async ctx => {
 		const a = sig<StyleMap>({ color: "blue" });
 		const b = sig("red");
 		const c = sig<StyleMap>({ width: "42px" });
-		const elem = <div style={[
+		const elem = uncapture(() => <div style={[
 			a,
 			() => [
 				[
@@ -131,7 +131,7 @@ await test("render", async ctx => {
 				],
 				c.value,
 			],
-		]} /> as HTMLElement;
+		]} />) as HTMLElement;
 		strictEqual(elem.style.color, "red");
 		strictEqual(elem.style.width, "42px");
 		c.value = { width: "7px" };

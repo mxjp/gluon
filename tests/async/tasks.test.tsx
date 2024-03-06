@@ -3,14 +3,14 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { capture, extract, inject, isPending, isSelfPending, mount, TASKS, Tasks, waitFor, watch, wrapContext } from "@mxjp/gluon";
+import { capture, extract, inject, isPending, isSelfPending, mount, TASKS, Tasks, uncapture, waitFor, watch, wrapContext } from "@mxjp/gluon";
 
 import { assertEvents, future } from "../common.js";
 
 await test("async/tasks", async ctx => {
 	await ctx.test("waitFor", async () => {
-		const parent = new Tasks();
-		const inner = new Tasks(parent);
+		const parent = uncapture(() => new Tasks());
+		const inner = uncapture(() => new Tasks(parent));
 		strictEqual(parent.pending, false);
 		strictEqual(parent.selfPending, false);
 		strictEqual(inner.pending, false);
@@ -32,7 +32,7 @@ await test("async/tasks", async ctx => {
 	});
 
 	await ctx.test("setPending", async () => {
-		const tasks = new Tasks();
+		const tasks = uncapture(() => new Tasks());
 		strictEqual(tasks.pending, false);
 		const dispose = capture(() => tasks.setPending());
 		strictEqual(tasks.pending, true);
@@ -43,7 +43,7 @@ await test("async/tasks", async ctx => {
 	await ctx.test("multiple tasks", async () => {
 		const [a, resolveA] = future();
 		const [b, resolveB] = future();
-		const tasks = new Tasks();
+		const tasks = uncapture(() => new Tasks());
 		tasks.waitFor(a);
 		tasks.waitFor(b);
 		strictEqual(tasks.pending, true);
@@ -59,7 +59,7 @@ await test("async/tasks", async ctx => {
 	});
 
 	await ctx.test("error handling", async () => {
-		const tasks = new Tasks();
+		const tasks = uncapture(() => new Tasks());
 		const [a,, rejectA] = future();
 		tasks.waitFor(a);
 		strictEqual(tasks.pending, true);
@@ -72,12 +72,14 @@ await test("async/tasks", async ctx => {
 
 	await ctx.test("tracking", async () => {
 		const events: unknown[] = [];
-		const tasks = new Tasks();
-		watch(() => tasks.pending, pending => {
-			events.push(pending);
-		});
-		watch(() => tasks.selfPending, selfPending => {
-			events.push(selfPending);
+		const tasks = uncapture(() => new Tasks());
+		uncapture(() => {
+			watch(() => tasks.pending, pending => {
+				events.push(pending);
+			});
+			watch(() => tasks.selfPending, selfPending => {
+				events.push(selfPending);
+			});
 		});
 		assertEvents(events, [false, false]);
 
@@ -94,11 +96,11 @@ await test("async/tasks", async ctx => {
 		strictEqual(isPending(), false);
 		strictEqual(isSelfPending(), false);
 
-		await inject(TASKS, new Tasks(), () => {
+		await inject(TASKS, uncapture(() => new Tasks()), () => {
 			const outer = extract(TASKS);
 			strictEqual(outer instanceof Tasks, true);
 
-			inject(TASKS, new Tasks(outer), () => {
+			inject(TASKS, uncapture(() => new Tasks(outer)), () => {
 				strictEqual(extract(TASKS)?.parent, outer);
 			});
 
@@ -125,7 +127,7 @@ await test("async/tasks", async ctx => {
 		const input = <input /> as HTMLInputElement;
 		const dispose = capture(() => mount(document.body, input));
 		try {
-			const tasks = new Tasks();
+			const tasks = uncapture(() => new Tasks());
 
 			input.focus();
 			strictEqual(document.activeElement, input);

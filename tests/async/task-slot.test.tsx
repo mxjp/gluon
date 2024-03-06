@@ -1,14 +1,16 @@
+import "../env.js";
+
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { TaskSlot } from "@mxjp/gluon";
+import { TaskSlot, uncapture } from "@mxjp/gluon";
 
 import { assertEvents } from "../common.js";
 
 await test("async/task-slot", async ctx => {
 	await ctx.test("sync side effect", () => {
 		const events: unknown[] = [];
-		const slot = new TaskSlot();
+		const slot = uncapture(() => new TaskSlot());
 		slot.sideEffect(signal => {
 			events.push(0);
 			strictEqual(signal.aborted, false);
@@ -20,7 +22,7 @@ await test("async/task-slot", async ctx => {
 
 	await ctx.test("sync blocking", () => {
 		const events: unknown[] = [];
-		const slot = new TaskSlot();
+		const slot = uncapture(() => new TaskSlot());
 		void slot.block(() => {
 			events.push(0);
 		});
@@ -30,7 +32,7 @@ await test("async/task-slot", async ctx => {
 
 	await ctx.test("abort side effect", async () => {
 		const events: unknown[] = [];
-		const slot = new TaskSlot();
+		const slot = uncapture(() => new TaskSlot());
 		slot.sideEffect(async signal => {
 			events.push(0);
 			await Promise.resolve();
@@ -44,7 +46,7 @@ await test("async/task-slot", async ctx => {
 
 	await ctx.test("dequeue side effect & run most recent", async () => {
 		const events: unknown[] = [];
-		const slot = new TaskSlot();
+		const slot = uncapture(() => new TaskSlot());
 		slot.sideEffect(async signal => {
 			events.push(0);
 			await Promise.resolve();
@@ -64,7 +66,7 @@ await test("async/task-slot", async ctx => {
 
 	await ctx.test("abort side effects by blocking tasks", async () => {
 		const events: unknown[] = [];
-		const slot = new TaskSlot();
+		const slot = uncapture(() => new TaskSlot());
 		slot.sideEffect(async signal => {
 			events.push(0);
 			await Promise.resolve();
@@ -87,7 +89,7 @@ await test("async/task-slot", async ctx => {
 
 	await ctx.test("multiple blocking tasks", async () => {
 		const events: unknown[] = [];
-		const slot = new TaskSlot();
+		const slot = uncapture(() => new TaskSlot());
 		slot.sideEffect(async signal => {
 			events.push(0);
 			await Promise.resolve();

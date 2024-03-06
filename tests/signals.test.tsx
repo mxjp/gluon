@@ -1,7 +1,9 @@
+import "./env.js";
+
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, extract, get, inject, lazy, map, memo, optionalString, sig, Signal, string, teardown, trigger, watch } from "@mxjp/gluon";
+import { batch, capture, extract, get, inject, lazy, map, memo, optionalString, sig, Signal, string, teardown, trigger, uncapture, watch } from "@mxjp/gluon";
 
 import { assertEvents, assertSharedInstance } from "./common.js";
 
@@ -63,9 +65,9 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const a = sig("a");
 			const b = sig(1);
-			watch(() => a.value + b.value, value => {
+			uncapture(() => watch(() => a.value + b.value, value => {
 				events.push(value);
-			});
+			}));
 			assertEvents(events, ["a1"]);
 
 			a.value = "b";
@@ -85,14 +87,14 @@ await test("signals", async ctx => {
 		await ctx.test("uncapture expression", () => {
 			const events: unknown[] = [];
 			const signal = sig(42);
-			watch(() => {
+			uncapture(() => watch(() => {
 				teardown(() => {
 					throw new Error("invalid teardown");
 				});
 				return signal.value;
 			}, value => {
 				events.push(value);
-			});
+			}));
 			assertEvents(events, [42]);
 
 			const dispose = capture(() => {
@@ -134,9 +136,9 @@ await test("signals", async ctx => {
 			const b = sig(7);
 			const events: unknown[] = [];
 
-			watch(() => a.value ? b.value : 0, value => {
+			uncapture(() => watch(() => a.value ? b.value : 0, value => {
 				events.push(value);
-			});
+			}));
 
 			assertEvents(events, [0]);
 
@@ -164,14 +166,14 @@ await test("signals", async ctx => {
 			const inner = sig(1);
 			const outer = sig(1);
 
-			watch(() => {
+			uncapture(() => watch(() => {
 				watch(inner, value => {
 					events.push(`i${value}`);
 				});
 				return outer.value;
 			}, value => {
 				events.push(`o${value}`);
-			});
+			}));
 
 			assertEvents(events, ["i1", "o1"]);
 			inner.value = 2;
@@ -184,12 +186,12 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(1);
 			inject("test", 42, () => {
-				watch(() => {
+				uncapture(() => watch(() => {
 					events.push(`e${extract("test")}`);
 					signal.access();
 				}, () => {
 					events.push(`c${extract("test")}`);
-				});
+				}));
 			});
 			assertEvents(events, ["e42", "c42"]);
 			inject("test", 7, () => {
@@ -252,9 +254,9 @@ await test("signals", async ctx => {
 				events.push("a");
 			});
 
-			watch(signal, value => {
+			uncapture(() => watch(signal, value => {
 				events.push(value);
-			});
+			}));
 
 			trigger(signal, () => {
 				events.push("b");
@@ -300,12 +302,12 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(1);
 
-			watch(memo(() => {
+			uncapture(() => watch(memo(() => {
 				events.push("e");
 				return signal.value;
 			}), value => {
 				events.push(value);
-			});
+			}));
 
 			assertEvents(events, ["e", 1]);
 			signal.value = 2;
@@ -317,18 +319,18 @@ await test("signals", async ctx => {
 		await ctx.test("batch & nested memos", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
-			const inner = memo(() => {
+			const inner = uncapture(() => memo(() => {
 				events.push("i");
 				return signal.value * 2;
-			});
-			const outer = memo(() => {
+			}));
+			const outer = uncapture(() => memo(() => {
 				events.push("o");
 				return signal.value + inner();
-			});
+			}));
 
-			watch(outer, value => {
+			uncapture(() => watch(outer, value => {
 				events.push(value);
-			});
+			}));
 
 			assertEvents(events, ["i", "o", 3]);
 			signal.value = 2;
@@ -387,12 +389,13 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, []);
 
-			watch(expr, value => {
-				events.push(`x${value}`);
-			});
-
-			watch(expr, value => {
-				events.push(`y${value}`);
+			uncapture(() => {
+				watch(expr, value => {
+					events.push(`x${value}`);
+				});
+				watch(expr, value => {
+					events.push(`y${value}`);
+				});
 			});
 
 			assertEvents(events, ["eval", "x6", "y6"]);
@@ -437,12 +440,13 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, []);
 
-			watch(expr, value => {
-				events.push(`x${value}`);
-			});
-
-			watch(expr, value => {
-				events.push(`y${value}`);
+			uncapture(() => {
+				watch(expr, value => {
+					events.push(`x${value}`);
+				});
+				watch(expr, value => {
+					events.push(`y${value}`);
+				});
 			});
 
 			assertEvents(events, ["eval", "x0", "y0"]);
@@ -476,9 +480,9 @@ await test("signals", async ctx => {
 			strictEqual(expr(), 1);
 			assertEvents(events, ["eval"]);
 
-			watch(expr, value => {
+			uncapture(() => watch(expr, value => {
 				events.push(value);
-			});
+			}));
 			assertEvents(events, [1]);
 
 			signal.value = 2;
@@ -488,19 +492,19 @@ await test("signals", async ctx => {
 		await ctx.test("lazy in batch with memos", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
-			const inner = memo(() => {
+			const inner = uncapture(() => memo(() => {
 				events.push("inner");
 				return signal.value;
-			});
+			}));
 			assertEvents(events, ["inner"]);
 			const outer = lazy(() => {
 				events.push("outer");
 				return inner();
 			});
 			assertEvents(events, []);
-			watch(outer, value => {
+			uncapture(() => watch(outer, value => {
 				events.push(value);
-			});
+			}));
 			assertEvents(events, ["outer", 1]);
 			batch(() => {
 				signal.value = 2;

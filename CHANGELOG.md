@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.3
++ Add `@mxjp/gluon/test` utilities.
+
 ## 5.2
 + Add `TaskSlot`.
 + Make all internal globals shared between different gluon versions in the same thread.

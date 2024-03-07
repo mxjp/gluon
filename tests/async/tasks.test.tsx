@@ -8,28 +8,30 @@ import { capture, extract, inject, isPending, isSelfPending, mount, TASKS, Tasks
 import { assertEvents, future } from "../common.js";
 
 await test("async/tasks", async ctx => {
-	await ctx.test("waitFor", async () => {
-		const parent = uncapture(() => new Tasks());
-		const inner = uncapture(() => new Tasks(parent));
-		strictEqual(parent.pending, false);
-		strictEqual(parent.selfPending, false);
-		strictEqual(inner.pending, false);
-		strictEqual(inner.selfPending, false);
+	for (const fn of [false, true]) {
+		await ctx.test(`waitFor ${fn ? "function" : "promise"}`, async () => {
+			const parent = uncapture(() => new Tasks());
+			const inner = uncapture(() => new Tasks(parent));
+			strictEqual(parent.pending, false);
+			strictEqual(parent.selfPending, false);
+			strictEqual(inner.pending, false);
+			strictEqual(inner.selfPending, false);
 
-		const [a, resolveA] = future();
-		parent.waitFor(a);
-		strictEqual(parent.pending, true);
-		strictEqual(parent.selfPending, true);
-		strictEqual(inner.pending, true);
-		strictEqual(inner.selfPending, false);
+			const [a, resolveA] = future();
+			parent.waitFor(fn ? (() => a) : a);
+			strictEqual(parent.pending, true);
+			strictEqual(parent.selfPending, true);
+			strictEqual(inner.pending, true);
+			strictEqual(inner.selfPending, false);
 
-		resolveA();
-		await Promise.resolve();
-		strictEqual(parent.pending, false);
-		strictEqual(parent.selfPending, false);
-		strictEqual(inner.pending, false);
-		strictEqual(inner.selfPending, false);
-	});
+			resolveA();
+			await Promise.resolve();
+			strictEqual(parent.pending, false);
+			strictEqual(parent.selfPending, false);
+			strictEqual(inner.pending, false);
+			strictEqual(inner.selfPending, false);
+		});
+	}
 
 	await ctx.test("setPending", async () => {
 		const tasks = uncapture(() => new Tasks());

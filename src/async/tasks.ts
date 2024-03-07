@@ -108,8 +108,9 @@ export class Tasks {
 					return await source();
 				} catch (error) {
 					void Promise.reject(error);
+				} finally {
+					this.#unsetPending();
 				}
-				this.#unsetPending();
 			})();
 		} else if (source instanceof Promise) {
 			this.#setPending();

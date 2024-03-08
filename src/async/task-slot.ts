@@ -70,6 +70,7 @@ export class TaskSlot {
 						this.#controller = undefined;
 					}
 				}
+				this.#blocked--;
 				this.#running = undefined;
 			})();
 		}

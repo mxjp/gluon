@@ -108,4 +108,18 @@ await test("async/task-slot", async ctx => {
 		strictEqual(await b, "b");
 		assertEvents(events, [1, true, "a", "b"]);
 	});
+
+	await ctx.test("side effect after blocking", async () => {
+		const events: unknown[] = [];
+		const slot = uncapture(() => new TaskSlot());
+		await slot.block(() => {
+			events.push(0);
+		});
+		events.push(1);
+		slot.sideEffect(() => {
+			events.push(2);
+		});
+		events.push(3);
+		assertEvents(events, [0, 1, 2, 3]);
+	});
 });

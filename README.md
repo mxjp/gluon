@@ -1135,7 +1135,7 @@ Routers provide a reactive path and query parameters and allow navigating in the
 
 Currently, there is a **HistoryRouter** that uses the location and history API and a **HashRouter** that uses the location hash as the path. You can also implement custom routers by implementing the **Router** interface.
 ```tsx
-import { mount, Inject, HistoryRouter } from "@mxjp/gluon";
+import { mount, Inject, HistoryRouter, ROUTER } from "@mxjp/gluon";
 
 mount(
   document.body,

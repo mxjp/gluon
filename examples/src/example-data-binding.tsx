@@ -26,7 +26,7 @@ export function example() {
 		<h2>Trim</h2>
 		<div>The source signal will contain the trimmed version of the input value.</div>
 		<Row>
-			<TextInput value={trimInput(trimmed)} />
+			<TextInput value={trimmed.pipe(trim)} />
 			<Button action={() => { trimmed.value = "Hello World!"; }}>Reset</Button>
 		</Row>
 		<div>
@@ -36,7 +36,7 @@ export function example() {
 		<h2>Parse</h2>
 		<div>The source signal will contain the input value parsed as an integer. Note, that changes are not passed to the source signal if the input is not an integer.</div>
 		<Row>
-			<TextInput value={numberInput(number)} />
+			<TextInput value={number.pipe(parseInt)} />
 			<Button action={() => { number.value = 42; }}>Reset</Button>
 		</Row>
 		<div>
@@ -46,9 +46,9 @@ export function example() {
 		<h2>Composition & Shared Sources</h2>
 		<div>This example shows an email address input with a single signal as backing storage. It also reuses the trim behavior from the example above for local part and domain.</div>
 		<Row>
-			<TextInput value={trimInput(emailPart(email, true))} />
+			<TextInput value={email.pipe(emailPart, true).pipe(trim)} />
 			@
-			<TextInput value={trimInput(emailPart(email, false))} />
+			<TextInput value={email.pipe(emailPart, false).pipe(trim)} />
 			<Button action={() => { email.value = "testify@example.com"; }}>Reset</Button>
 		</Row>
 		<div>
@@ -57,7 +57,7 @@ export function example() {
 	</>;
 }
 
-function trimInput(source: Signal<string>) {
+function trim(source: Signal<string>) {
 	const input = sig(source.value);
 	watch(input, value => {
 		source.value = value.trim();
@@ -70,7 +70,7 @@ function trimInput(source: Signal<string>) {
 	return input;
 }
 
-function numberInput(source: Signal<number>) {
+function parseInt(source: Signal<number>) {
 	const input = sig(String(source.value));
 	watch(input, value => {
 		if (/^\d+$/.test(value)) {

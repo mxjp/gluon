@@ -179,6 +179,24 @@ export class Signal<T> {
 			dependants.forEach(callDependant);
 		}
 	}
+
+	/**
+	 * Pass this signal to a function and get it's result.
+	 *
+	 * @example
+	 * ```tsx
+	 * const value = sig(42);
+	 *
+	 * <TextInput value={
+	 *   value
+	 *     .pipe(parseInt)
+	 *     .pipe(trim)
+	 * } />
+	 * ```
+	 */
+	pipe<T, A extends any[]>(fn: (source: this, ...args: A) => T, ...args: A): T {
+		return fn(this, ...args);
+	}
 }
 
 /**

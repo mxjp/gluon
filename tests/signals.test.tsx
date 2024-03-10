@@ -31,6 +31,15 @@ await test("signals", async ctx => {
 		signal.notify();
 	});
 
+	await ctx.test("pipe", () => {
+		const a = sig(42);
+		const c = a.pipe(b => {
+			strictEqual(a, b);
+			return 7;
+		});
+		strictEqual(c, 7);
+	});
+
 	await ctx.test("watch", async ctx => {
 		await ctx.test("static", () => {
 			const events: unknown[] = [];

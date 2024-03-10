@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.4
++ Add `Signal.pipe` utility.
+
 ## 5.3
 + Add `@mxjp/gluon/test` utilities.
 

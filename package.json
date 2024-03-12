@@ -12,7 +12,7 @@
 		"web-components"
 	],
 	"license": "MIT",
-	"version": "5.4.0",
+	"version": "5.5.0",
 	"type": "module",
 	"main": "./dist/es/index.js",
 	"exports": {

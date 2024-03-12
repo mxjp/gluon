@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.5
++ Add event API.
+
 ## 5.4
 + Add `Signal.pipe` utility.
 

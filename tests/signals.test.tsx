@@ -3,7 +3,7 @@ import "./env.js";
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, extract, get, inject, lazy, map, memo, optionalString, sig, Signal, string, teardown, trigger, uncapture, watch } from "@mxjp/gluon";
+import { batch, capture, extract, get, inject, lazy, map, memo, optionalString, sig, Signal, string, teardown, trigger, uncapture, watch, watchUpdates } from "@mxjp/gluon";
 
 import { assertEvents, assertSharedInstance } from "./common.js";
 
@@ -208,6 +208,25 @@ await test("signals", async ctx => {
 			});
 			assertEvents(events, ["e42", "c42"]);
 		});
+	});
+
+	await ctx.test("watchUpdates", async () => {
+		const events: unknown[] = [];
+		const signal = sig("a");
+		const dispose = capture(() => {
+			const first = watchUpdates(signal, value => {
+				events.push(value);
+			});
+			strictEqual(first, "a");
+		});
+		assertEvents(events, []);
+		signal.value = "b";
+		assertEvents(events, ["b"]);
+		signal.value = "c";
+		assertEvents(events, ["c"]);
+		dispose();
+		signal.value = "d";
+		assertEvents(events, []);
 	});
 
 	await ctx.test("trigger", async ctx => {

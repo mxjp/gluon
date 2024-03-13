@@ -327,6 +327,28 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 }
 
 /**
+ * Watch an expression until the current lifecycle is disposed.
+ *
+ * @param expr The expression to watch.
+ * @param fn The function to call with the expression result when any updates occur.
+ * @param trigger If true, {@link batch batches} are ignored and the callback is guaranteed to be called before all other non-trigger callbacks. This can be used to implement computations that can run during batches.
+ * @returns The first expression result.
+ */
+export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false): T {
+	let first: T;
+	let update = false;
+	watch(expr, value => {
+		if (update) {
+			fn(value);
+		} else {
+			first = value;
+			update = true;
+		}
+	}, trigger);
+	return first!;
+}
+
+/**
  * Evaluate an expression and call a function once when any accessed signals are updated.
  *
  * It is guaranteed that all triggers are called before other non-trigger dependants per signal update or batch.

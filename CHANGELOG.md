@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.7
++ Add `watchUpdates` utility.
+
 ## 5.6
 + Export `sharedGlobal` and `shareInstanceOf` utilities.
 

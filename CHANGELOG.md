@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.6
++ Export `sharedGlobal` and `shareInstanceOf` utilities.
+
 ## 5.5
 + Add event API.
 

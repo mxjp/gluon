@@ -195,7 +195,7 @@ export class Signal<T> {
 	 * } />
 	 * ```
 	 */
-	pipe<T, A extends any[]>(fn: (source: this, ...args: A) => T, ...args: A): T {
+	pipe<A extends any[], R>(fn: (self: this, ...args: A) => R, ...args: A): R {
 		return fn(this, ...args);
 	}
 }

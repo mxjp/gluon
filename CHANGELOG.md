@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0
++ **Breaking:** Memos no longer run during batches.
+
 ## 5.7
 + Add `watchUpdates` utility.
 

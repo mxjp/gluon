@@ -366,9 +366,9 @@ await test("signals", async ctx => {
 
 			batch(() => {
 				signal.value = 3;
-				assertEvents(events, ["i", "o"]);
+				assertEvents(events, []);
 			});
-			assertEvents(events, [9]);
+			assertEvents(events, ["i", "o", 9]);
 		});
 	});
 
@@ -536,11 +536,10 @@ await test("signals", async ctx => {
 			assertEvents(events, ["outer", 1]);
 			batch(() => {
 				signal.value = 2;
-				assertEvents(events, ["inner"]);
 				signal.value = 3;
-				assertEvents(events, ["inner"]);
+				assertEvents(events, []);
 			});
-			assertEvents(events, ["outer", 3]);
+			assertEvents(events, ["inner", "outer", 3]);
 		});
 	});
 

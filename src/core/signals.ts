@@ -429,7 +429,7 @@ export function batch<T>(fn: () => T): T {
 /**
  * Watch an expression and create a function to reactively access it's latest result.
  *
- * This is similar to {@link lazy}, but the expression is also evaluated if it isn't used and during batches.
+ * This is similar to {@link lazy}, but the expression is also evaluated if it isn't used.
  *
  * @param expr The expression to watch.
  * @param equals True to skip updates when a result is strictly equal to the previous one or a function to determine if the results are equal. Default is true.
@@ -452,7 +452,7 @@ export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolea
 	const signal = sig<T>(undefined!, equals);
 	watch(expr, value => {
 		signal.value = value;
-	}, true);
+	});
 	return () => signal.value;
 }
 

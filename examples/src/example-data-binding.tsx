@@ -1,4 +1,4 @@
-import { Signal, sig, watch } from "@mxjp/gluon";
+import { Signal, sig, watchUpdates } from "@mxjp/gluon";
 import { TextInput } from "./components/text-input";
 import { Row } from "./components/row";
 import { Button } from "./components/button";
@@ -59,10 +59,10 @@ export function example() {
 
 function trim(source: Signal<string>) {
 	const input = sig(source.value);
-	watch(input, value => {
+	watchUpdates(input, value => {
 		source.value = value.trim();
-	}, true);
-	watch(source, value => {
+	});
+	watchUpdates(source, value => {
 		if (input.value.trim() !== value) {
 			input.value = value;
 		}
@@ -72,16 +72,16 @@ function trim(source: Signal<string>) {
 
 function parseInt(source: Signal<number>) {
 	const input = sig(String(source.value));
-	watch(input, value => {
+	watchUpdates(input, value => {
 		if (/^\d+$/.test(value)) {
 			source.value = Number(value);
 		}
-	}, true);
-	watch(source, value => {
+	});
+	watchUpdates(source, value => {
 		if (!/^\d+$/.test(input.value) || Number(input.value) !== value) {
 			input.value = String(value);
 		}
-	}, true);
+	});
 	return input;
 }
 
@@ -94,7 +94,7 @@ function emailPart(source: Signal<string>, localPart: boolean) {
 	}
 
 	const input = sig(parseEmail(source.value)[localPart ? 0 : 1]);
-	watch(input, value => {
+	watchUpdates(input, value => {
 		if (!value.includes("@")) {
 			if (localPart) {
 				source.value = value + "@" + parseEmail(source.value)[1];
@@ -102,9 +102,9 @@ function emailPart(source: Signal<string>, localPart: boolean) {
 				source.value = parseEmail(source.value)[0] + "@" + value;
 			}
 		}
-	}, true);
-	watch(source, value => {
+	});
+	watchUpdates(source, value => {
 		input.value = parseEmail(value)[localPart ? 0 : 1];
-	}, true);
+	});
 	return input;
 }

@@ -783,6 +783,7 @@ watch(() => count.value, count => {
   console.log(`Clicked ${count} times!`);
 });
 ```
+
 Note, that static values will not be reactive, even if they originate from a signal:
 ```tsx
 import { sig } from "@mxjp/gluon";
@@ -795,27 +796,40 @@ watch(count.value, count => {
 });
 ```
 
+The **watchUpdates** function can be used as an alternative, that returns the initial value instead of immediately calling a function with it:
+```tsx
+import { sig, watchUpdates } from "@mxjp/gluon";
+
+const count = sig(0);
+
+const initialValue = watchUpdates(count, count => {
+  console.log(`Count updated: ${count}`);
+});
+
+console.log("Initial count:", initialValue);
+```
+
 ## Conversion
 Sometimes it can be useful to convert user inputs in some way, e.g. trimming whitespace or parsing a number.
 
 The example below shows how signals can be converted while allowing data flow in both directions. Things like the **trim** function below are easy to reuse and compose with other behaviors.
 ```tsx
-import { sig, Signal, watch, mount } from "@mxjp/gluon";
+import { sig, Signal, watchUpdates, mount } from "@mxjp/gluon";
 
 export function trim(source: Signal<string>): Signal<string> {
   const input = sig(source.value);
 
   // Write the trimmed value back into source when the input is updated:
-  watch(input, value => {
+  watchUpdates(input, value => {
     source.value = value.trim();
-  }, true);
+  });
 
   // Write the source value into the input if it doesn't match the trimmed input:
-  watch(source, value => {
+  watchUpdates(source, value => {
     if (value !== input.value.trim()) {
       input.value = value;
     }
-  }, true);
+  });
 
   return input;
 }

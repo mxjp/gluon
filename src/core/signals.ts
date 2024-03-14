@@ -581,6 +581,16 @@ export type MapFn<I, O> = (input: I) => O;
 
 /**
  * Map an expression value while preserving if the expression is static or not.
+ *
+ * @example
+ * ```tsx
+ * import { sig, map, get } from "@mxjp/gluon";
+ *
+ * const count = sig(42);
+ * const doubleCount = map(count, value => value * 2);
+ *
+ * get(doubleCount) // 84
+ * ```
  */
 export function map<I, O>(input: Expression<I>, mapFn: MapFn<I, O>): Expression<O> {
 	if (input instanceof Signal) {

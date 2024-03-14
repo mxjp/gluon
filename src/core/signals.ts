@@ -252,7 +252,6 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately.
- * @param trigger If true, {@link batch batches} are ignored and the callback is guaranteed to be called before all other non-trigger callbacks. This can be used to implement computations that can run during batches.
  *
  * @example
  * ```tsx
@@ -276,7 +275,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  * count.value = 2;
  * ```
  */
-export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false): void {
+export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 	if (expr instanceof Signal || typeof expr === "function") {
 		const context = getContext();
 		let disposed = false;
@@ -303,9 +302,8 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 			}
 			cycle++;
 			runInContext(context, () => {
-				const dependants: Dependant[] = [[dependant, cycle]];
-				TRIGGERS_STACK.push(trigger ? dependants : []);
-				DEPENDANTS_STACK.push(trigger ? [] : dependants);
+				TRIGGERS_STACK.push([]);
+				DEPENDANTS_STACK.push([[dependant, cycle]]);
 				try {
 					uncapture(runExpr);
 				} finally {
@@ -331,10 +329,9 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result when any updates occur.
- * @param trigger If true, {@link batch batches} are ignored and the callback is guaranteed to be called before all other non-trigger callbacks. This can be used to implement computations that can run during batches.
  * @returns The first expression result.
  */
-export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false): T {
+export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void): T {
 	let first: T;
 	let update = false;
 	watch(expr, value => {
@@ -344,7 +341,7 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, tri
 			first = value;
 			update = true;
 		}
-	}, trigger);
+	});
 	return first!;
 }
 

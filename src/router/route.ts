@@ -151,7 +151,7 @@ export function watchRoutes<T extends Route>(path: Expression<string>, routes: T
 			parent.value = undefined;
 			rest.value = "";
 		}
-	}, false);
+	});
 	return new WatchedRoutes(parent, rest);
 }
 

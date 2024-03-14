@@ -2,6 +2,7 @@
 
 ## 6.0
 + **Breaking:** Memos no longer run during batches.
++ **Breaking:** `trigger` argument has been removed from `watch` and `watchUpdates`.
 
 ## 5.7
 + Add `watchUpdates` utility.

@@ -231,6 +231,9 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
   + [Navigation](#navigation)
   + [Route Matching](#route-matching)
   + [Nested Routing](#nested-routing)
++ [Troubleshooting](#troubleshooting)
+  + [Missing Context Values](#missing-context-values)
+  + [Reactivity Not Working](#reactivity-not-working)
 + [Testing](#testing)
   + [Synchronous Tests](#synchronous-tests)
   + [Asynchronous Tests](#asynchronous-tests)
@@ -1344,6 +1347,152 @@ class ExampleComponent extends HTMLElement {
     this.#dispose = undefined;
   }
 }
+```
+
+<br>
+
+
+
+# Troubleshooting
+This section shows some common pitfalls and how to deal with them.
+
+## Missing Context Values
+
+### Context Key Typos
+Ensure that the **key** argument is the same everywhere.
+```tsx
+inject("message", "Hello World!", () => {
+  // There is a typo here:
+  extract("nessage");
+});
+```
+
+To avoid this, you can use [typed context keys](#typed-keys):
+```tsx
+const MESSAGE = Symbol.for("example-message") as ContextKey<string>;
+
+inject(MESSAGE, "Hello World!", () => {
+  // This typo is now a compiler error:
+  extract(NESSAGE);
+});
+```
+
+### Extract Running Too Late
+**extract** must be called synchronously while the callback passed to **inject** or **deriveContext** is running.
+```tsx
+inject(MESSAGE, "Hello World!", () => {
+  queueMicrotask(() => {
+    // This runs after the inject call has already ended:
+    extract(MESSAGE); // undefined
+  });
+});
+```
+
+To solve this, you can [forward the context](#context) as follows:
+```tsx
+inject(MESSAGE, "Hello World!", () => {
+
+  // Bind the current context to your callback:
+  queueMicrotask(wrapContext(() => {
+    extract(MESSAGE); // "Hello World!"
+  }));
+
+  // Or manually pass the context to somewhere else:
+  const context = getContext();
+  queueMicrotask(() => {
+    runInContext(context, () => {
+      extract(MESSAGE); // "Hello World!"
+    });
+  });
+
+});
+```
+
+### Extract Running Too Early
+When using **deriveContext**, the context must be modified before **extract** is called.
+```tsx
+deriveContext(ctx => {
+  // This doesn't work:
+  extract(MESSAGE); // undefined
+
+  ctx.set(MESSAGE, "Hello World!");
+
+  // This works:
+  extract(MESSAGE); // "Hello World!"
+});
+```
+
+## Reactivity Not Working
+For things to get updated or re-rendered, the following needs to be true:
++ The value in a signal must be replaced, or the signal must notify dependants using **notify** or **update**.
++ The place where the value is used must be able to access the signal by calling a function.
+
+### Deep Updates
+Signals don't automatically detect when values are deeply changed. They only detect when values are entirely replaced.
+```tsx
+const counter = sig({ count: 0 });
+// This will not trigger any updates:
+counter.value.count++;
+```
+When possible, you should wrap the inner values into signals:
+```tsx
+const counter = { count: sig(0) };
+// Signals can also be deeply nested:
+const counter = sig({ count: sig(0) });
+```
+
+When this isn't possible, you can use one of the following options:
+```tsx
+// Use the update function:
+counter.update(value => {
+  value.count++;
+});
+
+// Replace the entire value:
+counter.value = { count: 1 };
+
+// Manually notify dependants:
+counter.value.count++;
+counter.notify();
+```
+
+### Static Values
+The value of signals or expressions can always be accessed in a non reactive ways:
+```tsx
+const count = sig(0);
+
+// This isn't reactive:
+mount(document.body, <>{count.value}</>);
+mount(document.body, <>{get(count)}</>);
+```
+For signal accesses to be reactive, they need to be done in a function call:
+```tsx
+// This is now reactive:
+mount(document.body, <>{() => count.value}</>);
+mount(document.body, <>{() => get(count)}</>);
+
+// Using the signal itself is also reactive:
+mount(document.body, <>{count}</>);
+```
+This is also true for every other API that uses [expressions](#expressions). This way you always have the option to make something reactive or static.
+
+### Strict Equality
+By default, signals don't notify dependants after replacing the value if it's strictly equal to the previous one.
+```tsx
+const count = sig(0);
+// This will not trigger any updates:
+count.value = 0;
+```
+To force updates, you can use one of the following options:
+```tsx
+// Manually notify dependants:
+count.notify();
+
+// Disable the default equality check:
+const count = sig(0, false);
+
+// Use a custom equality check:
+const count = sig(0, (previous, current) => false);
 ```
 
 <br>

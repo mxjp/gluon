@@ -210,6 +210,7 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
     + [Fragments & Arrays](#fragments--arrays)
   + [Namespaces](#namespaces)
   + [Components](#components)
+    + [Children](#children)
 + [Reactivity](#reactivity)
   + [Signals](#signals)
   + [Expressions](#expressions)
@@ -690,9 +691,7 @@ mount(
 );
 ```
 
-By default, properties are non-reactive. To accept reactive properties, you can use [expressions](#reactivity).
-
-To map an expression value, use the **map** function, to access an expression value at any time use the **get** function:
+By default, properties are non-reactive. To accept reactive properties, you can use [expressions](#reactivity). To map an expression value, use the **map** function, to access an expression value at any time use the **get** function:
 ```tsx
 import { mount, get, Expression } from "@mxjp/gluon";
 
@@ -716,6 +715,52 @@ mount(
     <Hint variant={() => "info"}>Hello World!</Hint>
     <Hint variant={someSignal}>Hello World!</Hint>
   </>,
+);
+```
+
+### Children
+Component children are always passed via the **children** property.
+
+To accept arbitrary content with it's [lifecycle](#lifecycle) bound to the parent, you can use the **unknown** type:
+```tsx
+import { mount } from "@mxjp/gluon";
+
+function TextBlock(props: { children?: unknown }) {
+  return <div>
+    {props.children}
+  </div>;
+}
+
+mount(
+  document.body,
+  <TextBlock>
+    Hello World!
+  </TextBlock>
+);
+```
+
+You can also use arbitrary functions to render children multiple times or to pass values:
+```tsx
+import { mount, For } from "@mxjp/gluon";
+
+function ForEachNote(props: { children: (note: string) => unknown }) {
+  return <ul>
+    <For each={someNotes}>
+      {note => <li>
+        {props.children(note)}
+      </li>}
+    </For>
+  </ul>;
+}
+
+mount(
+  document.body,
+  <ForEachNote>
+    {note => <div>
+      <h2>{note.title}</h2>
+      <p>{note.content}</p>
+    </div>}
+  </ForEachNote>
 );
 ```
 

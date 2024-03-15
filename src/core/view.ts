@@ -81,6 +81,8 @@ export class View {
 
 	/**
 	 * The current first node of this view.
+	 *
+	 * Note, that this property is not reactive.
 	 */
 	get first(): Node {
 		return this.#first;
@@ -88,6 +90,8 @@ export class View {
 
 	/**
 	 * The current last node of this view.
+	 *
+	 * Note, that this property is not reactive.
 	 */
 	get last(): Node {
 		return this.#last;
@@ -95,6 +99,8 @@ export class View {
 
 	/**
 	 * The current parent node or undefined if there is none.
+	 *
+	 * Note, that this property is not reactive.
 	 */
 	get parent(): Node | undefined {
 		return this.#first?.parentNode ?? undefined;

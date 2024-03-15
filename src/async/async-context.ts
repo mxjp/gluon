@@ -17,6 +17,13 @@ export class AsyncContext {
 
 	/**
 	 * Reactively check if there are any pending tasks in this context.
+	 *
+	 * @example
+	 * ```tsx
+	 * <Show when={() => asyncCtx.pending}>
+	 *   <div class="overlay">Please wait...</div>
+	 * </Show>
+	 * ```
 	 */
 	get pending(): boolean {
 		return this.#tasks.value.size > 0;

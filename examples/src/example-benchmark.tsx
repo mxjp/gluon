@@ -1,4 +1,4 @@
-import { Iter, Nest, When } from "@mxjp/gluon";
+import { IndexFor, Nest, Show } from "@mxjp/gluon";
 import { Bench, BenchResult, Group } from "./benchmarks/common";
 import classes from "./benchmarks/common.module.css";
 import { Button } from "./components/button";
@@ -50,7 +50,7 @@ function Entry(props: {
 			</Button>
 		</div>
 
-		<When value={() => props.item instanceof Bench ? props.item : null}>
+		<Show when={() => props.item instanceof Bench ? props.item : null}>
 			{bench => <div class={classes.status}>
 				<Nest>
 					{() => {
@@ -63,13 +63,13 @@ function Entry(props: {
 					}}
 				</Nest>
 			</div>}
-		</When>
+		</Show>
 
-		<When value={() => props.item instanceof Group ? props.item : null}>
-			{group => <Iter each={group.items}>
+		<Show when={() => props.item instanceof Group ? props.item : null}>
+			{group => <IndexFor each={group.items}>
 				{item => <Entry item={item} indent={props.indent + 1} />}
-			</Iter>}
-		</When>
+			</IndexFor>}
+		</Show>
 	</>;
 }
 

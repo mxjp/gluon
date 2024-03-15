@@ -1,11 +1,11 @@
-import "./env.js";
+import "../env.js";
 
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
 import { capture, captureSelf, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
 
-import { assertEvents } from "./common.js";
+import { assertEvents } from "../common.js";
 
 await test("lifecycle", async ctx => {
 	await ctx.test("inert use", () => {

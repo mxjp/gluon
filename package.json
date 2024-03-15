@@ -9,16 +9,18 @@
 		"declarative",
 		"signals",
 		"jsx",
-		"web-components"
+		"web-components",
+		"router",
+		"async"
 	],
 	"license": "MIT",
-	"version": "5.7.0",
+	"version": "6.0.0",
 	"type": "module",
-	"main": "./dist/es/index.js",
+	"main": "./dist/es/core/index.js",
 	"exports": {
 		".": {
-			"types": "./dist/es/index.d.ts",
-			"default": "./dist/es/index.js"
+			"types": "./dist/es/core/index.d.ts",
+			"default": "./dist/es/core/index.js"
 		},
 		"./jsx": {
 			"types": "./dist/es/core/jsx/legacy.d.ts",
@@ -31,6 +33,14 @@
 		"./jsx-dev-runtime": {
 			"types": "./dist/es/core/jsx/r17.d.ts",
 			"default": "./dist/es/core/jsx/r17.js"
+		},
+		"./async": {
+			"types": "./dist/es/async/index.d.ts",
+			"default": "./dist/es/async/index.js"
+		},
+		"./router": {
+			"types": "./dist/es/router/index.d.ts",
+			"default": "./dist/es/router/index.js"
 		},
 		"./test": {
 			"types": "./dist/es/test/index.d.ts",

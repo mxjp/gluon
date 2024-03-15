@@ -1,8 +1,22 @@
 # Changelog
 
 ## 6.0
++ **Breaking:** Async and router exports have been moved to `@mxjp/gluon/async` and `@mxjp/gluon/router`.
 + **Breaking:** Memos no longer run during batches.
 + **Breaking:** `trigger` argument has been removed from `watch` and `watchUpdates`.
++ **Breaking:** The following components have been renamed:
+  + `<Show>` => `<Attach>`
+  + `<When> => <Show>`
+  + `<IterUnique> => <For>`
+  + `<Iter> => <IndexFor>`
++ **Breaking:** The following functions have been removed:
+  + `useUniqueId` - Use `uniqueId` or `<UseUniqueId>` instead.
+  + `nest` - Use `<Nest>` instead.
+  + `when` - Use `<Show>` instead.
+  + `iterUnique` - Use `<For>` instead.
+  + `iter` - Use `<IndexFor>` instead.
+  + `show` - Use `<Attach>` instead.
++ Components are now also included in pre-bundled versions.
 
 ## 5.7
 + Add `watchUpdates` utility.

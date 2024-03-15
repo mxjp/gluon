@@ -74,7 +74,7 @@ export function extract<K>(key: K): ContextValue<K> | undefined {
 /**
  * Run a function within a copy of the current context that also contains an additional entry.
  *
- * For injecting multiple entries prefer using {@link deriveContext}.
+ * + For injecting multiple entries prefer using {@link deriveContext}.
  *
  * @param value The key value pair or instance to inject.
  * @param fn The function to run.
@@ -87,6 +87,29 @@ export function inject<K, R>(key: K, value: ContextValue<K>, fn: () => R): R {
 }
 
 /**
+ * Inject an entry.
+ *
+ * @example
+ * ```tsx
+ * import { mount, Inject, extract } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <Inject key="message" value="Hello World!">
+ *     {() => <h1>{extract("message")}</h1>}
+ *   </Inject>
+ * );
+ * ```
+ */
+export function Inject<K>(props: {
+	key: K;
+	value: ContextValue<K>;
+	children: () => unknown;
+}): unknown {
+	return inject(props.key, props.value, props.children);
+}
+
+/**
  * Run a function within a copy of the current context.
  *
  * @param fn The function to run.
@@ -96,6 +119,33 @@ export function deriveContext<R>(fn: (context: Context, parent?: ReadonlyContext
 	const parent = getContext() as Map<any, any>;
 	const context = new Map(parent) as Context;
 	return runInContext(context, () => fn(context, parent));
+}
+
+/**
+ * Render content with a copy of the current context.
+ *
+ * @example
+ * ```tsx
+ * import { mount, DeriveContext, extract } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <DeriveContext>
+ *     {context => {
+ *       context.set("message", "Hello World!");
+ *       return <h1>{extract("message")}</h1>;
+ *     }}
+ *   </DeriveContext>
+ * );
+ * ```
+ */
+export function DeriveContext(props: {
+	/**
+	 * A function to render content.
+	 */
+	children: (context: Context, parent?: ReadonlyContext) => unknown;
+}): unknown {
+	return deriveContext(props.children);
 }
 
 /**

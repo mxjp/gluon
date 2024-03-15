@@ -1,4 +1,5 @@
-import { Expression, get, isPending, waitFor } from "@mxjp/gluon";
+import { Expression, get } from "@mxjp/gluon";
+import { isPending, waitFor } from "@mxjp/gluon/async";
 
 export function Button(props: {
 	children?: unknown;

@@ -12,11 +12,25 @@ export function uniqueId(): string {
 }
 
 /**
- * Run a function with an ID that is unique in the current thread.
+ * A component that provides a unique id to it's children.
  *
- * @param fn The function to run.
- * @returns The function's return value.
+ * @example
+ * ```tsx
+ * import { mount, UseUniqueId } from "@mxjp/gluon";
+ *
+ * mount(
+ *   document.body,
+ *   <UseUniqueId>
+ *     {id => <>
+ *       <label for={id}>Text</label>
+ *       <input type="text" id={id} />
+ *     </>}
+ *   </UseUniqueId>
+ * );
+ * ```
  */
-export function useUniqueId<T>(fn: (id: string) => T): T {
-	return fn(uniqueId());
+export function UseUniqueId(props: {
+	children: (id: string) => unknown;
+}): unknown {
+	return props.children(uniqueId());
 }

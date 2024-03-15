@@ -178,14 +178,33 @@ export function * viewNodes(view: View): IterableIterator<Node> {
 }
 
 /**
- * Create a view that renders content depending on an expression.
+ * A component that renders content depending on an expression.
  *
- * @param expr An expression that returns a function to create content or null or undefined to render nothing.
- * @returns The view.
+ * @example
+ * ```tsx
+ * import { mount, Nest, sig } from "@mxjp/gluon";
+ *
+ * const count = sig(0);
+ *
+ * mount(
+ *   document.body,
+ *   <Nest>
+ *     {() => {
+ *       const value = count.value;
+ *       return () => <>{value}</>;
+ *     }}
+ *   </Nest>
+ * );
+ * ```
  */
-export function nest(expr: Expression<(() => unknown) | null | undefined>): View {
+export function Nest(props: {
+	/**
+	 * An expression that returns a function to create content or null or undefined to render nothing.
+	 */
+	children: Expression<(() => unknown) | null | undefined>;
+}): View {
 	return new View((setBoundary, self) => {
-		watch(expr, value => {
+		watch(props.children, value => {
 			const view = render(value?.());
 			const parent = self.parent;
 			if (parent) {
@@ -199,28 +218,56 @@ export function nest(expr: Expression<(() => unknown) | null | undefined>): View
 }
 
 /**
- * Create a view that renders conditional content.
+ * A component that renders conditional content.
  *
- * @param value The expression to evaluate.
- * @param thenFn A function to create content if the value is truthy.
- * @param elseFn An optional function to create content if the value is falsy.
- * @returns The view.
+ * Content is only re-rendered if the expression result is not strictly equal to the previous one. If this behavior is undesired, use {@link Nest} instead.
+ *
+ * @example
+ * ```tsx
+ * import { mount, sig, Show } from "@mxjp/gluon";
+ *
+ * const message = sig<null | string>("Hello World!");
+ *
+ * mount(
+ *   document.body,
+ *   <Show when={message} else={() => <>No message...</>}>
+ *     {value => <h1>{value}</h1>}
+ *   </Show>
+ * );
+ * ```
  */
-export function when<T>(value: Expression<T | Falsy>, thenFn: (value: T) => unknown, elseFn?: () => unknown): View {
-	const getValue = memo(value);
-	return nest(() => {
-		const value = getValue();
-		if (value) {
-			return () => thenFn(value);
-		}
-		return elseFn;
+export function Show<T>(props: {
+	/**
+	 * The expression to evaluate.
+	 */
+	when: Expression<T | Falsy>;
+
+	/**
+	 * A function to create content if the value is truthy.
+	 */
+	children: (value: T) => unknown;
+
+	/**
+	 * An optional function to create content if the value is falsy.
+	 */
+	else?: () => unknown;
+}): View {
+	const getValue = memo(props.when);
+	return Nest({
+		children: () => {
+			const value = getValue();
+			if (value) {
+				return () => props.children(value);
+			}
+			return props.else;
+		},
 	});
 }
 
 /**
  * A function to create content for a specific value.
  */
-export interface IterUniqueContentFn<T> {
+export interface ForContentFn<T> {
 	/**
 	 * @param value The value.
 	 * @param index An expression to get the current index.
@@ -230,15 +277,33 @@ export interface IterUniqueContentFn<T> {
 }
 
 /**
- * Create a view that renders content for each unique value from an interable.
+ * A component that renders content for each unique value in an iterable.
  *
- * Content instances are keyed by value.
+ * @example
+ * ```tsx
+ * import { ForUnique, mount, sig } from "@mxjp/gluon";
  *
- * @param expr The expression.
- * @param content A function to create content for a specific value.
- * @returns The view.
+ * const items = sig([1, 2, 3]);
+ *
+ * mount(
+ *   document.body,
+ *   <ForUnique each={items}>
+ *     {value => <li>{value}</li>}
+ *   </ForUnique>
+ * );
+ * ```
  */
-export function iterUnique<T>(expr: Expression<Iterable<T>>, content: IterUniqueContentFn<T>): View {
+export function For<T>(props: {
+	/**
+	 * The expression.
+	 */
+	each: Expression<Iterable<T>>;
+
+	/**
+	 * A function to create content for a specific value.
+	 */
+	children: ForContentFn<T>;
+}): View {
 	return new View((setBoundary, self) => {
 		interface Instance {
 			value: T;
@@ -268,7 +333,7 @@ export function iterUnique<T>(expr: Expression<Iterable<T>>, content: IterUnique
 			}
 		});
 
-		watch(expr, values => {
+		watch(props.each, values => {
 			let parent = self.parent;
 			if (!parent) {
 				parent = document.createDocumentFragment();
@@ -295,7 +360,7 @@ export function iterUnique<T>(expr: Expression<Iterable<T>>, content: IterUnique
 						};
 
 						instance.dispose = capture(() => {
-							instance.view = render(content(value, () => instance.index.value));
+							instance.view = render(props.children(value, () => instance.index.value));
 							instance.view.setBoundaryOwner((_, last) => {
 								if (instances[instances.length - 1] === instance && instance.cycle === cycle) {
 									setBoundary(undefined, last);
@@ -359,7 +424,7 @@ export function iterUnique<T>(expr: Expression<Iterable<T>>, content: IterUnique
 /**
  * A function to create content for a specific index and value.
  */
-export interface IterContentFn<T> {
+export interface IndexForContentFn<T> {
 	/**
 	 * @param value The value.
 	 * @param index The index.
@@ -369,15 +434,33 @@ export interface IterContentFn<T> {
 }
 
 /**
- * Create a view that renders content for each value from an iterable.
+ * A component that renders content for each value in an iterable, keyed by index and value.
  *
- * Content instances are keyed by index and value.
+ * @example
+ * ```tsx
+ * import { mount, IndexFor, sig } from "@mxjp/gluon";
  *
- * @param expr The expression.
- * @param content A function to create content for a specific index and value.
- * @returns The view.
+ * const items = sig([1, 2, 3]);
+ *
+ * mount(
+ *   document.body,
+ *   <IndexFor each={items}>
+ *     {value => <li>{value}</li>}
+ *   </IndexFor>
+ * );
+ * ```
  */
-export function iter<T>(expr: Expression<Iterable<T>>, content: (value: T, index: number) => unknown): View {
+export function IndexFor<T>(props: {
+	/**
+	 * The expression.
+	 */
+	each: Expression<Iterable<T>>;
+
+	/**
+	 * A function to create content for a specific index and value.
+	 */
+	children: IndexForContentFn<T>;
+}): View {
 	return new View((setBoundary, self) => {
 		interface Instance {
 			value: T;
@@ -390,7 +473,7 @@ export function iter<T>(expr: Expression<Iterable<T>>, content: (value: T, index
 
 		const instances: Instance[] = [];
 
-		watch(expr, values => {
+		watch(props.each, values => {
 			let parent = self.parent;
 			if (!parent) {
 				parent = document.createDocumentFragment();
@@ -417,7 +500,7 @@ export function iter<T>(expr: Expression<Iterable<T>>, content: (value: T, index
 				};
 
 				instance.dispose = capture(() => {
-					instance.view = render(content(value, index));
+					instance.view = render(props.children(value, index));
 					instance.view.setBoundaryOwner((_, last) => {
 						if (instances[instances.length - 1] === instance) {
 							setBoundary(undefined, last);
@@ -503,14 +586,41 @@ export function movable(content: unknown): MovableView {
 }
 
 /**
- * Render content and attach it to the tree depending on an expression.
+ * A component that attaches or detaches content depending on an expression.
+ *
+ * Content is kept alive when detached.
+ *
+ * @example
+ * ```tsx
+ * import { mount, sig, Attach } from "@mxjp/gluon";
+ *
+ * const showMessage = sig(true);
+ *
+ * mount(
+ *   document.body,
+ *   <Attach when={showMessage}>
+ *     <h1>Hello World!</h1>
+ *   </Attach>
+ * );
+ * ```
  */
-export function show(expr: Expression<boolean>, content: unknown): View {
-	const inner = render(content);
-	const show = memo(() => Boolean(get(expr)));
-	return nest(() => {
-		return show()
-			? () => inner
-			: () => document.createComment("g");
+export function Attach(props: {
+	/**
+	 * The expression to evaluate.
+	 */
+	when: Expression<boolean>;
+
+	/**
+	 * The content to attach when the expression is truthy.
+	 */
+	children?: unknown;
+}): View {
+	const inner = render(props.children);
+	return Nest({
+		children: () => {
+			if (get(props.when)) {
+				return () => inner;
+			}
+		},
 	});
 }

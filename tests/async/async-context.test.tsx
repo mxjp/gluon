@@ -3,7 +3,8 @@ import "../env.js";
 import { deepStrictEqual, fail, rejects, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { AsyncContext, AsyncError, uncapture, watch } from "@mxjp/gluon";
+import { uncapture, watch } from "@mxjp/gluon";
+import { AsyncContext, AsyncError } from "@mxjp/gluon/async";
 
 import { assertEvents, future } from "../common.js";
 

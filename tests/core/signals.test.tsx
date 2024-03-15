@@ -1,11 +1,11 @@
-import "./env.js";
+import "../env.js";
 
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
 import { batch, capture, extract, get, inject, lazy, map, memo, optionalString, sig, Signal, string, teardown, trigger, uncapture, watch, watchUpdates } from "@mxjp/gluon";
 
-import { assertEvents, assertSharedInstance } from "./common.js";
+import { assertEvents, assertSharedInstance } from "../common.js";
 
 await test("signals", async ctx => {
 	await ctx.test("shared instances", () => {

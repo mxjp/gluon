@@ -1,6 +1,6 @@
 import { extract, inject } from "../core/context.js";
 import { Expression, get, sig, Signal, watch } from "../core/signals.js";
-import { nest, View } from "../core/view.js";
+import { Nest } from "../core/view.js";
 import { ChildRouter } from "./child-router.js";
 import { normalize } from "./path.js";
 import { ROUTER } from "./router.js";
@@ -137,6 +137,7 @@ export class WatchedRoutes<T extends Route> {
  *
  * @param path The normalized path.
  * @param routes The routes to watch.
+ * @returns An object with individually watchable route match and the unmatched rest path.
  */
 export function watchRoutes<T extends Route>(path: Expression<string>, routes: T[]): WatchedRoutes<T> {
 	const parent = sig<ParentRouteMatch<T> | undefined>(undefined);
@@ -155,22 +156,37 @@ export function watchRoutes<T extends Route>(path: Expression<string>, routes: T
 	return new WatchedRoutes(parent, rest);
 }
 
-export interface ContentRoute extends Route {
-	content: (params: unknown) => unknown;
+export interface ComponentRoute extends Route {
+	content: (props: {
+		/**
+		 * Matched route parameters.
+		 */
+		params: unknown;
+	}) => unknown;
 }
 
-export function routes(routes: ContentRoute[]): View {
+/**
+ * Match and render routes in the current context.
+ */
+export function Routes(props: {
+	/**
+	 * The routes to match.
+	 */
+	routes: ComponentRoute[];
+}): unknown {
 	const router = extract(ROUTER);
 	if (!router) {
 		throw new Error("router not available");
 	}
-	const watched = watchRoutes(() => router.path, routes);
-	return nest(() => {
-		const match = watched.match;
-		if (match) {
-			return () => inject(ROUTER, new ChildRouter(router, match.path, () => watched.rest), () => {
-				return match.route.content(match.params);
-			});
-		}
+	const watched = watchRoutes(() => router.path, props.routes);
+	return Nest({
+		children: () => {
+			const match = watched.match;
+			if (match) {
+				return () => inject(ROUTER, new ChildRouter(router, match.path, () => watched.rest), () => {
+					return match.route.content({ params: match.params });
+				});
+			}
+		},
 	});
 }

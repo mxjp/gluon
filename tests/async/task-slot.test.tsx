@@ -3,7 +3,8 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { TaskSlot, uncapture } from "@mxjp/gluon";
+import { uncapture } from "@mxjp/gluon";
+import { TaskSlot } from "@mxjp/gluon/async";
 
 import { assertEvents } from "../common.js";
 

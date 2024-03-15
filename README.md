@@ -200,11 +200,11 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
     + [Text](#text)
     + [Nodes](#nodes)
     + [Views](#views)
-      + [when](#when)
-      + [nest](#nest)
-      + [iterUnique](#iterunique)
-      + [iter](#iter)
-      + [show](#show)
+      + [`<Show>`](#show)
+      + [`<Nest>`](#nest)
+      + [`<For>`](#for)
+      + [`<IndexFor>`](#indexfor)
+      + [`<Attach>`](#attach)
       + [movable](#movable)
     + [Hidden Content](#hidden-content)
     + [Fragments & Arrays](#fragments--arrays)
@@ -500,31 +500,29 @@ mount(
 ### Views
 Views are sequences of one or more nodes that change over time. They can be used to render collections or conditional content.
 
-For every view listed below, there is a lower cased variant for use without jsx.
-
-#### `<When>`
+#### `<Show>`
 Render conditional content or optional fallback content.
 
-Note, that content is recreated if the expression result is not strictly equal to the last one. To keep content alive when the condition is falsy, use [show](#show) instead.
+Content is rerendered if the expression result is not strictly equal to the last one. To keep content alive when the condition is falsy, use [`<Attach>`](#attach) instead.
 ```tsx
-import { mount, When, sig } from "@mxjp/gluon";
+import { mount, Show, sig } from "@mxjp/gluon";
 
 const message = sig(null);
 
 mount(
   document.body,
-  <When value={message} else={() => <>No message to render.</>}>
+  <Show when={message} else={() => <>No message to render.</>}>
     {message => <h1>{message}</h1>}
-  </When>
+  </Show>
 );
 ```
 
 #### `<Nest>`
 Render a [component](#components) returned from an expression.
 
-Note, that content is recreated every time the expression is rerun.
+Content is rerendered every time the expression is rerun.
 
-For simple conditional content, prefer using [when](#when).
+For simple conditional content, prefer using [`<Show>`](#show).
 ```tsx
 import { mount, Nest, sig } from "@mxjp/gluon";
 
@@ -547,50 +545,44 @@ mount(
 );
 ```
 
-#### `<IterUnique>`
-Render content for each unique value in an iterable.
-
-Items are rendered in iteration order and duplicates are silently ignored.
+#### `<For>`
+Render content for each unique value in an iterable. Items are rendered in iteration order and duplicates are silently ignored.
 
 The **index** parameter is a function that can be used to reactively get the current index.
 ```tsx
-import { mount, IterUnique, sig } from "@mxjp/gluon";
+import { mount, For, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
 mount(
   document.body,
   <ul>
-    <IterUnique each={items}>
+    <For each={items}>
       {(value, index) => <li>{() => index() + 1}: {value}</li>}
-    </IterUnique>
+    </For>
   </ul>
 );
 ```
 
-#### `<Iter>`
-Render content for each index / item pair in an iterable.
-
-Items are rendered in iteration order.
+#### `<IndexFor>`
+Render content for each index-value pair in an iterable. Items are rendered in iteration order.
 ```tsx
-import { mount, Iter, sig } from "@mxjp/gluon";
+import { mount, IndexFor, sig } from "@mxjp/gluon";
 
 const items = sig(["foo", "bar", "bar", "baz"]);
 
 mount(
   document.body,
   <ul>
-    <Iter each={items}>
+    <IndexFor each={items}>
       {(value, index) => <li>{index + 1}: {value}</li>}
-    </Iter>
+    </IndexFor>
   </ul>
 );
 ```
 
-#### `<Show>`
+#### `<Attach>`
 Attach content if an expression is truthy.
-
-To conditionally render content, use [when](#when) or [nest](#nest) instead.
 
 ```tsx
 import { mount, Show, sig } from "@mxjp/gluon";
@@ -604,11 +596,10 @@ mount(
   </Show>
 );
 ```
+To conditionally render content, use [`<Show>`](#show) or [`<Nest>`](#nest) instead.
 
 #### `movable`
-The **movable** function wraps content, so that it can be safely moved to new places.
-
-When moved, content is safely detached from it's previous parent.
+The **movable** function wraps content, so that it can be safely moved to new places. When moved, content is safely detached from it's previous parent.
 ```tsx
 import { mount, movable } from "@mxjp/gluon";
 
@@ -649,7 +640,7 @@ mount(
 );
 ```
 
-Note, that jsx fragments in gluon return their children as is.
+Jsx fragments return their children as is.
 ```tsx
 <>Hello World!</>; // => string
 <>foo{42}</>; // => ["foo", 42]
@@ -673,7 +664,7 @@ mount(
 ```
 
 ## Components
-In gluon, components are simple functions that return content and take arbitrary inputs. When used with JSX syntax, props are passed as the first argument.
+In gluon, components are functions that return content and take arbitrary inputs. When used with JSX syntax, props are passed as the first argument.
 ```tsx
 import { mount, Signal } from "@mxjp/gluon";
 
@@ -1055,7 +1046,8 @@ watch(expression, () => { ... });
 ## Tasks
 The task system in gluon keeps track of pending tasks in a specific context.
 ```tsx
-import { mount, Inject, Tasks, isPending, waitFor } from "@mxjp/gluon";
+import { mount, Inject } from "@mxjp/gluon";
+import { isPending, waitFor } from "@mxjp/gluon/async";
 
 mount(
   document.body,
@@ -1077,7 +1069,8 @@ mount(
 ## Async
 Render content depending on an async function or promise.
 ```tsx
-import { mount, Async } from "@mxjp/gluon";
+import { mount } from "@mxjp/gluon";
+import { Async } from "@mxjp/gluon/async";
 
 const promise = new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -1089,9 +1082,10 @@ mount(
 );
 ```
 
-To use promises returned from an expression, this can be combined with [when](#when):
+To use promises returned from an expression, this can be combined with [`<Show>`](#show):
 ```tsx
-import { mount, Async, When, sig } from "@mxjp/gluon";
+import { mount, When, sig } from "@mxjp/gluon";
+import { Async } from "@mxjp/gluon/async";
 
 const promise = sig(undefined);
 setInterval(() => {
@@ -1110,7 +1104,8 @@ mount(
 
 Async contexts can be used to wait for all async parts of a tree to complete:
 ```tsx
-import { mount, Inject, ASYNC, Async, AsyncContext } from "@mxjp/gluon";
+import { mount, Inject } from "@mxjp/gluon";
+import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
 
 // Create a new context with the current one as parent if there is one:
 const context = AsyncContext.fork();
@@ -1133,7 +1128,7 @@ Abort controllers can be used in many web APIs to abort things.
 
 The **useAbortController** and **useAbortSignal** functions can be used to abort things when the current context is disposed e.g. when content inside a `<When>` component is no longer rendered.
 ```tsx
-import { useAbortSignal } from "@mxjp/gluon";
+import { useAbortSignal } from "@mxjp/gluon/async";
 
 fetch("/info.txt", { signal: useAbortSignal() });
 
@@ -1149,7 +1144,8 @@ Routers provide a reactive path and query parameters and allow navigating in the
 
 Currently, there is a **HistoryRouter** that uses the location and history API and a **HashRouter** that uses the location hash as the path. You can also implement custom routers by implementing the **Router** interface.
 ```tsx
-import { mount, Inject, HistoryRouter, ROUTER } from "@mxjp/gluon";
+import { mount, Inject } from "@mxjp/gluon";
+import { ROUTER, HistoryRouter } from "@mxjp/gluon/router";
 
 mount(
   document.body,
@@ -1163,7 +1159,8 @@ mount(
 
 The **routes** function or **Routes** component can be used to render content based on the current path.
 ```tsx
-import { mount, UseRouter, HistoryRouter, ROUTER, Routes } from "@mxjp/gluon";
+import { mount, Inject } from "@mxjp/gluon";
+import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
 
 mount(
   document.body,
@@ -1188,6 +1185,9 @@ The router in the current context can be used for navigation.
 
 Routers implement a **push** function for regular navigation and a **replace** function for replacing the current path if possible.
 ```tsx
+import { extract } from "@mxjp/gluon";
+import { ROUTER } from "@mxjp/gluon/router";
+
 function ExamplePage() {
   const router = extract(ROUTER).root;
   return <button $click={() => {
@@ -1207,7 +1207,8 @@ When matching against a path, routes are tested in order. Route paths can be any
 
 Route parameters are passed to the content functions or components. The example below renders an ID extracted from paths like **/books/42**:
 ```tsx
-import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
+import { mount, Inject } from "@mxjp/gluon";
+import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
 
 function Example(props) {
   return `ID: ${props.params[1]}`;
@@ -1230,7 +1231,8 @@ Routes can be arbitrarily nested with content in between.
 
 The example below renders text for the paths **/, /foo/bar, /foo/baz**
 ```tsx
-import { mount, UseRouter, HistoryRouter, Routes } from "@mxjp/gluon";
+import { mount, Inject, extract } from "@mxjp/gluon";
+import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
 
 mount(
   document.body,

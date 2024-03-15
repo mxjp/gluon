@@ -3,7 +3,8 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { capture, useAbortSignal } from "@mxjp/gluon";
+import { capture } from "@mxjp/gluon";
+import { useAbortSignal } from "@mxjp/gluon/async";
 
 await test("async/abort", () => {
 	let signal!: AbortSignal;

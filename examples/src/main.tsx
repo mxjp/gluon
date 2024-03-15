@@ -1,4 +1,6 @@
-import { Inject, Iter, Nest, TASKS, Tasks, Async, mount, sig } from "@mxjp/gluon";
+import { IndexFor, Inject, Nest, mount, sig } from "@mxjp/gluon";
+import { Async, TASKS, Tasks } from "@mxjp/gluon/async";
+
 import { Column } from "./components/column";
 
 import classes from "./main.module.css";
@@ -53,11 +55,11 @@ mount(
 					<div class={classes.menu}>
 						<h1>gluon! examples</h1>
 						<div class={classes.menuItems}>
-							<Iter each={exampleNames}>
+							<IndexFor each={exampleNames}>
 								{name => (
 									<a href={`#${name}`}>{name}</a>
 								)}
-							</Iter>
+							</IndexFor>
 						</div>
 					</div>
 				</div>

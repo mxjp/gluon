@@ -1,4 +1,5 @@
-import { Inject, QueryInit, ROUTER, Router, Routes, extract, normalize, sig } from "@mxjp/gluon";
+import { Inject, extract, sig } from "@mxjp/gluon";
+import { QueryInit, ROUTER, Router, Routes, normalize } from "@mxjp/gluon/router";
 
 import { Box } from "./components/box";
 import { Row } from "./components/row";

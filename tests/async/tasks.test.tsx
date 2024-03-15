@@ -3,7 +3,8 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { capture, extract, inject, isPending, isSelfPending, mount, TASKS, Tasks, uncapture, waitFor, watch, wrapContext } from "@mxjp/gluon";
+import { capture, extract, inject, mount, uncapture, watch, wrapContext } from "@mxjp/gluon";
+import { isPending, isSelfPending, TASKS, Tasks, waitFor } from "@mxjp/gluon/async";
 
 import { assertEvents, future } from "../common.js";
 

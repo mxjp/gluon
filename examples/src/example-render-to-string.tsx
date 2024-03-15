@@ -1,4 +1,5 @@
-import { ASYNC, Async, AsyncContext, Inject, capture, mount } from "@mxjp/gluon";
+import { Inject, capture, mount } from "@mxjp/gluon";
+import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
 import { Box } from "./components/box";
 
 async function renderToString(root: () => unknown) {

@@ -3,7 +3,8 @@ import "../env.js";
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { matchRoute, Route, sig, uncapture, watch, watchRoutes } from "@mxjp/gluon";
+import { sig, uncapture, watch } from "@mxjp/gluon";
+import { matchRoute, Route, watchRoutes } from "@mxjp/gluon/router";
 
 import { assertEvents } from "../common.js";
 

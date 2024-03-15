@@ -1,4 +1,4 @@
-import { Show, Signal, View, render, sig, watch } from "@mxjp/gluon";
+import { Attach, Signal, View, render, sig, watch } from "@mxjp/gluon";
 import { Row } from "./components/row";
 import { Button } from "./components/button";
 import { Box } from "./components/box";
@@ -18,13 +18,13 @@ export function example() {
 		</Row>
 		<Box>
 			<div>Before</div>
-			<Show when={show}>
+			<Attach when={show}>
 				<RotateOrder on={rotate}>
 					<TextInput style={{ width: "10rem" }} value={sig("A")} />
 					<TextInput style={{ width: "10rem" }} value={sig("B")} />
 					<TextInput style={{ width: "10rem" }} value={sig("C")} />
 				</RotateOrder>
-			</Show>
+			</Attach>
 			<div>After</div>
 		</Box>
 	</>;

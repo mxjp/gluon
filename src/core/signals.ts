@@ -251,7 +251,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  * Watch an expression until the current lifecycle is disposed.
  *
  * @param expr The expression to watch.
- * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately.
+ * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately. Lifecycle hooks are called before the next function call or when the current lifecycle is disposed.
  *
  * @example
  * ```tsx

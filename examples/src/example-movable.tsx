@@ -1,4 +1,4 @@
-import { Iter, When, movable, sig } from "@mxjp/gluon";
+import { For, Show, movable, sig } from "@mxjp/gluon";
 
 import { Row } from "./components/row";
 import { Button } from "./components/button";
@@ -11,15 +11,15 @@ export function example() {
 		<div>This demonstrates how content can be safely kept alive and passed around to new places.</div>
 		<div>Using the devtools, you can verify that the input element below is only created once and then moved into new places.</div>
 
-		<Iter each={[0, 1, 2]}>
+		<For each={[0, 1, 2]}>
 			{i =>
 				<Row>
 					<Button action={() => { place.value = i; }}>Move here</Button>
-					<When value={() => place.value === i}>
+					<Show when={() => place.value === i}>
 						{() => content.move()}
-					</When>
+					</Show>
 				</Row>
 			}
-		</Iter>
+		</For>
 	</>;
 }

@@ -1,4 +1,5 @@
-import { Signal, StyleValue, isPending } from "@mxjp/gluon";
+import { Signal, StyleValue } from "@mxjp/gluon";
+import { isPending } from "@mxjp/gluon/async";
 
 export function TextInput(props: {
 	value: Signal<string>;

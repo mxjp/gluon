@@ -3,7 +3,8 @@ import "../env.js";
 import { rejects, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { sig, watchFor } from "@mxjp/gluon";
+import { sig } from "@mxjp/gluon";
+import { watchFor } from "@mxjp/gluon/async";
 
 await test("async/wait-for", async ctx => {
 	await ctx.test("static", async () => {

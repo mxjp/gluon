@@ -1,4 +1,4 @@
-import { Expression, Iter, When, get, lazy, sig, teardown } from "@mxjp/gluon";
+import { Expression, IndexFor, Show, get, lazy, sig, teardown } from "@mxjp/gluon";
 import { Button } from "./components/button";
 import { Row } from "./components/row";
 
@@ -14,27 +14,25 @@ export function example() {
 		</div>
 
 		<Row>
-			<When
-				value={timer.running}
-				children={() => <>
+			<Show when={timer.running} else={() => <>
+				<Button action={timer.start}>Start</Button>
+				<Button action={timer.reset}>Reset</Button>
+			</>}>
+				{() => <>
 					<Button action={timer.stop}>Stop</Button>
 					<Button action={timer.lap}>Lap</Button>
 				</>}
-				else={() => <>
-					<Button action={timer.start}>Start</Button>
-					<Button action={timer.reset}>Reset</Button>
-				</>}
-			/>
+			</Show>
 		</Row>
 
 		<ul>
-			<Iter each={timer.laps}>
+			<IndexFor each={timer.laps}>
 				{(lap, index) => (
 					<li>
 						Lap {index + 1}: <Time value={lap.lap} />
 					</li>
 				)}
-			</Iter>
+			</IndexFor>
 		</ul>
 	</>;
 }
@@ -43,7 +41,7 @@ function Time(props: {
 	value: Expression<number>
 }) {
 	return <>
-		<When value={() => {
+		<Show when={() => {
 			const hours = Math.floor(get(props.value) / 1000 / 60 / 60);
 			if (hours > 0) {
 				return String(hours);
@@ -53,7 +51,7 @@ function Time(props: {
 				{hours}
 				<span class={classes.punct}>:</span>
 			</>}
-		</When>
+		</Show>
 		{() => String(Math.floor(get(props.value) / 1000 / 60) % 60)}
 		<span class={classes.punct}>:</span>
 		{() => String(Math.floor(get(props.value) / 1000) % 60).padStart(2, "0")}

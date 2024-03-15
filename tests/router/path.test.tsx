@@ -3,7 +3,7 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { join, normalize } from "@mxjp/gluon";
+import { join, normalize } from "@mxjp/gluon/router";
 
 await test("router/path", async ctx => {
 	await ctx.test("normalize", () => {

@@ -1,8 +1,10 @@
+import "../env.js";
+
 import test from "node:test";
 
 import { capture, Emitter } from "@mxjp/gluon";
 
-import { assertEvents } from "./common.js";
+import { assertEvents } from "../common.js";
 
 await test("events", () => {
 	const events: unknown[] = [];

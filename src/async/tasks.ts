@@ -69,6 +69,11 @@ export class Tasks {
 
 	/**
 	 * True if this instance has any pending tasks.
+	 *
+	 * @example
+	 * ```tsx
+	 * <div inert={() => tasks.selfPending}>...</div>
+	 * ```
 	 */
 	get selfPending(): boolean {
 		return this.#pending.value;
@@ -76,6 +81,11 @@ export class Tasks {
 
 	/**
 	 * True if this instance or any of it's parents has any pending tasks.
+	 *
+	 * @example
+	 * ```tsx
+	 * <button disabled={() => tasks.pending}>...</button>
+	 * ```
 	 */
 	get pending(): boolean {
 		return (this.#parent?.pending ?? false) || this.#pending.value;
@@ -141,6 +151,11 @@ export const TASKS = Symbol.for("gluon:tasks") as ContextKey<Tasks>;
  * This can be used in conjuction with {@link waitFor} to indicate if there are any pending tasks.
  *
  * This is meant to be used for preventing concurrent user interaction in a specific context.
+ *
+ * @example
+ * ```tsx
+ * <div inert={isSelfPending}>...</div>
+ * ```
  */
 export function isSelfPending(): boolean {
 	return extract(TASKS)?.selfPending ?? false;
@@ -152,6 +167,11 @@ export function isSelfPending(): boolean {
  * This can be used in conjunction with {@link waitFor} to disable inputs and buttons while there are any pending tasks.
  *
  * This is meant to be used for preventing concurrent user interaction in a specific context.
+ *
+ * @example
+ * ```tsx
+ * <button disabled={isPending}>...</button>
+ * ```
  */
 export function isPending(): boolean {
 	return extract(TASKS)?.pending ?? false;

@@ -1,5 +1,8 @@
 import { ContextKey } from "../core/context.js";
 
+/**
+ * Represents a path with optional query parameters that may change over time.
+ */
 export interface Router {
 	/**
 	 * The root router.
@@ -12,12 +15,12 @@ export interface Router {
 	get parent(): Router | undefined;
 
 	/**
-	 * Get the remaining normalized path in this context.
+	 * Reactively get the remaining normalized path in this context.
 	 */
 	get path(): string;
 
 	/**
-	 * The search parameters in this context.
+	 * Reactively get the search parameters in this context.
 	 */
 	get query(): URLSearchParams | undefined;
 
@@ -26,11 +29,27 @@ export interface Router {
 	 *
 	 * @param path The path. This may not be normalized.
 	 * @param query The query part.
+	 *
+	 * @example
+	 * ```tsx
+	 * import { extract } from "@mxjp/gluon";
+	 * import { ROUTER } from "@mxjp/gluon/router";
+	 *
+	 * extract(ROUTER)!.root.push("/home");
+	 * ```
 	 */
 	push(path: string, query?: QueryInit): void;
 
 	/**
 	 * Same as {@link push}, but replaces the URL in history if possible.
+	 *
+	 * @example
+	 * ```tsx
+	 * import { extract } from "@mxjp/gluon";
+	 * import { ROUTER } from "@mxjp/gluon/router";
+	 *
+	 * extract(ROUTER)!.root.replace("/home");
+	 * ```
 	 */
 	replace(path: string, query?: QueryInit): void;
 }

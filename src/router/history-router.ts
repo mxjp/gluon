@@ -63,6 +63,9 @@ export class HistoryRouter implements Router {
 	}
 }
 
+/**
+ * Format a path with optional query parameters for use in `location.href` or the history API.
+ */
 export function formatPath(path: string, query?: QueryInit): string {
 	return `${path || "/"}${query === undefined ? "" : new URLSearchParams(query)}`;
 }

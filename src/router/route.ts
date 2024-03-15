@@ -6,6 +6,12 @@ import { normalize } from "./path.js";
 import { ROUTER } from "./router.js";
 
 export interface RouteMatchFn {
+	/**
+	 * Check if this route matches the specified path.
+	 *
+	 * @param path The path to match against.
+	 * @returns `undefined` if this route doesn't match, the matched path if it does or the matched path with extracted parameters.
+	 */
 	(path: string): string | [string, unknown] | undefined;
 }
 
@@ -17,12 +23,26 @@ export interface Route {
 }
 
 export interface ParentRouteMatch<T extends Route> {
+	/**
+	 * The route that has been matched.
+	 */
 	route: T;
+
+	/**
+	 * The matched path.
+	 */
 	path: string;
+
+	/**
+	 * The parameters extracted from the matched path.
+	 */
 	params: unknown;
 }
 
 export interface RouteMatch<T extends Route> extends ParentRouteMatch<T> {
+	/**
+	 * The remaining unmatched rest path.
+	 */
 	rest: string;
 }
 
@@ -116,14 +136,14 @@ export class WatchedRoutes<T extends Route> {
 	}
 
 	/**
-	 * Access the route match.
+	 * Reactively get the route match.
 	 */
 	get match(): ParentRouteMatch<T> | undefined {
 		return this.#match.value;
 	}
 
 	/**
-	 * Access the rest path.
+	 * Reactively get the remaining unmatched rest path.
 	 *
 	 * This is set to an empty string if no route matched.
 	 */
@@ -156,6 +176,9 @@ export function watchRoutes<T extends Route>(path: Expression<string>, routes: T
 	return new WatchedRoutes(parent, rest);
 }
 
+/**
+ * A route where the content is a component to render.
+ */
 export interface ComponentRoute extends Route {
 	content: (props: {
 		/**
@@ -167,6 +190,8 @@ export interface ComponentRoute extends Route {
 
 /**
  * Match and render routes in the current context.
+ *
+ * A {@link ChildRouter} is injected as a replacement for the current router when rendering route content.
  */
 export function Routes(props: {
 	/**

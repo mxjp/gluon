@@ -12,6 +12,11 @@ export interface HashRouterOptions {
 	parseEvents?: string[];
 }
 
+/**
+ * A router that uses `location.hash` as the path ignoring the leading `"#"`.
+ *
+ * Everything after the first `"?"` is treated as query parameters.
+ */
 export class HashRouter implements Router {
 	#path = sig<string>(undefined!);
 	#query = sig<URLSearchParams | undefined>(undefined);

@@ -59,7 +59,7 @@
 		"start:types": "tsc -p tsconfig-types.json -w --preserveWatchOutput",
 		"start:tests": "tsc -p tests/tsconfig.json -w --preserveWatchOutput",
 		"test": "node --enable-source-maps --test ./tests_out",
-		"lint": "eslint --config .eslintrc.cjs ./{src,test}/**/*.{ts,tsx}",
+		"lint": "eslint --config .eslintrc.cjs ./{src,tests}/**/*.{ts,tsx}",
 		"prepack": "npm run build && npm run lint && npm test && node scripts/prepack.js"
 	},
 	"devDependencies": {

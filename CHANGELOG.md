@@ -17,6 +17,7 @@
   + `iter` - Use `<IndexFor>` instead.
   + `show` - Use `<Attach>` instead.
 + Components are now also included in pre-bundled versions.
++ Fix broken query formatting in history router.
 
 ## 5.7
 + Add `watchUpdates` utility.

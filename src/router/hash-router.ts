@@ -22,7 +22,7 @@ export class HashRouter implements Router {
 	#query = sig<URLSearchParams | undefined>(undefined);
 
 	constructor(options?: HashRouterOptions) {
-		const parseEvents = options?.parseEvents ?? ["popstate", "gluon:router:update"];
+		const parseEvents = options?.parseEvents ?? ["hashchange"];
 		for (const name of parseEvents) {
 			window.addEventListener(name, this.#parse, { passive: true });
 			teardown(() => window.removeEventListener(name, this.#parse));
@@ -61,7 +61,7 @@ export class HashRouter implements Router {
 	}
 
 	push(path: string, query?: QueryInit): void {
-		location.hash = `#${normalize(path)}${query === undefined ? "" : new URLSearchParams(query)}`;
+		location.hash = `#${normalize(path)}${query === undefined ? "" : `?${new URLSearchParams(query)}`}`;
 	}
 
 	replace(path: string, query?: QueryInit): void {

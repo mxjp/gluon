@@ -67,14 +67,14 @@
 		"@mxjp/gluon": "file:.",
 		"@rollup/plugin-terser": "^0.4.4",
 		"@types/jsdom": "^21.1.6",
-		"@types/node": "^20.11.24",
+		"@types/node": "^20.11.28",
 		"concurrently": "^8.2.2",
 		"jsdom": "^24.0.0",
 		"prettier": "^3.2.5",
-		"rollup": "^4.12.0",
+		"rollup": "^4.13.0",
 		"rollup-plugin-dts": "^6.1.0",
 		"rollup-plugin-prettier": "^4.1.1",
-		"typescript": "^5.3.3",
+		"typescript": "^5.4.2",
 		"yargs-parser": "^21.1.1"
 	}
 }

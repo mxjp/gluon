@@ -1,7 +1,7 @@
 import { Signal, sig, watchUpdates } from "@mxjp/gluon";
-import { TextInput } from "./components/text-input";
-import { Row } from "./components/row";
 import { Button } from "./components/button";
+import { Row } from "./components/row";
+import { TextInput } from "./components/text-input";
 
 export function example() {
 	const direct = sig("Hello World!");

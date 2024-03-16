@@ -1,11 +1,11 @@
 import { IndexFor, Nest, Show } from "@mxjp/gluon";
 import { Bench, BenchResult, Group } from "./benchmarks/common";
 import classes from "./benchmarks/common.module.css";
-import { Button } from "./components/button";
-import { renderingGroup } from "./benchmarks/rendering";
-import { Row } from "./components/row";
-import { signalsGroup } from "./benchmarks/signals";
 import { contextGroup } from "./benchmarks/context";
+import { renderingGroup } from "./benchmarks/rendering";
+import { signalsGroup } from "./benchmarks/signals";
+import { Button } from "./components/button";
+import { Row } from "./components/row";
 
 export function example() {
 	return <>

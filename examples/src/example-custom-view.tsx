@@ -1,7 +1,7 @@
 import { Attach, Signal, View, render, sig, watch } from "@mxjp/gluon";
-import { Row } from "./components/row";
-import { Button } from "./components/button";
 import { Box } from "./components/box";
+import { Button } from "./components/button";
+import { Row } from "./components/row";
 import { TextInput } from "./components/text-input";
 
 export function example() {

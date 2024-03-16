@@ -1,7 +1,6 @@
 import { For, Show, movable, sig } from "@mxjp/gluon";
-
-import { Row } from "./components/row";
 import { Button } from "./components/button";
+import { Row } from "./components/row";
 
 export function example() {
 	const content = movable(<input type="text" value="Type here..." />);

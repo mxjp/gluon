@@ -1,8 +1,6 @@
 import { IndexFor, Inject, Nest, mount, sig } from "@mxjp/gluon";
 import { Async, TASKS, Tasks } from "@mxjp/gluon/async";
-
 import { Column } from "./components/column";
-
 import classes from "./main.module.css";
 
 await new Promise(resolve => {

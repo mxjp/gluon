@@ -3,10 +3,11 @@ import "../env.js";
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { sig, uncapture, watch } from "@mxjp/gluon";
-import { matchRoute, Route, watchRoutes } from "@mxjp/gluon/router";
+import { extract, Inject, sig, uncapture, watch } from "@mxjp/gluon";
+import { ChildRouter, matchRoute, Route, ROUTER, Routes, watchRoutes } from "@mxjp/gluon/router";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, lifecycleEvent, text } from "../common.js";
+import { TestRouter } from "./common.js";
 
 await test("router/route", async ctx => {
 	await ctx.test("match", async () => {
@@ -106,5 +107,68 @@ await test("router/route", async ctx => {
 		assertEvents(events, ["match", "rest"]);
 		strictEqual(watched.match, undefined);
 		strictEqual(watched.rest, "");
+	});
+
+	await ctx.test("routes", async ctx => {
+		await ctx.test("matching", () => {
+			const router = new TestRouter();
+			const root = uncapture(() => <div>
+				<Inject key={ROUTER} value={router}>
+					{() => <Routes routes={[
+						{ path: "/", content: () => <>a</> },
+						{ path: "/b", content: () => <>b</> },
+						{ path: "/b/", content: () => <>c</> },
+						{ path: /^\/d-(\d+)(\/|$)/, content: props => {
+							return <>d:{(props.params as RegExpExecArray)[1]}</>;
+						} },
+					]} />}
+				</Inject>
+			</div>) as HTMLDivElement;
+			strictEqual(text(root), "a");
+			for (const [path, expectedText] of [
+				["/b", "b"],
+				["/b/c", "c"],
+				["/d-123", "d:123"],
+				["/d-456/test", "d:456"],
+				["/e", ""],
+			] as [string, string][]) {
+				router.push(path);
+				strictEqual(text(root), expectedText);
+			}
+		});
+
+		await ctx.test("lifecycle & child router", () => {
+			const events: unknown[] = [];
+			const router = new TestRouter();
+			uncapture(() => <div>
+				<Inject key={ROUTER} value={router}>
+					{() => <Routes routes={[
+						{ path: "/", content: () => lifecycleEvent(events, "a") },
+						{ path: "/b", content: () => lifecycleEvent(events, "b") },
+						{ path: "/c/", content: () => {
+							lifecycleEvent(events, "c");
+							const child = extract(ROUTER);
+							strictEqual(child instanceof ChildRouter, true);
+							watch(() => child!.path, path => events.push(path));
+						} },
+					]} />}
+				</Inject>
+			</div>) as HTMLDivElement;
+			assertEvents(events, ["s:a"]);
+			router.push("/b");
+			assertEvents(events, ["e:a", "s:b"]);
+			router.push("/c");
+			assertEvents(events, ["e:b", "s:c", ""]);
+			router.push("/c/");
+			assertEvents(events, []);
+			router.push("/c/foo");
+			assertEvents(events, ["/foo"]);
+			router.push("/c/bar/baz");
+			assertEvents(events, ["/bar/baz"]);
+			router.push("/d");
+			assertEvents(events, ["e:c"]);
+			router.push("/d/e");
+			assertEvents(events, []);
+		});
 	});
 });

@@ -2,9 +2,7 @@ import "./env.js";
 
 import { deepStrictEqual, strictEqual } from "node:assert";
 
-import { View, ViewBoundaryOwner } from "@mxjp/gluon";
-
-import { shareInstancesOf } from "../dist/es/core/globals.js";
+import { shareInstancesOf, teardown, View, ViewBoundaryOwner } from "@mxjp/gluon";
 
 export function assertEvents(events: unknown[], expected: unknown[]): void {
 	deepStrictEqual(events, expected);
@@ -61,6 +59,13 @@ export function boundaryEvents(events: unknown[]): ViewBoundaryOwner {
 	return (first, last) => {
 		events.push(text(first) + text(last));
 	};
+}
+
+export function lifecycleEvent(events: unknown[], key: string): void {
+	events.push(`s:${key}`);
+	teardown(() => {
+		events.push(`e:${key}`);
+	});
 }
 
 export type ResolveFn<T> = (value: T | PromiseLike<T>) => void;

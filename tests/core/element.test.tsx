@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { extract, inject, sig, StyleMap, uncapture } from "@mxjp/gluon";
 
-await test("render", async ctx => {
+await test("element", async ctx => {
 	await ctx.test("element content", () => {
 		strictEqual((<div /> as HTMLElement).outerHTML, "<div></div>");
 		strictEqual((<div></div> as HTMLElement).outerHTML, "<div></div>");

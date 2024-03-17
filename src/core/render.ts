@@ -21,7 +21,7 @@ export function createText(expr: Expression<unknown>): Text {
  * Supported content types are:
  * + Null and undefined (not displayed).
  * + Arbitrarily nested arrays/fragments of content.
- * + DOM nodes (document fragments will result in undefined behavior).
+ * + DOM nodes. Children will be removed from document fragments.
  * + {@link View Views}.
  * + Anything created with gluons jsx runtime.
  * + Anything else is displayed as text.
@@ -45,6 +45,7 @@ export function createText(expr: Expression<unknown>): Text {
  * render(<h1>Hello World!</h1>);
  * render(document.createElement("input"));
  * render(document.createTextNode("Hello World!"));
+ * render(someTemplate.cloneNode(true));
  *
  * // Views:
  * render(render("Hello World!"));
@@ -101,7 +102,11 @@ export function render(content: unknown): View {
 			const node = document.createComment("g");
 			setBoundary(node, node);
 		} else if (content instanceof Node) {
-			setBoundary(content, content);
+			if (content.nodeName === "#document-fragment") {
+				setBoundary(content.firstChild!, content.lastChild!);
+			} else {
+				setBoundary(content, content);
+			}
 		} else if (content instanceof View) {
 			setBoundary(content.first, content.last);
 			content.setBoundaryOwner(setBoundary);

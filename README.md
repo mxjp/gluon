@@ -488,7 +488,7 @@ mount(
 ```
 
 ### Nodes
-Any DOM nodes (except document fragments) are used as is.
+Any DOM nodes are used as is.
 ```tsx
 import { mount } from "@mxjp/gluon";
 
@@ -500,6 +500,7 @@ mount(
   </div>,
 );
 ```
+Note, that document fragments are not cloned automatically and child nodes are removed from the document fragment as soon as the rendered view is used or removed.
 
 ### Views
 Views are sequences of one or more nodes that change over time. They can be used to render collections or conditional content.

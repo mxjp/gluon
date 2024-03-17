@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.1
++ Add support for rendering document fragments.
+
 ## 6.0
 + **Breaking:** Async and router exports have been moved to `@mxjp/gluon/async` and `@mxjp/gluon/router`.
 + **Breaking:** Memos no longer run during batches.

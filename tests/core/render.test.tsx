@@ -1,0 +1,206 @@
+import "../env.js";
+
+import { deepStrictEqual, notStrictEqual, strictEqual } from "node:assert";
+import test from "node:test";
+
+import { createText, render, sig, uncapture, View, viewNodes } from "@mxjp/gluon";
+
+import { assertEvents, boundaryEvents, testView, text } from "../common.js";
+
+await test("render", async ctx => {
+	function renderToNodes(content: unknown) {
+		return Array.from(viewNodes(render(content)));
+	}
+
+	await ctx.test("createText", () => {
+		const signal = sig<unknown>(undefined);
+		const text = uncapture(() => createText(signal));
+		strictEqual(text.textContent, "");
+		signal.value = null;
+		strictEqual(text.textContent, "");
+		signal.value = 42;
+		strictEqual(text.textContent, "42");
+		signal.value = "test";
+		strictEqual(text.textContent, "test");
+	});
+
+	await ctx.test("view passthrough", () => {
+		const inner = render(undefined);
+		strictEqual(inner instanceof View, true);
+		const outer = render(inner);
+		strictEqual(inner, outer);
+	});
+
+	await ctx.test("null & undefined", () => {
+		for (const value of [null, undefined]) {
+			const view = render(value);
+			const nodes = renderToNodes(view);
+			strictEqual(nodes.length, 1);
+			strictEqual(nodes[0] instanceof Comment, true);
+		}
+	});
+
+	await ctx.test("document fragment", () => {
+		const fragment = document.createDocumentFragment();
+		const a = document.createElement("div");
+		const b = document.createElement("div");
+		fragment.appendChild(a);
+		fragment.appendChild(b);
+		const view = render(fragment);
+		const nodes = Array.from(viewNodes(view));
+		deepStrictEqual(nodes, [a, b]);
+		strictEqual(a.parentNode, fragment);
+		strictEqual(b.parentNode, fragment);
+		const next = view.take();
+		notStrictEqual(fragment, next);
+		strictEqual(a.parentNode, next);
+		strictEqual(b.parentNode, next);
+	});
+
+	await ctx.test("node", () => {
+		for (const node of [
+			document.createElement("div"),
+			document.createComment("test"),
+		]) {
+			deepStrictEqual(renderToNodes(node), [node]);
+		}
+	});
+
+	await ctx.test("text", () => {
+		for (const value of ["test", 42, true]) {
+			for (const nodes of [
+				renderToNodes(value),
+				uncapture(() => renderToNodes(() => value)),
+				uncapture(() => renderToNodes(sig(value))),
+			]) {
+				strictEqual(nodes.length, 1);
+				strictEqual(nodes[0] instanceof Text, true);
+				strictEqual(nodes[0].textContent, String(value));
+			}
+		}
+	});
+
+	await ctx.test("arrays", async ctx => {
+		await ctx.test("single view", () => {
+			const content = document.createElement("div");
+			const inner = render(content);
+			strictEqual(inner instanceof View, true);
+			const outer = uncapture(() => render([inner]));
+			notStrictEqual(inner, outer);
+			deepStrictEqual(Array.from(viewNodes(outer)), [content]);
+		});
+
+		await ctx.test("inner view", () => {
+			const inner = testView();
+
+			const fragmentChild = document.createElement("div");
+			const fragment = document.createDocumentFragment();
+			fragment.appendChild(fragmentChild);
+
+			const view = uncapture(() => render([
+				"foo",
+				[
+					null,
+					inner.view,
+					() => "bar",
+					fragment,
+				],
+				[undefined],
+			]));
+
+			uncapture(() => view.setBoundaryOwner(() => {
+				throw new Error("boundary should be static");
+			}));
+
+			{
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[0]), "foo");
+				strictEqual(nodes[1] instanceof Comment, true);
+				strictEqual(text(nodes[2]), "f");
+				strictEqual(text(nodes[3]), "l");
+				strictEqual(text(nodes[4]), "bar");
+				strictEqual(nodes[5], fragmentChild);
+				strictEqual(nodes[6] instanceof Comment, true);
+			}
+
+			{
+				inner.nextFirst();
+				inner.nextLast();
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[2]), "f0");
+				strictEqual(text(nodes[3]), "l1");
+				strictEqual(nodes[6] instanceof Comment, true);
+			}
+		});
+
+		await ctx.test("outer views", () => {
+			const events: unknown[] = [];
+			const first = testView();
+			const last = testView();
+
+			const fragmentChild = document.createElement("div");
+			const fragment = document.createDocumentFragment();
+			fragment.appendChild(fragmentChild);
+
+			const view = uncapture(() => render([
+				[first.view],
+				[[
+					"foo",
+					fragment,
+					() => 42,
+				]],
+				last.view,
+			]));
+
+			uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
+
+			{
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[0]), "f");
+				strictEqual(text(nodes[1]), "l");
+				strictEqual(text(nodes[2]), "foo");
+				strictEqual(nodes[3], fragmentChild);
+				strictEqual(text(nodes[4]), "42");
+				strictEqual(text(nodes[5]), "f");
+				strictEqual(text(nodes[6]), "l");
+			}
+
+			{
+				first.nextLast();
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[1]), "l0");
+				assertEvents(events, []);
+			}
+
+			{
+				first.nextFirst();
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[0]), "f1");
+				strictEqual(text(nodes[6]), "l");
+				assertEvents(events, ["f1l"]);
+			}
+
+			{
+				last.nextFirst();
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[5]), "f0");
+				assertEvents(events, []);
+			}
+
+			{
+				last.nextLast();
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[0]), "f1");
+				strictEqual(text(nodes[6]), "l1");
+				assertEvents(events, ["f1l1"]);
+			}
+		});
+	});
+});

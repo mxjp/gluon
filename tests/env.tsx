@@ -21,6 +21,7 @@ for (const key of [
 	"document",
 	"Range",
 	"Node",
+	"Text",
 	"Comment",
 	"DocumentFragment",
 	"HTMLDivElement",

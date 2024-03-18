@@ -27,7 +27,7 @@ export function createText(expr: Expression<unknown>): Text {
  * + Anything else is displayed as text.
  *
  * @param content The content to render.
- * @returns A view instance.
+ * @returns A view instance or the content itself if it's already a view.
  *
  * @example
  * ```tsx

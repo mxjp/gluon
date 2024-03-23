@@ -82,31 +82,31 @@ await test("router/route", async ctx => {
 		const path = sig("");
 		const watched = uncapture(() => watchRoutes(path, routes));
 		uncapture(() => {
-			watch(() => watched.match, () => events.push("match"));
-			watch(() => watched.rest, () => events.push("rest"));
+			watch(watched.match, () => events.push("match"));
+			watch(watched.rest, () => events.push("rest"));
 		});
 		assertEvents(events, ["match", "rest"]);
 
-		strictEqual(watched.match?.route, routes[0]);
-		strictEqual(watched.match?.path, "");
-		strictEqual(watched.match?.params, undefined);
-		strictEqual(watched.rest, "");
+		strictEqual(watched.match()?.route, routes[0]);
+		strictEqual(watched.match()?.path, "");
+		strictEqual(watched.match()?.params, undefined);
+		strictEqual(watched.rest(), "");
 
 		path.value = "/foo";
 		assertEvents(events, ["match"]);
-		strictEqual(watched.match?.route, routes[1]);
-		strictEqual(watched.match?.path, "/foo");
-		strictEqual(Array.isArray(watched.match?.params), true);
-		strictEqual(watched.rest, "");
+		strictEqual(watched.match()?.route, routes[1]);
+		strictEqual(watched.match()?.path, "/foo");
+		strictEqual(Array.isArray(watched.match()?.params), true);
+		strictEqual(watched.rest(), "");
 
 		path.value = "/foo/bar";
 		assertEvents(events, ["rest"]);
-		strictEqual(watched.rest, "/bar");
+		strictEqual(watched.rest(), "/bar");
 
 		path.value = "/bar";
 		assertEvents(events, ["match", "rest"]);
-		strictEqual(watched.match, undefined);
-		strictEqual(watched.rest, "");
+		strictEqual(watched.match(), undefined);
+		strictEqual(watched.rest(), "");
 	});
 
 	await ctx.test("routes", async ctx => {

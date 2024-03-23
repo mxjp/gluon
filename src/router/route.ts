@@ -1,5 +1,5 @@
 import { extract, inject } from "../core/context.js";
-import { Expression, get, sig, Signal, watch } from "../core/signals.js";
+import { Expression, get, sig, watch } from "../core/signals.js";
 import { Nest } from "../core/view.js";
 import { ChildRouter } from "./child-router.js";
 import { normalize } from "./path.js";
@@ -126,30 +126,9 @@ export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMat
 	}
 }
 
-export class WatchedRoutes<T extends Route> {
-	#match: Signal<ParentRouteMatch<T> | undefined>;
-	#rest: Signal<string>;
-
-	constructor(match: Signal<ParentRouteMatch<T> | undefined>, rest: Signal<string>) {
-		this.#match = match;
-		this.#rest = rest;
-	}
-
-	/**
-	 * Reactively get the route match.
-	 */
-	get match(): ParentRouteMatch<T> | undefined {
-		return this.#match.value;
-	}
-
-	/**
-	 * Reactively get the remaining unmatched rest path.
-	 *
-	 * This is set to an empty string if no route matched.
-	 */
-	get rest(): string {
-		return this.#rest.value;
-	}
+export interface WatchedRoutes<T extends Route> {
+	match: () => ParentRouteMatch<T> | undefined;
+	rest: () => string;
 }
 
 /**
@@ -173,7 +152,10 @@ export function watchRoutes<T extends Route>(path: Expression<string>, routes: T
 			rest.value = "";
 		}
 	});
-	return new WatchedRoutes(parent, rest);
+	return {
+		match: () => parent.value,
+		rest: () => rest.value,
+	};
 }
 
 /**
@@ -206,9 +188,9 @@ export function Routes(props: {
 	const watched = watchRoutes(() => router.path, props.routes);
 	return Nest({
 		children: () => {
-			const match = watched.match;
+			const match = watched.match();
 			if (match) {
-				return () => inject(ROUTER, new ChildRouter(router, match.path, () => watched.rest), () => {
+				return () => inject(ROUTER, new ChildRouter(router, match.path, watched.rest), () => {
 					return match.route.content({ params: match.params });
 				});
 			}

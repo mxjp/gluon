@@ -178,7 +178,7 @@ export function Routes(props: {
 	/**
 	 * The routes to match.
 	 */
-	routes: ComponentRoute[];
+	routes: Expression<Iterable<ComponentRoute>>;
 }): unknown {
 	const router = extract(ROUTER);
 	if (!router) {

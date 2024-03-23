@@ -53,9 +53,8 @@ export interface RouteMatch<T extends Route> extends ParentRouteMatch<T> {
  * @param routes The routes to test in order.
  * @returns A match or undefined if none of the routes matched.
  */
-export function matchRoute<T extends Route>(path: string, routes: T[]): RouteMatch<T> | undefined {
-	for (let i = 0; i < routes.length; i++) {
-		const route = routes[i];
+export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): RouteMatch<T> | undefined {
+	for (const route of routes) {
 		if (typeof route.path === "string") {
 			const test = route.path === "/" ? "" : route.path;
 			if (test.endsWith("/")) {
@@ -138,10 +137,10 @@ export interface WatchedRoutes<T extends Route> {
  * @param routes The routes to watch.
  * @returns An object with individually watchable route match and the unmatched rest path.
  */
-export function watchRoutes<T extends Route>(path: Expression<string>, routes: T[]): WatchedRoutes<T> {
+export function watchRoutes<T extends Route>(path: Expression<string>, routes: Expression<Iterable<T>>): WatchedRoutes<T> {
 	const parent = sig<ParentRouteMatch<T> | undefined>(undefined);
 	const rest = sig<string>(undefined!);
-	watch(() => matchRoute(get(path), routes), match => {
+	watch(() => matchRoute(get(path), get(routes)), match => {
 		if (match) {
 			if (!parent.value || parent.value.path !== match.path || parent.value.route !== match.route) {
 				parent.value = match;

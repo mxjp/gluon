@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0
++ **Breaking:** Rewrite route matching for ease of use and better tree shaking:
+  + Support arbitrary iterable expressions as routes.
+
 ## 6.1
 + Add support for rendering document fragments.
 

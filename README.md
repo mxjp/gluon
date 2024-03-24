@@ -228,8 +228,9 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
   + [Async](#async)
   + [Abort Controllers](#abort-controllers)
 + [Routing](#routing)
-  + [Navigation](#navigation)
   + [Route Matching](#route-matching)
+  + [Path Normalization](#path-normalization)
+  + [Navigation](#navigation)
   + [Nested Routing](#nested-routing)
 + [Troubleshooting](#troubleshooting)
   + [Missing Context Values](#missing-context-values)
@@ -1206,7 +1207,7 @@ mount(
 );
 ```
 
-The **routes** function or **Routes** component can be used to render content based on the current path.
+The **Routes** component can be used to render content based on the current path.
 ```tsx
 import { mount, Inject } from "@mxjp/gluon";
 import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
@@ -1216,8 +1217,8 @@ mount(
   <Inject key={ROUTER} value={new HistoryRouter()}>
     {() => <>
       <Routes routes={[
-        { path: "/", content: () => "Home" },
-        { path: "/foo", content: ExamplePage },
+        { match: "/", content: () => "Home" },
+        { match: "/foo", content: ExamplePage },
         { content: () => "Not found" },
       ]} />
     </>}
@@ -1228,6 +1229,68 @@ function ExamplePage() {
   return <>Example</>;
 }
 ```
+
+## Route Matching
+Routes are matched against the [normalized](#path-normalization) path in the order in which they are specified.
+
+Strings match exactly that path and all sub paths if they end with a slash:
+```tsx
+[
+  // Matches only "/foo":
+  { match: "/foo", ... },
+  // Matches "/foo", "/foo/bar" etc.
+  { match: "/foo/", ... },
+]
+```
+
+Regular expressions are tested against the [normalized](#path-normalization) path:
+```tsx
+[
+  // Matches only "/foo":
+  { match: /^\/foo$/, ... },
+
+  // Matches "/user/123":
+  {
+    match: /^\/user\/(\d+)$/,
+    content: ({ params }) => {
+      // The match is passed via the "params" property:
+      return <>User id: {params[1]}</>;
+    },
+  },
+]
+```
+Gluon itself doesn't provide any custom syntax for dynamic routes, but you can use a package like [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) if you need to:
+```tsx
+import { pathToRegexp } from "path-to-regexp";
+
+[
+  { match: pathToRegexp("/user/:id"), ... }
+]
+```
+
+Functions can return an object with the normalized matched path and optional parameters to indicate a match:
+```tsx
+import { normalize } from "@mxjp/gluon/router";
+
+[
+  {
+    match: path => {
+      if (/\/foo(\/|$)/.test(path)) {
+        return {
+          path: normalize(path.slice(4)),
+          params: 42,
+        };
+      }
+    },
+    content: ({ params }) => {
+      return <>{params}</>;
+    },
+  }
+]
+```
+
+## Path Normalization
+Paths are normalized, so that non-empty paths always start with a slash and the root path is represented as an empty string.
 
 ## Navigation
 The router in the current context can be used for navigation.
@@ -1244,36 +1307,7 @@ function ExamplePage() {
   }}>Navigate</button>;
 }
 ```
-Note, that the router instance is replaced with a [child router](#nested-routing) inside of routed content. In this case, the **root** property provides access to the history router from above.
-
-## Route Matching
-When matching against a path, routes are tested in order. Route paths can be any of the following:
-+ Strings with a trailing slash match that path and all sub paths.
-+ Strings without traling slash match exactly that path.
-+ Functions may return the path that was matched or a tuple with the matched path and extracted parameters to indicate a match.
-+ For regular expressions, the match array is provided as parameters.
-+ Routes without path match always.
-
-Route parameters are passed to the content functions or components. The example below renders an ID extracted from paths like **/books/42**:
-```tsx
-import { mount, Inject } from "@mxjp/gluon";
-import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
-
-function Example(props) {
-  return `ID: ${props.params[1]}`;
-}
-
-mount(
-  document.body,
-  <Inject key={ROUTER} value={new HistoryRouter()}>
-    {() => <>
-      <Routes routes={[
-        { path: /^\/books\/(\d+)(?:\/|$)/, content: Example },
-      ]} />
-    </>}
-  </Inject>
-);
-```
+Note, that the router instance is replaced with a [child router](#nested-routing) inside of routed content. In this case, the **root** property always provides access to the history router from above.
 
 ## Nested Routing
 Routes can be arbitrarily nested with content in between.
@@ -1288,12 +1322,12 @@ mount(
   <Inject key={ROUTER} value={new HistoryRouter()}>
     {() => <>
       <Routes routes={[
-        { path: "/", content: () => "Home" },
-        { path: "/foo/", content: () => {
+        { match: "/", content: () => "Home" },
+        { match: "/foo/", content: () => {
           const innerRouter = extract(ROUTER);
           return <Routes routes={[
-            { path: "/bar", content: () => "Bar" },
-            { path: "/baz", content: () => "Baz" },
+            { match: "/bar", content: () => "Bar" },
+            { match: "/baz", content: () => "Baz" },
           ]} />;
         } },
       ]} />

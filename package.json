@@ -1,6 +1,6 @@
 {
 	"name": "@mxjp/gluon",
-	"description": "Tiny signal based rendering library",
+	"description": "A signal based rendering library",
 	"homepage": "https://github.com/mxjp/gluon",
 	"repository": {
 		"type": "git",
@@ -18,7 +18,7 @@
 		"async"
 	],
 	"license": "MIT",
-	"version": "6.1.0",
+	"version": "7.0.0",
 	"type": "module",
 	"main": "./dist/es/core/index.js",
 	"exports": {

@@ -1,7 +1,7 @@
 ![](./assets/banner.svg)
 
 # gluon!
-This is a tiny signal based rendering library which aims to:
+This is a signal based rendering library which aims to:
 + be usable with widely adopted build systems
 + be as simple as possible without breaking at edge cases
 + avoid [maintenance overhead](#shared-globals--compatibility) for long living projects

@@ -5,14 +5,26 @@ import { ChildRouter } from "./child-router.js";
 import { normalize } from "./path.js";
 import { ROUTER } from "./router.js";
 
+export interface RouteMatchResult {
+	/**
+	 * The normalized matched path.
+	 */
+	path: string;
+
+	/**
+	 * The parameters extracted from the matched path.
+	 */
+	params?: unknown;
+}
+
 export interface RouteMatchFn {
 	/**
 	 * Check if this route matches the specified path.
 	 *
 	 * @param path The path to match against.
-	 * @returns `undefined` if this route doesn't match, the matched path if it does or the matched path with extracted parameters.
+	 * @returns The match result or undefined if the path doesn't match.
 	 */
-	(path: string): string | [string, unknown] | undefined;
+	(path: string): RouteMatchResult | undefined;
 }
 
 export interface Route {
@@ -29,19 +41,19 @@ export interface ParentRouteMatch<T extends Route> {
 	route: T;
 
 	/**
-	 * The matched path.
+	 * The normalized matched path.
 	 */
 	path: string;
 
 	/**
 	 * The parameters extracted from the matched path.
 	 */
-	params: unknown;
+	params?: unknown;
 }
 
 export interface RouteMatch<T extends Route> extends ParentRouteMatch<T> {
 	/**
-	 * The remaining unmatched rest path.
+	 * The normalized remaining rest path.
 	 */
 	rest: string;
 }
@@ -67,35 +79,16 @@ export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): 
 					};
 				}
 			} else if (test === path) {
-				return {
-					route,
-					path,
-					params: undefined,
-					rest: "",
-				};
+				return { route, path, rest: "" };
 			}
 		} else if (typeof route.match === "function") {
 			const match = route.match(path);
 			if (match !== undefined) {
-				let matched: string;
-				let params: unknown;
-				if (Array.isArray(match)) {
-					matched = normalize(match[0]);
-					params = match[1];
-				} else {
-					matched = normalize(match);
-					params = undefined;
-				}
 				let rest = path;
-				if (path.startsWith(matched) && (path.length === matched.length || path[matched.length] === "/")) {
-					rest = normalize(path.slice(matched.length));
+				if (path.startsWith(match.path) && (path.length === match.path.length || path[match.path.length] === "/")) {
+					rest = normalize(path.slice(match.path.length));
 				}
-				return {
-					route,
-					path: matched,
-					params,
-					rest,
-				};
+				return { ...match, route, rest };
 			}
 		} else if (route.match instanceof RegExp) {
 			const match = route.match.exec(path);
@@ -105,22 +98,12 @@ export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): 
 				if (path.startsWith(matched) && (path.length === matched.length || path[matched.length] === "/")) {
 					rest = normalize(path.slice(matched.length));
 				}
-				return {
-					route,
-					path: matched,
-					params: match,
-					rest,
-				};
+				return { route, path: matched, params: match, rest };
 			}
 		} else if (route.match === undefined) {
-			return {
-				route,
-				path: "",
-				params: undefined,
-				rest: path,
-			};
+			return { route, path: "", rest: path };
 		} else {
-			throw new Error("invalid path");
+			throw new Error("unsupported match type");
 		}
 	}
 }

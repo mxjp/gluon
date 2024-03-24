@@ -52,12 +52,11 @@ await test("router/route", async ctx => {
 		assert({ match: "/foo/" }, "/foo/bar/", ["/foo", "/bar/"]);
 
 		assert({ match: () => undefined }, "/foo");
-		assert({ match: () => "" }, "/foo", ["", "/foo"]);
-		assert({ match: () => "foo" }, "/foo/bar", ["/foo", "/bar"]);
-		assert({ match: () => "/foo" }, "/foo/bar", ["/foo", "/bar"]);
-		assert({ match: () => "/baz" }, "/foo", ["/baz", "/foo"]);
-		assert({ match: () => "/baz" }, "/foo/bar", ["/baz", "/foo/bar"]);
-		assert({ match: () => ["", 42] }, "/foo", ["", "/foo", 42]);
+		assert({ match: () => ({ path: "" }) }, "/foo", ["", "/foo"]);
+		assert({ match: () => ({ path: "/foo" }) }, "/foo/bar", ["/foo", "/bar"]);
+		assert({ match: () => ({ path: "/baz" }) }, "/foo", ["/baz", "/foo"]);
+		assert({ match: () => ({ path: "/baz" }) }, "/foo/bar", ["/baz", "/foo/bar"]);
+		assert({ match: () => ({ path: "", params: 42 }) }, "/foo", ["", "/foo", 42]);
 
 		assert({ match: /foo/ }, "/foo", ["/foo", ""]);
 		assert({ match: /^\/foo/ }, "/foo", ["/foo", ""]);

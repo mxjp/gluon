@@ -3,6 +3,7 @@
 ## 7.0
 + **Breaking:** Rewrite route matching for ease of use and better tree shaking:
   + Support arbitrary iterable expressions as routes.
+  + Custom route matchers must now return an object with normalized paths.
 
 ## 6.1
 + Add support for rendering document fragments.

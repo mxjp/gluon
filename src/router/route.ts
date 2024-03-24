@@ -19,7 +19,7 @@ export interface Route {
 	/**
 	 * The paths this route matches.
 	 */
-	path?: string | RegExp | RouteMatchFn;
+	match?: string | RegExp | RouteMatchFn;
 }
 
 export interface ParentRouteMatch<T extends Route> {
@@ -55,8 +55,8 @@ export interface RouteMatch<T extends Route> extends ParentRouteMatch<T> {
  */
 export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): RouteMatch<T> | undefined {
 	for (const route of routes) {
-		if (typeof route.path === "string") {
-			const test = route.path === "/" ? "" : route.path;
+		if (typeof route.match === "string") {
+			const test = route.match === "/" ? "" : route.match;
 			if (test.endsWith("/")) {
 				if (path.startsWith(test) || path === test.slice(0, -1)) {
 					return {
@@ -74,8 +74,8 @@ export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): 
 					rest: "",
 				};
 			}
-		} else if (typeof route.path === "function") {
-			const match = route.path(path);
+		} else if (typeof route.match === "function") {
+			const match = route.match(path);
 			if (match !== undefined) {
 				let matched: string;
 				let params: unknown;
@@ -97,8 +97,8 @@ export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): 
 					rest,
 				};
 			}
-		} else if (route.path instanceof RegExp) {
-			const match = route.path.exec(path);
+		} else if (route.match instanceof RegExp) {
+			const match = route.match.exec(path);
 			if (match !== null) {
 				const matched = normalize(match[0], false);
 				let rest = path;
@@ -112,7 +112,7 @@ export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): 
 					rest,
 				};
 			}
-		} else if (route.path === undefined) {
+		} else if (route.match === undefined) {
 			return {
 				route,
 				path: "",

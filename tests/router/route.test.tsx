@@ -23,8 +23,8 @@ await test("router/route", async ctx => {
 				strictEqual(match?.route, route, "route");
 				strictEqual(match?.path, expected[0], "path");
 				strictEqual(match?.rest, expected[1], "rest");
-				if (route.path instanceof RegExp) {
-					deepStrictEqual(route.path.exec(path), match?.params, "regexp match");
+				if (route.match instanceof RegExp) {
+					deepStrictEqual(route.match.exec(path), match?.params, "regexp match");
 				} else {
 					strictEqual(match?.params, expected[2], "params");
 				}
@@ -35,48 +35,48 @@ await test("router/route", async ctx => {
 		assert({}, "/foo", ["", "/foo"]);
 		assert({}, "/foo/", ["", "/foo/"]);
 
-		assert({ path: "" }, "", ["", ""]);
-		assert({ path: "" }, "/foo");
-		assert({ path: "/" }, "", ["", ""]);
-		assert({ path: "/" }, "/foo");
+		assert({ match: "" }, "", ["", ""]);
+		assert({ match: "" }, "/foo");
+		assert({ match: "/" }, "", ["", ""]);
+		assert({ match: "/" }, "/foo");
 
-		assert({ path: "/foo" }, "");
-		assert({ path: "/foo" }, "/foo", ["/foo", ""]);
-		assert({ path: "/foo" }, "/foo/");
-		assert({ path: "/foo" }, "/foo/bar");
+		assert({ match: "/foo" }, "");
+		assert({ match: "/foo" }, "/foo", ["/foo", ""]);
+		assert({ match: "/foo" }, "/foo/");
+		assert({ match: "/foo" }, "/foo/bar");
 
-		assert({ path: "/foo/" }, "");
-		assert({ path: "/foo/" }, "/foo", ["/foo", ""]);
-		assert({ path: "/foo/" }, "/foo/", ["/foo", ""]);
-		assert({ path: "/foo/" }, "/foo/bar", ["/foo", "/bar"]);
-		assert({ path: "/foo/" }, "/foo/bar/", ["/foo", "/bar/"]);
+		assert({ match: "/foo/" }, "");
+		assert({ match: "/foo/" }, "/foo", ["/foo", ""]);
+		assert({ match: "/foo/" }, "/foo/", ["/foo", ""]);
+		assert({ match: "/foo/" }, "/foo/bar", ["/foo", "/bar"]);
+		assert({ match: "/foo/" }, "/foo/bar/", ["/foo", "/bar/"]);
 
-		assert({ path: () => undefined }, "/foo");
-		assert({ path: () => "" }, "/foo", ["", "/foo"]);
-		assert({ path: () => "foo" }, "/foo/bar", ["/foo", "/bar"]);
-		assert({ path: () => "/foo" }, "/foo/bar", ["/foo", "/bar"]);
-		assert({ path: () => "/baz" }, "/foo", ["/baz", "/foo"]);
-		assert({ path: () => "/baz" }, "/foo/bar", ["/baz", "/foo/bar"]);
-		assert({ path: () => ["", 42] }, "/foo", ["", "/foo", 42]);
+		assert({ match: () => undefined }, "/foo");
+		assert({ match: () => "" }, "/foo", ["", "/foo"]);
+		assert({ match: () => "foo" }, "/foo/bar", ["/foo", "/bar"]);
+		assert({ match: () => "/foo" }, "/foo/bar", ["/foo", "/bar"]);
+		assert({ match: () => "/baz" }, "/foo", ["/baz", "/foo"]);
+		assert({ match: () => "/baz" }, "/foo/bar", ["/baz", "/foo/bar"]);
+		assert({ match: () => ["", 42] }, "/foo", ["", "/foo", 42]);
 
-		assert({ path: /foo/ }, "/foo", ["/foo", ""]);
-		assert({ path: /^\/foo/ }, "/foo", ["/foo", ""]);
-		assert({ path: /^\/foo/ }, "/foo/bar", ["/foo", "/bar"]);
-		assert({ path: /^\/foo$/ }, "/foo", ["/foo", ""]);
-		assert({ path: /^\/foo$/ }, "/foo/");
-		assert({ path: /^\/foo$/ }, "/foo/bar");
-		assert({ path: /^\/foo\// }, "/foo");
-		assert({ path: /^\/foo\// }, "/foo/", ["/foo", ""]);
-		assert({ path: /^\/foo\/$/ }, "/foo/bar");
-		assert({ path: /^\/foo(?=\/bar$)/ }, "/foo");
-		assert({ path: /^\/foo(?=\/bar$)/ }, "/foo/bar", ["/foo", "/bar"]);
+		assert({ match: /foo/ }, "/foo", ["/foo", ""]);
+		assert({ match: /^\/foo/ }, "/foo", ["/foo", ""]);
+		assert({ match: /^\/foo/ }, "/foo/bar", ["/foo", "/bar"]);
+		assert({ match: /^\/foo$/ }, "/foo", ["/foo", ""]);
+		assert({ match: /^\/foo$/ }, "/foo/");
+		assert({ match: /^\/foo$/ }, "/foo/bar");
+		assert({ match: /^\/foo\// }, "/foo");
+		assert({ match: /^\/foo\// }, "/foo/", ["/foo", ""]);
+		assert({ match: /^\/foo\/$/ }, "/foo/bar");
+		assert({ match: /^\/foo(?=\/bar$)/ }, "/foo");
+		assert({ match: /^\/foo(?=\/bar$)/ }, "/foo/bar", ["/foo", "/bar"]);
 	});
 
 	await ctx.test("watch", () => {
 		const events: unknown[] = [];
 		const routes: Route[] = [
-			{ path: "/" },
-			{ path: /^\/foo(\/|$)/ },
+			{ match: "/" },
+			{ match: /^\/foo(\/|$)/ },
 		];
 
 		const path = sig("");
@@ -115,10 +115,10 @@ await test("router/route", async ctx => {
 			const root = uncapture(() => <div>
 				<Inject key={ROUTER} value={router}>
 					{() => <Routes routes={[
-						{ path: "/", content: () => <>a</> },
-						{ path: "/b", content: () => <>b</> },
-						{ path: "/b/", content: () => <>c</> },
-						{ path: /^\/d-(\d+)(\/|$)/, content: props => {
+						{ match: "/", content: () => <>a</> },
+						{ match: "/b", content: () => <>b</> },
+						{ match: "/b/", content: () => <>c</> },
+						{ match: /^\/d-(\d+)(\/|$)/, content: props => {
 							return <>d:{(props.params as RegExpExecArray)[1]}</>;
 						} },
 					]} />}
@@ -143,9 +143,9 @@ await test("router/route", async ctx => {
 			uncapture(() => <div>
 				<Inject key={ROUTER} value={router}>
 					{() => <Routes routes={[
-						{ path: "/", content: () => lifecycleEvent(events, "a") },
-						{ path: "/b", content: () => lifecycleEvent(events, "b") },
-						{ path: "/c/", content: () => {
+						{ match: "/", content: () => lifecycleEvent(events, "a") },
+						{ match: "/b", content: () => lifecycleEvent(events, "b") },
+						{ match: "/c/", content: () => {
 							lifecycleEvent(events, "c");
 							const child = extract(ROUTER);
 							strictEqual(child instanceof ChildRouter, true);

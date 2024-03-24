@@ -38,7 +38,7 @@ export function example() {
 				<Box>
 					<Routes routes={[
 						{
-							path: "/foo/",
+							match: "/foo/",
 							content: () => <>
 								<ContextInfo />
 								<Row>
@@ -49,7 +49,7 @@ export function example() {
 							</>,
 						},
 						{
-							path: "",
+							match: "",
 							content: () => <>
 								Home
 								<ContextInfo />

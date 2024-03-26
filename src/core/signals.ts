@@ -154,6 +154,15 @@ export class Signal<T> {
 	}
 
 	/**
+	 * Check if this signal has any triggers or dependants to notify.
+	 *
+	 * When this is false, it is guaranteed that updating the value does not result in immediate side effects.
+	 */
+	get active(): boolean {
+		return this.#triggers.size > 0 || this.#dependants.size > 0;
+	}
+
+	/**
 	 * Manually access this signal.
 	 */
 	access(): void {

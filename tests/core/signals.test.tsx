@@ -52,21 +52,27 @@ await test("signals", async ctx => {
 		await ctx.test("signal & dispose", () => {
 			const events: unknown[] = [];
 			const signal = sig(42);
+			strictEqual(signal.active, false);
 			const dispose = capture(() => {
 				watch(signal, value => {
 					events.push(value);
 				});
+				strictEqual(signal.active, true);
 			});
 			assertEvents(events, [42]);
 
 			signal.value = 7;
+			strictEqual(signal.active, true);
 			assertEvents(events, [7]);
 
 			signal.value = 8;
+			strictEqual(signal.active, true);
 			assertEvents(events, [8]);
 
 			dispose();
+			strictEqual(signal.active, true);
 			signal.value = 9;
+			strictEqual(signal.active, false);
 			assertEvents(events, []);
 		});
 
@@ -74,22 +80,34 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const a = sig("a");
 			const b = sig(1);
+			strictEqual(a.active, false);
+			strictEqual(b.active, false);
 			uncapture(() => watch(() => a.value + b.value, value => {
 				events.push(value);
 			}));
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, ["a1"]);
 
 			a.value = "b";
+			strictEqual(a.active, true);
 			assertEvents(events, ["b1"]);
 
 			b.value = 2;
+			strictEqual(b.active, true);
 			assertEvents(events, ["b2"]);
 
 			batch(() => {
+				strictEqual(a.active, true);
+				strictEqual(b.active, true);
 				a.value = "c";
 				b.value = 3;
+				strictEqual(a.active, false);
+				strictEqual(b.active, false);
 				assertEvents(events, []);
 			});
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, ["c3"]);
 		});
 
@@ -148,25 +166,38 @@ await test("signals", async ctx => {
 			uncapture(() => watch(() => a.value ? b.value : 0, value => {
 				events.push(value);
 			}));
-
+			strictEqual(a.active, true);
+			strictEqual(b.active, false);
 			assertEvents(events, [0]);
 
 			b.value = 3;
+			strictEqual(a.active, true);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 
 			a.value = true;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, [3]);
 
 			b.value = 42;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, [42]);
 
 			a.value = false;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, [0]);
 
 			b.value = 2;
+			strictEqual(a.active, true);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 
 			a.value = true;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, [2]);
 		});
 
@@ -213,19 +244,25 @@ await test("signals", async ctx => {
 	await ctx.test("watchUpdates", async () => {
 		const events: unknown[] = [];
 		const signal = sig("a");
+		strictEqual(signal.active, false);
 		const dispose = capture(() => {
 			const first = watchUpdates(signal, value => {
 				events.push(value);
 			});
+			strictEqual(signal.active, true);
 			strictEqual(first, "a");
 		});
 		assertEvents(events, []);
 		signal.value = "b";
+		strictEqual(signal.active, true);
 		assertEvents(events, ["b"]);
 		signal.value = "c";
+		strictEqual(signal.active, true);
 		assertEvents(events, ["c"]);
 		dispose();
+		strictEqual(signal.active, true);
 		signal.value = "d";
+		strictEqual(signal.active, false);
 		assertEvents(events, []);
 	});
 
@@ -233,44 +270,54 @@ await test("signals", async ctx => {
 		await ctx.test("behavior", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
+			strictEqual(signal.active, false);
 			const value = trigger(() => {
 				events.push(`?${signal.value}`);
 				return signal.value;
 			}, () => {
 				events.push("trigger");
 			});
+			strictEqual(signal.active, true);
 			strictEqual(value, 1);
 
 			assertEvents(events, ["?1"]);
 
 			signal.value = 7;
+			strictEqual(signal.active, false);
 			assertEvents(events, ["trigger"]);
 
 			signal.value = 2;
+			strictEqual(signal.active, false);
 			assertEvents(events, []);
 		});
 
 		await ctx.test("nested triggers", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
+			strictEqual(signal.active, false);
 			const value = trigger(() => {
-				return trigger(() => {
+				const inner = trigger(() => {
 					events.push(`?${signal.value}`);
 					return signal.value;
 				}, () => {
 					events.push("inner");
 				});
+				strictEqual(signal.active, true);
+				return inner;
 			}, () => {
 				events.push("outer");
 			});
+			strictEqual(signal.active, true);
 			strictEqual(value, 1);
 
 			assertEvents(events, ["?1"]);
 
 			signal.value = 7;
+			strictEqual(signal.active, false);
 			assertEvents(events, ["outer", "inner"]);
 
 			signal.value = 2;
+			strictEqual(signal.active, false);
 			assertEvents(events, []);
 		});
 
@@ -300,11 +347,14 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(1);
 			batch(() => {
+				strictEqual(signal.active, false);
 				trigger(signal, () => {
 					events.push("a");
 				});
+				strictEqual(signal.active, true);
 				assertEvents(events, []);
 				signal.value = 2;
+				strictEqual(signal.active, false);
 				assertEvents(events, ["a"]);
 			});
 			assertEvents(events, []);
@@ -316,9 +366,12 @@ await test("signals", async ctx => {
 			trigger(signal, () => {
 				events.push("a");
 			});
+			strictEqual(signal.active, true);
 			assertEvents(events, []);
 			batch(() => {
+				strictEqual(signal.active, true);
 				signal.value = 2;
+				strictEqual(signal.active, false);
 				assertEvents(events, ["a"]);
 			});
 			assertEvents(events, []);
@@ -329,6 +382,7 @@ await test("signals", async ctx => {
 		await ctx.test("watch", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
+			strictEqual(signal.active, false);
 
 			uncapture(() => watch(memo(() => {
 				events.push("e");
@@ -336,12 +390,35 @@ await test("signals", async ctx => {
 			}), value => {
 				events.push(value);
 			}));
+			strictEqual(signal.active, true);
 
 			assertEvents(events, ["e", 1]);
 			signal.value = 2;
+			strictEqual(signal.active, true);
 			assertEvents(events, ["e", 2]);
 			signal.notify();
+			strictEqual(signal.active, true);
 			assertEvents(events, ["e"]);
+		});
+
+		await ctx.test("dispose", () => {
+			const signal = sig(1);
+
+			let memoized!: () => number;
+			const dispose = capture(() => {
+				memoized = memo(signal);
+				strictEqual(signal.active, true);
+			});
+			strictEqual(memoized(), 1);
+			signal.value = 2;
+			strictEqual(signal.active, true);
+			strictEqual(memoized(), 2);
+
+			dispose();
+			strictEqual(signal.active, true);
+			signal.value = 3;
+			strictEqual(signal.active, false);
+			strictEqual(memoized(), 2);
 		});
 
 		await ctx.test("batch & nested memos", () => {
@@ -382,27 +459,39 @@ await test("signals", async ctx => {
 				events.push("eval");
 				return a.value * b.value;
 			});
+			strictEqual(a.active, false);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 
 			const dispose = capture(() => {
 				watch(expr, value => {
 					events.push(`x${value}`);
 				});
+				strictEqual(a.active, true);
+				strictEqual(b.active, true);
 				assertEvents(events, ["eval", "x6"]);
 
 				watch(expr, value => {
 					events.push(`y${value}`);
 				});
+				strictEqual(a.active, true);
+				strictEqual(b.active, true);
 				assertEvents(events, ["y6"]);
 			});
 
 			a.value = 1;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, ["eval", "x3", "y3"]);
 
 			dispose();
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, []);
 
 			b.value = 5;
+			strictEqual(a.active, true);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 		});
 
@@ -421,6 +510,8 @@ await test("signals", async ctx => {
 				watch(expr, value => {
 					events.push(`x${value}`);
 				});
+				strictEqual(a.active, true);
+				strictEqual(b.active, true);
 				watch(expr, value => {
 					events.push(`y${value}`);
 				});
@@ -431,8 +522,12 @@ await test("signals", async ctx => {
 			batch(() => {
 				a.value = 1;
 				b.value = 4;
+				strictEqual(a.active, false);
+				strictEqual(b.active, false);
 				assertEvents(events, []);
 			});
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 
 			assertEvents(events, ["eval", "x4", "y4"]);
 		});
@@ -445,15 +540,18 @@ await test("signals", async ctx => {
 				events.push("eval");
 				return signal.value;
 			});
+			strictEqual(signal.active, false);
 			assertEvents(events, []);
 
 			const value = trigger(expr, () => {
 				events.push("a");
 			});
+			strictEqual(signal.active, true);
 			strictEqual(value, 1);
 			assertEvents(events, ["eval"]);
 
 			signal.value = 2;
+			strictEqual(signal.active, false);
 			assertEvents(events, ["a"]);
 		});
 
@@ -466,32 +564,48 @@ await test("signals", async ctx => {
 				events.push("eval");
 				return a.value ? b.value : 0;
 			});
+			strictEqual(a.active, false);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 
 			uncapture(() => {
 				watch(expr, value => {
 					events.push(`x${value}`);
 				});
+				strictEqual(a.active, true);
+				strictEqual(b.active, false);
 				watch(expr, value => {
 					events.push(`y${value}`);
 				});
+				strictEqual(a.active, true);
+				strictEqual(b.active, false);
 			});
 
 			assertEvents(events, ["eval", "x0", "y0"]);
 
 			b.value = 7;
+			strictEqual(a.active, true);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 
 			a.value = true;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, ["eval", "x7", "y7"]);
 
 			b.value = 8;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, ["eval", "x8", "y8"]);
 
 			a.value = false;
+			strictEqual(a.active, true);
+			strictEqual(b.active, true);
 			assertEvents(events, ["eval", "x0", "y0"]);
 
 			b.value = 3;
+			strictEqual(a.active, true);
+			strictEqual(b.active, false);
 			assertEvents(events, []);
 		});
 
@@ -503,17 +617,21 @@ await test("signals", async ctx => {
 				events.push("eval");
 				return signal.value;
 			});
+			strictEqual(signal.active, false);
 			assertEvents(events, []);
 
 			strictEqual(expr(), 1);
+			strictEqual(signal.active, true);
 			assertEvents(events, ["eval"]);
 
 			uncapture(() => watch(expr, value => {
 				events.push(value);
 			}));
+			strictEqual(signal.active, true);
 			assertEvents(events, [1]);
 
 			signal.value = 2;
+			strictEqual(signal.active, true);
 			assertEvents(events, ["eval", 2]);
 		});
 
@@ -524,21 +642,27 @@ await test("signals", async ctx => {
 				events.push("inner");
 				return signal.value;
 			}));
+			strictEqual(signal.active, true);
 			assertEvents(events, ["inner"]);
 			const outer = lazy(() => {
 				events.push("outer");
 				return inner();
 			});
+			strictEqual(signal.active, true);
 			assertEvents(events, []);
 			uncapture(() => watch(outer, value => {
 				events.push(value);
 			}));
+			strictEqual(signal.active, true);
 			assertEvents(events, ["outer", 1]);
 			batch(() => {
 				signal.value = 2;
+				strictEqual(signal.active, false);
 				signal.value = 3;
+				strictEqual(signal.active, false);
 				assertEvents(events, []);
 			});
+			strictEqual(signal.active, true);
 			assertEvents(events, ["inner", "outer", 3]);
 		});
 	});

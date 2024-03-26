@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.1
++ Add `Signal.active` property.
+
 ## 7.0
 + **Breaking:** Rewrite route matching for ease of use and better tree shaking:
   + Support arbitrary iterable expressions as routes.

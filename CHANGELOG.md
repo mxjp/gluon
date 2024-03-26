@@ -2,6 +2,7 @@
 
 ## 7.1
 + Add `Signal.active` property.
++ Add `isTracking` utility.
 
 ## 7.0
 + **Breaking:** Rewrite route matching for ease of use and better tree shaking:

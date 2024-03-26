@@ -555,6 +555,14 @@ export function track<T>(fn: () => T): T {
 }
 
 /**
+ * Check if there are currently any triggers or dependants that would be tracked when accessing a signal.
+ */
+export function isTracking(): boolean {
+	return TRACKING_STACK[TRACKING_STACK.length - 1]
+		&& (TRIGGERS_STACK[TRIGGERS_STACK.length - 1].length > 0 || DEPENDANTS_STACK[DEPENDANTS_STACK.length - 1].length > 0);
+}
+
+/**
  * Evaulate an expression.
  *
  * This can be used to access reactive and non reactive inputs.

@@ -3,7 +3,7 @@ import "../env.js";
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, extract, get, inject, lazy, map, memo, optionalString, sig, Signal, string, teardown, trigger, uncapture, watch, watchUpdates } from "@mxjp/gluon";
+import { batch, capture, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, Signal, string, teardown, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
 
 import { assertEvents, assertSharedInstance } from "../common.js";
 
@@ -43,9 +43,11 @@ await test("signals", async ctx => {
 	await ctx.test("watch", async ctx => {
 		await ctx.test("static", () => {
 			const events: unknown[] = [];
+			strictEqual(isTracking(), false);
 			watch(42, value => {
 				events.push(value);
 			});
+			strictEqual(isTracking(), false);
 			assertEvents(events, [42]);
 		});
 
@@ -54,9 +56,11 @@ await test("signals", async ctx => {
 			const signal = sig(42);
 			strictEqual(signal.active, false);
 			const dispose = capture(() => {
+				strictEqual(isTracking(), false);
 				watch(signal, value => {
 					events.push(value);
 				});
+				strictEqual(isTracking(), false);
 				strictEqual(signal.active, true);
 			});
 			assertEvents(events, [42]);
@@ -82,9 +86,15 @@ await test("signals", async ctx => {
 			const b = sig(1);
 			strictEqual(a.active, false);
 			strictEqual(b.active, false);
-			uncapture(() => watch(() => a.value + b.value, value => {
+			strictEqual(isTracking(), false);
+			uncapture(() => watch(() => {
+				strictEqual(isTracking(), true);
+				return a.value + b.value;
+			}, value => {
+				strictEqual(isTracking(), false);
 				events.push(value);
 			}));
+			strictEqual(isTracking(), false);
 			strictEqual(a.active, true);
 			strictEqual(b.active, true);
 			assertEvents(events, ["a1"]);
@@ -98,6 +108,7 @@ await test("signals", async ctx => {
 			assertEvents(events, ["b2"]);
 
 			batch(() => {
+				strictEqual(isTracking(), false);
 				strictEqual(a.active, true);
 				strictEqual(b.active, true);
 				a.value = "c";
@@ -105,10 +116,12 @@ await test("signals", async ctx => {
 				strictEqual(a.active, false);
 				strictEqual(b.active, false);
 				assertEvents(events, []);
+				strictEqual(isTracking(), false);
 			});
 			strictEqual(a.active, true);
 			strictEqual(b.active, true);
 			assertEvents(events, ["c3"]);
+			strictEqual(isTracking(), false);
 		});
 
 		await ctx.test("uncapture expression", () => {
@@ -163,9 +176,15 @@ await test("signals", async ctx => {
 			const b = sig(7);
 			const events: unknown[] = [];
 
-			uncapture(() => watch(() => a.value ? b.value : 0, value => {
+			strictEqual(isTracking(), false);
+			uncapture(() => watch(() => {
+				strictEqual(isTracking(), true);
+				return a.value ? b.value : 0;
+			}, value => {
+				strictEqual(isTracking(), false);
 				events.push(value);
 			}));
+			strictEqual(isTracking(), false);
 			strictEqual(a.active, true);
 			strictEqual(b.active, false);
 			assertEvents(events, [0]);
@@ -201,19 +220,30 @@ await test("signals", async ctx => {
 			assertEvents(events, [2]);
 		});
 
-		await ctx.test("stack isolation", () => {
+		await ctx.test("lifecycle isolation", () => {
 			const events: unknown[] = [];
 			const inner = sig(1);
 			const outer = sig(1);
 
+			strictEqual(isTracking(), false);
 			uncapture(() => watch(() => {
-				watch(inner, value => {
+				strictEqual(isTracking(), true);
+				let tracking = true;
+				watch(() => {
+					strictEqual(isTracking(), true);
+					return inner.value;
+				}, value => {
+					strictEqual(isTracking(), tracking);
 					events.push(`i${value}`);
 				});
+				strictEqual(isTracking(), true);
+				tracking = false;
 				return outer.value;
 			}, value => {
+				strictEqual(isTracking(), false);
 				events.push(`o${value}`);
 			}));
+			strictEqual(isTracking(), false);
 
 			assertEvents(events, ["i1", "o1"]);
 			inner.value = 2;
@@ -227,7 +257,9 @@ await test("signals", async ctx => {
 			const signal = sig(1);
 			inject("test", 42, () => {
 				uncapture(() => watch(() => {
+					strictEqual(isTracking(), true);
 					events.push(`e${extract("test")}`);
+					strictEqual(isTracking(), true);
 					signal.access();
 				}, () => {
 					events.push(`c${extract("test")}`);
@@ -264,6 +296,74 @@ await test("signals", async ctx => {
 		signal.value = "d";
 		strictEqual(signal.active, false);
 		assertEvents(events, []);
+	});
+
+	await ctx.test("tracking", async ctx => {
+		await ctx.test("inert", () => {
+			strictEqual(isTracking(), false);
+			track(() => {
+				strictEqual(isTracking(), false);
+				untrack(() => {
+					strictEqual(isTracking(), false);
+					track(() => {
+						strictEqual(isTracking(), false);
+					});
+				});
+			});
+		});
+
+		await ctx.test("watch", () => {
+			const events: unknown[] = [];
+			const a = sig(0);
+			const b = sig(0);
+			uncapture(() => watch(() => {
+				strictEqual(isTracking(), true);
+				const result = a.value + untrack(() => {
+					strictEqual(isTracking(), false);
+					track(() => {
+						strictEqual(isTracking(), true);
+					});
+					return b.value;
+				});
+				strictEqual(isTracking(), true);
+				return result;
+			}, value => {
+				events.push(value);
+			}));
+			assertEvents(events, [0]);
+			a.value++;
+			assertEvents(events, [1]);
+			b.value++;
+			assertEvents(events, []);
+			a.value++;
+			assertEvents(events, [3]);
+		});
+
+		await ctx.test("trigger", () => {
+			const events: unknown[] = [];
+			const a = sig(1);
+			const b = sig(2);
+			const value = trigger(() => {
+				strictEqual(isTracking(), true);
+				const result = a.value + untrack(() => {
+					strictEqual(isTracking(), false);
+					track(() => {
+						strictEqual(isTracking(), true);
+					});
+					return b.value;
+				});
+				strictEqual(isTracking(), true);
+				return result;
+			}, cycle => {
+				events.push(cycle);
+			}, 42);
+			strictEqual(value, 3);
+			assertEvents(events, []);
+			b.value++;
+			assertEvents(events, []);
+			a.value++;
+			assertEvents(events, [42]);
+		});
 	});
 
 	await ctx.test("trigger", async ctx => {
@@ -383,11 +483,14 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(1);
 			strictEqual(signal.active, false);
+			strictEqual(isTracking(), false);
 
 			uncapture(() => watch(memo(() => {
+				strictEqual(isTracking(), true);
 				events.push("e");
 				return signal.value;
 			}), value => {
+				strictEqual(isTracking(), false);
 				events.push(value);
 			}));
 			strictEqual(signal.active, true);
@@ -456,6 +559,7 @@ await test("signals", async ctx => {
 			const b = sig(3);
 
 			const expr = lazy(() => {
+				strictEqual(isTracking(), true);
 				events.push("eval");
 				return a.value * b.value;
 			});
@@ -465,6 +569,7 @@ await test("signals", async ctx => {
 
 			const dispose = capture(() => {
 				watch(expr, value => {
+					strictEqual(isTracking(), false);
 					events.push(`x${value}`);
 				});
 				strictEqual(a.active, true);
@@ -472,6 +577,7 @@ await test("signals", async ctx => {
 				assertEvents(events, ["eval", "x6"]);
 
 				watch(expr, value => {
+					strictEqual(isTracking(), false);
 					events.push(`y${value}`);
 				});
 				strictEqual(a.active, true);
@@ -501,6 +607,7 @@ await test("signals", async ctx => {
 			const b = sig(3);
 
 			const expr = lazy(() => {
+				strictEqual(isTracking(), true);
 				events.push("eval");
 				return a.value * b.value;
 			});
@@ -520,6 +627,7 @@ await test("signals", async ctx => {
 			assertEvents(events, ["eval", "x6", "y6"]);
 
 			batch(() => {
+				strictEqual(isTracking(), false);
 				a.value = 1;
 				b.value = 4;
 				strictEqual(a.active, false);
@@ -537,6 +645,7 @@ await test("signals", async ctx => {
 			const signal = sig(1);
 
 			const expr = lazy(() => {
+				strictEqual(isTracking(), true);
 				events.push("eval");
 				return signal.value;
 			});
@@ -561,6 +670,7 @@ await test("signals", async ctx => {
 			const b = sig(42);
 
 			const expr = lazy(() => {
+				strictEqual(isTracking(), true);
 				events.push("eval");
 				return a.value ? b.value : 0;
 			});
@@ -614,6 +724,7 @@ await test("signals", async ctx => {
 			const signal = sig(1);
 
 			const expr = lazy(() => {
+				strictEqual(isTracking(), true);
 				events.push("eval");
 				return signal.value;
 			});
@@ -639,12 +750,14 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(1);
 			const inner = uncapture(() => memo(() => {
+				strictEqual(isTracking(), true);
 				events.push("inner");
 				return signal.value;
 			}));
 			strictEqual(signal.active, true);
 			assertEvents(events, ["inner"]);
 			const outer = lazy(() => {
+				strictEqual(isTracking(), true);
 				events.push("outer");
 				return inner();
 			});

@@ -46,6 +46,10 @@
 			"types": "./dist/es/router/index.d.ts",
 			"default": "./dist/es/router/index.js"
 		},
+		"./store": {
+			"types": "./dist/es/store/index.d.ts",
+			"default": "./dist/es/store/index.js"
+		},
 		"./test": {
 			"types": "./dist/es/test/index.d.ts",
 			"default": "./dist/es/test/index.js"

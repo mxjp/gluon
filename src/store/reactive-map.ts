@@ -1,0 +1,111 @@
+import { batch, sig, Signal } from "../core/signals.js";
+import type { Converter } from "./converter.js";
+import { ProbeMap } from "./probes.js";
+
+/**
+ * A reactive wrapper for a map.
+ */
+export class ReactiveMap<K, V> implements Map<K, V> {
+	#target: Map<K, V>;
+	#converter: Converter;
+	#size: Signal<number>;
+	#iterators: Signal<void>;
+	#getProbes: ProbeMap<K, V | undefined>;
+	#hasProbes: ProbeMap<K, boolean>;
+
+	constructor(target: Map<K, V>, converter: Converter) {
+		this.#target = target;
+		this.#converter = converter;
+		this.#size = sig(target.size);
+		this.#iterators = sig();
+		this.#getProbes = new ProbeMap(key => target.get(key));
+		this.#hasProbes = new ProbeMap(key => target.has(key));
+	}
+
+	get size(): number {
+		this.#size.access();
+		return this.#target.size;
+	}
+
+	get(key: K): V | undefined {
+		this.#getProbes.access(key);
+		return this.#converter.wrap(this.#target.get(key));
+	}
+
+	has(key: K): boolean {
+		this.#hasProbes.access(key);
+		return this.#target.has(key);
+	}
+
+	set(key: K, value: V): this {
+		batch(() => {
+			value = this.#converter.unwrap(value);
+			this.#target.set(key, value);
+			this.#size.value = this.#target.size;
+			this.#iterators.notify();
+			this.#getProbes.update(key, value);
+			this.#hasProbes.update(key, true);
+		});
+		return this;
+	}
+
+	delete(key: K): boolean {
+		return batch(() => {
+			const deleted = this.#target.delete(key);
+			if (deleted) {
+				this.#size.value = this.#target.size;
+				this.#iterators.notify();
+				this.#getProbes.update(key, undefined);
+				this.#hasProbes.update(key, false);
+			}
+			return deleted;
+		});
+	}
+
+	clear(): void {
+		batch(() => {
+			this.#target.clear();
+			this.#size.value = 0;
+			this.#iterators.notify();
+			this.#getProbes.fill(undefined);
+			this.#hasProbes.fill(false);
+		});
+	}
+
+	* entries(): IterableIterator<[K, V]> {
+		this.#iterators.access();
+		for (const entry of this.#target.entries()) {
+			yield [entry[0], this.#converter.wrap(entry[1])];
+		}
+	}
+
+	keys(): IterableIterator<K> {
+		this.#iterators.access();
+		return this.#target.keys();
+	}
+
+	* values(): IterableIterator<V> {
+		this.#iterators.access();
+		for (const entry of this.#target.values()) {
+			yield this.#converter.wrap(entry);
+		}
+	}
+
+	forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
+		this.#iterators.access();
+		return this.#target.forEach((value, key) => {
+			callback.call(thisArg, this.#converter.wrap(value), key, this);
+		});
+	}
+
+	* [Symbol.iterator](): IterableIterator<[K, V]> {
+		this.#iterators.access();
+		for (const entry of this.#target.entries()) {
+			yield [entry[0], this.#converter.wrap(entry[1])];
+		}
+	}
+
+	get [Symbol.toStringTag](): string {
+		return this.#target[Symbol.toStringTag];
+	}
+}

@@ -594,6 +594,13 @@ await test("signals", async ctx => {
 			assertEvents(events, []);
 		}));
 		assertEvents(events, [9]);
+
+		batch(() => {
+			a.value++;
+			a.value++;
+			assertEvents(events, []);
+		});
+		assertEvents(events, [11]);
 	});
 
 	await ctx.test("lazy", async ctx => {

@@ -8,18 +8,39 @@ import { ReactiveSet } from "./reactive-set.js";
  */
 export interface Barrier {
 	/**
-	 * Get an reactive wrapper for the specified value.
+	 * Get a reactive wrapper for the specified value.
+	 *
+	 * This should always return the same wrapper for the same value.
+	 *
+	 * @param value The target.
+	 * @returns The wrapper or the value itself if it was already wrapped.
 	 */
 	wrap<T>(value: T): T;
 
 	/**
 	 * Get the target for the specified reactive wrapper.
+	 *
+	 * This should always return the same target for the same value.
+	 *
+	 * @param value The wrapper or a non-wrapped value.
+	 * @returns The target or the value itself if it was already unwrapped.
 	 */
 	unwrap<T>(value: T): T;
 }
 
+/**
+ * Symbol for storing functions for wrapping an instance on it's constructor.
+ */
 const WRAP_INSTANCE = Symbol.for("gluon:store:wrap_instance");
+
+/**
+ * A map of targets to wrappers.
+ */
 const WRAPPERS = sharedGlobal("gluon:store:wrappers", () => new WeakMap<object, object>());
+
+/**
+ * A map of wrappers to targets.
+ */
 const TARGETS = sharedGlobal("gluon:store:targets", () => new WeakMap<object, object>());
 
 export interface WrapInstanceFn<T> {
@@ -30,6 +51,11 @@ const STORE: Barrier = { wrap, unwrap };
 
 /**
  * Get a deep reactive wrapper for the specified value.
+ *
+ * This always returns the same wrapper for the same value.
+ *
+ * @param value The value to wrap.
+ * @returns The wrapper or the value itself if it was already wrapped.
  */
 export function wrap<T>(value: T): T {
 	if (value !== null && typeof value === "object") {
@@ -45,6 +71,7 @@ export function wrap<T>(value: T): T {
 		} else {
 			switch (ctor) {
 				case null:
+				case undefined:
 				case Object:
 					wrapper = createReactiveProxy(value, STORE);
 					break;
@@ -70,6 +97,11 @@ export function wrap<T>(value: T): T {
 
 /**
  * Get the target for a reactive wrapper.
+ *
+ * This always returns the same target for the same value.
+ *
+ * @param value The value to unwrap.
+ * @returns The target or the value itself if it was already unwrapped.
  */
 export function unwrap<T>(value: T): T {
 	if (value !== null && typeof value === "object") {

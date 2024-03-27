@@ -12,6 +12,12 @@ export class ReactiveSet<T> implements Set<T> {
 	#iterators: Signal<void>;
 	#probes: ProbeMap<T, boolean>;
 
+	/**
+	 * Create a new wrapper.
+	 *
+	 * @param target The target.
+	 * @param barrier The barrier to convert values.
+	 */
 	constructor(target: Set<T>, barrier: Barrier) {
 		this.#target = target;
 		this.#barrier = barrier;

@@ -559,7 +559,7 @@ export function track<T>(fn: () => T): T {
 }
 
 /**
- * Check if there are currently any triggers or dependants that would be tracked when accessing a signal.
+ * Check if an expression is currently evaluated to track signal accesses.
  */
 export function isTracking(): boolean {
 	return TRACKING_STACK[TRACKING_STACK.length - 1]

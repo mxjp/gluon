@@ -4,6 +4,10 @@ import { ProbeMap } from "./probes.js";
 
 /**
  * Create a reactive proxy for an arbitrary object.
+ *
+ * @param target The target.
+ * @param barrier The barrier to convert values.
+ * @returns The proxy.
  */
 export function createReactiveProxy<T extends object>(target: T, barrier: Barrier): T {
 	const iterators = sig();

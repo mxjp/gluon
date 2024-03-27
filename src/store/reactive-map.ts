@@ -13,6 +13,12 @@ export class ReactiveMap<K, V> implements Map<K, V> {
 	#getProbes: ProbeMap<K, V | undefined>;
 	#hasProbes: ProbeMap<K, boolean>;
 
+	/**
+	 * Create a new wrapper.
+	 *
+	 * @param target The target.
+	 * @param barrier The barrier to convert values. Keys are not reactive.
+	 */
 	constructor(target: Map<K, V>, barrier: Barrier) {
 		this.#target = target;
 		this.#barrier = barrier;

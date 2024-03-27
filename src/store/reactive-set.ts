@@ -1,5 +1,5 @@
 import { batch, sig, Signal } from "../core/signals.js";
-import type { Converter } from "./converter.js";
+import type { Barrier } from "./barrier.js";
 import { ProbeMap } from "./probes.js";
 
 /**
@@ -7,14 +7,14 @@ import { ProbeMap } from "./probes.js";
  */
 export class ReactiveSet<T> implements Set<T> {
 	#target: Set<T>;
-	#converter: Converter;
+	#barrier: Barrier;
 	#size: Signal<number>;
 	#iterators: Signal<void>;
 	#probes: ProbeMap<T, boolean>;
 
-	constructor(target: Set<T>, converter: Converter) {
+	constructor(target: Set<T>, barrier: Barrier) {
 		this.#target = target;
-		this.#converter = converter;
+		this.#barrier = barrier;
 		this.#size = sig(target.size);
 		this.#iterators = sig();
 		this.#probes = new ProbeMap(key => target.has(key));
@@ -26,14 +26,14 @@ export class ReactiveSet<T> implements Set<T> {
 	}
 
 	has(value: T): boolean {
-		value = this.#converter.unwrap(value);
+		value = this.#barrier.unwrap(value);
 		this.#probes.access(value);
 		return this.#target.has(value);
 	}
 
 	add(value: T): this {
 		batch(() => {
-			value = this.#converter.unwrap(value);
+			value = this.#barrier.unwrap(value);
 			this.#target.add(value);
 			this.#size.value = this.#target.size;
 			this.#iterators.notify();
@@ -44,7 +44,7 @@ export class ReactiveSet<T> implements Set<T> {
 
 	delete(value: T): boolean {
 		return batch(() => {
-			value = this.#converter.unwrap(value);
+			value = this.#barrier.unwrap(value);
 			const deleted = this.#target.delete(value);
 			if (deleted) {
 				this.#size.value = this.#target.size;
@@ -67,7 +67,7 @@ export class ReactiveSet<T> implements Set<T> {
 	* entries(): IterableIterator<[T, T]> {
 		this.#iterators.access();
 		for (const entry of this.#target.entries()) {
-			const value = this.#converter.wrap(entry[0]);
+			const value = this.#barrier.wrap(entry[0]);
 			yield [value, value];
 		}
 	}
@@ -75,21 +75,21 @@ export class ReactiveSet<T> implements Set<T> {
 	* keys(): IterableIterator<T> {
 		this.#iterators.access();
 		for (const key of this.#target.keys()) {
-			yield this.#converter.wrap(key);
+			yield this.#barrier.wrap(key);
 		}
 	}
 
 	* values(): IterableIterator<T> {
 		this.#iterators.access();
 		for (const value of this.#target.values()) {
-			yield this.#converter.wrap(value);
+			yield this.#barrier.wrap(value);
 		}
 	}
 
 	forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: unknown): void {
 		this.#iterators.access();
 		return this.#target.forEach(value => {
-			value = this.#converter.wrap(value);
+			value = this.#barrier.wrap(value);
 			callback.call(thisArg, value, value, this);
 		}, thisArg);
 	}
@@ -97,7 +97,7 @@ export class ReactiveSet<T> implements Set<T> {
 	* [Symbol.iterator](): IterableIterator<T> {
 		this.#iterators.access();
 		for (const value of this.#target) {
-			yield this.#converter.wrap(value);
+			yield this.#barrier.wrap(value);
 		}
 	}
 

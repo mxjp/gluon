@@ -1,11 +1,11 @@
 import { batch, sig } from "../core/signals.js";
-import type { Converter } from "./converter.js";
+import type { Barrier } from "./barrier.js";
 import { ProbeMap } from "./probes.js";
 
 /**
  * Create a reactive proxy for an arbitrary object.
  */
-export function createReactiveProxy<T extends object>(target: T, converter: Converter): T {
+export function createReactiveProxy<T extends object>(target: T, barrier: Barrier): T {
 	const iterators = sig();
 	const getProbes = new ProbeMap<keyof T, T[keyof T]>(key => target[key]);
 	const hasProbes = new ProbeMap<keyof T, boolean>(key => key in target);
@@ -23,7 +23,7 @@ export function createReactiveProxy<T extends object>(target: T, converter: Conv
 			if (isReactive(prop)) {
 				getProbes.access(prop as keyof T);
 			}
-			return converter.wrap(Reflect.get(target, prop, recv));
+			return barrier.wrap(Reflect.get(target, prop, recv));
 		},
 		has(target, prop) {
 			if (isReactive(prop)) {
@@ -32,7 +32,7 @@ export function createReactiveProxy<T extends object>(target: T, converter: Conv
 			return Reflect.has(target, prop);
 		},
 		set(target, prop, value: T[keyof T], recv) {
-			value = converter.unwrap(value);
+			value = barrier.unwrap(value);
 			if (isReactive(prop)) {
 				return batch(() => {
 					const ok = Reflect.set(target, prop, value, recv);

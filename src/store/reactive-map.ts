@@ -1,5 +1,5 @@
 import { batch, sig, Signal } from "../core/signals.js";
-import type { Converter } from "./converter.js";
+import type { Barrier } from "./barrier.js";
 import { ProbeMap } from "./probes.js";
 
 /**
@@ -7,15 +7,15 @@ import { ProbeMap } from "./probes.js";
  */
 export class ReactiveMap<K, V> implements Map<K, V> {
 	#target: Map<K, V>;
-	#converter: Converter;
+	#barrier: Barrier;
 	#size: Signal<number>;
 	#iterators: Signal<void>;
 	#getProbes: ProbeMap<K, V | undefined>;
 	#hasProbes: ProbeMap<K, boolean>;
 
-	constructor(target: Map<K, V>, converter: Converter) {
+	constructor(target: Map<K, V>, barrier: Barrier) {
 		this.#target = target;
-		this.#converter = converter;
+		this.#barrier = barrier;
 		this.#size = sig(target.size);
 		this.#iterators = sig();
 		this.#getProbes = new ProbeMap(key => target.get(key));
@@ -29,7 +29,7 @@ export class ReactiveMap<K, V> implements Map<K, V> {
 
 	get(key: K): V | undefined {
 		this.#getProbes.access(key);
-		return this.#converter.wrap(this.#target.get(key));
+		return this.#barrier.wrap(this.#target.get(key));
 	}
 
 	has(key: K): boolean {
@@ -39,7 +39,7 @@ export class ReactiveMap<K, V> implements Map<K, V> {
 
 	set(key: K, value: V): this {
 		batch(() => {
-			value = this.#converter.unwrap(value);
+			value = this.#barrier.unwrap(value);
 			this.#target.set(key, value);
 			this.#size.value = this.#target.size;
 			this.#iterators.notify();
@@ -75,7 +75,7 @@ export class ReactiveMap<K, V> implements Map<K, V> {
 	* entries(): IterableIterator<[K, V]> {
 		this.#iterators.access();
 		for (const entry of this.#target.entries()) {
-			yield [entry[0], this.#converter.wrap(entry[1])];
+			yield [entry[0], this.#barrier.wrap(entry[1])];
 		}
 	}
 
@@ -87,21 +87,21 @@ export class ReactiveMap<K, V> implements Map<K, V> {
 	* values(): IterableIterator<V> {
 		this.#iterators.access();
 		for (const entry of this.#target.values()) {
-			yield this.#converter.wrap(entry);
+			yield this.#barrier.wrap(entry);
 		}
 	}
 
 	forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
 		this.#iterators.access();
 		return this.#target.forEach((value, key) => {
-			callback.call(thisArg, this.#converter.wrap(value), key, this);
+			callback.call(thisArg, this.#barrier.wrap(value), key, this);
 		});
 	}
 
 	* [Symbol.iterator](): IterableIterator<[K, V]> {
 		this.#iterators.access();
 		for (const entry of this.#target.entries()) {
-			yield [entry[0], this.#converter.wrap(entry[1])];
+			yield [entry[0], this.#barrier.wrap(entry[1])];
 		}
 	}
 

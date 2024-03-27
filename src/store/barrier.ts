@@ -6,7 +6,7 @@ import { ReactiveSet } from "./reactive-set.js";
 /**
  * An object that is used to convert between reactive wrappers and their targets.
  */
-export interface Converter {
+export interface Barrier {
 	/**
 	 * Get an reactive wrapper for the specified value.
 	 */
@@ -26,7 +26,7 @@ export interface WrapInstanceFn<T> {
 	(instance: T): T;
 }
 
-export const STORE: Converter = { wrap, unwrap };
+const STORE: Barrier = { wrap, unwrap };
 
 /**
  * Get a deep reactive wrapper for the specified value.

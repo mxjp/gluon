@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.0
++ **Breaking:** Fix nested batch behavior: Updates during batches are now deferred until all current batches are complete.
+
 ## 7.1
 + Add `Signal.active` property.
 + Add `isTracking` utility.

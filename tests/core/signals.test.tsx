@@ -552,6 +552,50 @@ await test("signals", async ctx => {
 		});
 	});
 
+	await ctx.test("batch", () => {
+		const events: unknown[] = [];
+		const a = sig(0);
+		const b = sig(1);
+		uncapture(() => watch(() => {
+			strictEqual(isTracking(), true);
+			return a.value + b.value;
+		}, value => {
+			events.push(value);
+		}));
+		assertEvents(events, [1]);
+
+		batch(() => {
+			a.value++;
+			b.value++;
+			assertEvents(events, []);
+		});
+		assertEvents(events, [3]);
+
+		batch(() => {
+			a.value++;
+			assertEvents(events, []);
+			batch(() => {
+				b.value++;
+				assertEvents(events, []);
+			});
+			assertEvents(events, []);
+		});
+		assertEvents(events, [5]);
+
+		batch(() => batch(() => {
+			a.value++;
+			b.value++;
+			assertEvents(events, []);
+			batch(() => {
+				a.value++;
+				b.value++;
+				assertEvents(events, []);
+			});
+			assertEvents(events, []);
+		}));
+		assertEvents(events, [9]);
+	});
+
 	await ctx.test("lazy", async ctx => {
 		await ctx.test("behavior", () => {
 			const events: unknown[] = [];

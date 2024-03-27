@@ -397,7 +397,7 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
 }
 
 /**
- * Defer signal updates while calling a function and call the immediately after the function returns.
+ * Defer signal updates while calling a function and call them immediately after all current batches have finished.
  *
  * @param fn The function to run.
  * @returns The function's return value.
@@ -428,7 +428,11 @@ export function batch<T>(fn: () => T): T {
 	} finally {
 		BATCH_STACK.pop();
 	}
-	notify(batch);
+	if (BATCH_STACK.length > 0) {
+		BATCH_STACK[BATCH_STACK.length - 1].push(...batch);
+	} else {
+		notify(batch);
+	}
 	return value;
 }
 

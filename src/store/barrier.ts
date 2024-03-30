@@ -59,6 +59,10 @@ const STORE: Barrier = { wrap, unwrap };
  */
 export function wrap<T>(value: T): T {
 	if (value !== null && typeof value === "object") {
+		if (TARGETS.has(value)) {
+			return value;
+		}
+
 		let wrapper = WRAPPERS.get(value) as T | undefined;
 		if (wrapper !== undefined) {
 			return wrapper as T;

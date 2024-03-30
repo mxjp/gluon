@@ -5,7 +5,7 @@ import { ProbeMap } from "./probes.js";
 /**
  * A reactive wrapper for a set.
  */
-export class ReactiveSet<T> implements Set<T> {
+export class ReactiveSet<T> extends Set<T> {
 	#target: Set<T>;
 	#barrier: Barrier;
 	#size: Signal<number>;
@@ -19,6 +19,7 @@ export class ReactiveSet<T> implements Set<T> {
 	 * @param barrier The barrier to convert values.
 	 */
 	constructor(target: Set<T>, barrier: Barrier) {
+		super();
 		this.#target = target;
 		this.#barrier = barrier;
 		this.#size = sig(target.size);

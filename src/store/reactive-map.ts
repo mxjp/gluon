@@ -5,7 +5,7 @@ import { ProbeMap } from "./probes.js";
 /**
  * A reactive wrapper for a map.
  */
-export class ReactiveMap<K, V> implements Map<K, V> {
+export class ReactiveMap<K, V> extends Map<K, V> {
 	#target: Map<K, V>;
 	#barrier: Barrier;
 	#size: Signal<number>;
@@ -20,6 +20,7 @@ export class ReactiveMap<K, V> implements Map<K, V> {
 	 * @param barrier The barrier to convert values. Keys are not reactive.
 	 */
 	constructor(target: Map<K, V>, barrier: Barrier) {
+		super();
 		this.#target = target;
 		this.#barrier = barrier;
 		this.#size = sig(target.size);

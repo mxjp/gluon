@@ -12,6 +12,7 @@ await test("store/reactive-set", async ctx => {
 		const inner = new Set(["foo"]);
 		const set = wrap(inner);
 		strictEqual(set instanceof ReactiveSet, true);
+		strictEqual(set instanceof Set, true);
 
 		assertEntries([inner, set], ["foo"]);
 		inner.add("bar");
@@ -32,7 +33,6 @@ await test("store/reactive-set", async ctx => {
 		const events: unknown[] = [];
 		const inner = new Set(["foo"]);
 		const set = wrap(inner);
-		strictEqual(set instanceof ReactiveSet, true);
 
 		uncapture(() => {
 			watch(() => set.size, value => {

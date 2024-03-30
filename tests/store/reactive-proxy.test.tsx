@@ -134,6 +134,7 @@ await test("store/reactive-proxy", async ctx => {
 		const inner = new Test();
 		const proxy = wrap(inner);
 		notStrictEqual(inner, proxy);
+		strictEqual(proxy instanceof Test, true);
 
 		uncapture(() => {
 			watch(() => proxy.value, value => {

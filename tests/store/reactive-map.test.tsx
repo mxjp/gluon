@@ -12,6 +12,7 @@ await test("store/reactive-map", async ctx => {
 		const inner = new Map<string, number>([["foo", 7]]);
 		const map = wrap(inner);
 		strictEqual(map instanceof ReactiveMap, true);
+		strictEqual(map instanceof Map, true);
 		assertEntries([inner, map], [["foo", 7]]);
 
 		inner.set("bar", 42);
@@ -34,7 +35,6 @@ await test("store/reactive-map", async ctx => {
 		const events: unknown[] = [];
 		const inner = new Map<string, number>([["foo", 7]]);
 		const map = wrap(inner);
-		strictEqual(map instanceof ReactiveMap, true);
 
 		uncapture(() => {
 			watch(() => map.size, value => {

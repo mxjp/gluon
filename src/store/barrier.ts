@@ -1,4 +1,5 @@
 import { sharedGlobal } from "../core/globals.js";
+import { createReactiveArrayProxy } from "./reactive-array-proxy.js";
 import { ReactiveMap } from "./reactive-map.js";
 import { createReactiveProxy } from "./reactive-proxy.js";
 import { ReactiveSet } from "./reactive-set.js";
@@ -78,6 +79,10 @@ export function wrap<T>(value: T): T {
 				case undefined:
 				case Object:
 					wrapper = createReactiveProxy(value, STORE);
+					break;
+
+				case Array:
+					wrapper = createReactiveArrayProxy(value as unknown[], STORE) as T;
 					break;
 
 				case Map:

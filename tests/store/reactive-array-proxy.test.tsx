@@ -5,6 +5,7 @@ import { uncapture, watchUpdates } from "@mxjp/gluon";
 import { wrap } from "@mxjp/gluon/store";
 
 import { assertEvents } from "../common.js";
+import { WrapTest } from "./common.js";
 
 await test("store/reactive-array-proxy", async ctx => {
 	await ctx.test("inert usage", () => {
@@ -247,6 +248,26 @@ await test("store/reactive-array-proxy", async ctx => {
 				],
 			});
 		});
+	});
+
+	await ctx.test("conversion", () => {
+		const inner = [new WrapTest()];
+		const proxy = wrap(inner);
+		proxy.push(new WrapTest());
+		inner.push(new WrapTest());
+
+		assertWrapped(inner, false);
+		assertWrapped(proxy, true);
+
+		function assertWrapped(target: WrapTest[], wrapped: boolean) {
+			// Wrapping is tested using multiple access methods to ensure, that this propagates through APIs not explicitly replaced with reactive versions:
+
+			for (let i = 0; i < target.length; i++) {
+				strictEqual(target[i].wrapped, wrapped);
+			}
+
+			strictEqual(target.every(p => p.wrapped === wrapped), true);
+		}
 	});
 
 	await ctx.test("reactive access", async ctx => {

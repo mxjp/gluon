@@ -2,7 +2,7 @@ import { batch, isTracking, sig } from "../core/signals.js";
 import type { Barrier } from "./barrier.js";
 import { ProbeMap } from "./probes.js";
 
-export function createReactiveArrayProxy<T>(target: T[], _barrier: Barrier): T[] {
+export function createReactiveArrayProxy<T>(target: T[], barrier: Barrier): T[] {
 	const length = sig(target.length);
 	const indexProbes = new ProbeMap<number, T | undefined>(i => target[i]);
 	return new Proxy(target, {
@@ -14,7 +14,7 @@ export function createReactiveArrayProxy<T>(target: T[], _barrier: Barrier): T[]
 			const index = asCanonicalIndex(prop);
 			if (index !== undefined) {
 				indexProbes.access(index);
-				return target[index];
+				return barrier.wrap(target[index]);
 			}
 			if (Object.prototype.hasOwnProperty.call(replacements, prop)) {
 				return replacements[prop as keyof typeof Array.prototype];
@@ -36,6 +36,7 @@ export function createReactiveArrayProxy<T>(target: T[], _barrier: Barrier): T[]
 			const index = asCanonicalIndex(prop);
 			if (index !== undefined) {
 				batch(() => {
+					value = barrier.unwrap(value);
 					target[index] = value;
 					indexProbes.update(index, value as T);
 				});

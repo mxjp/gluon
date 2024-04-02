@@ -1,9 +1,9 @@
 import "../env.js";
 
-import { deepStrictEqual, strictEqual } from "node:assert";
+import { deepStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, Signal, string, teardown, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
+import { batch, capture, effect, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, Signal, string, teardown, TeardownHook, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
 
 import { assertEvents, assertSharedInstance } from "../common.js";
 
@@ -128,8 +128,11 @@ await test("signals", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(42);
 			uncapture(() => watch(() => {
-				teardown(() => {
-					throw new Error("invalid teardown");
+				throws(() => {
+					teardown(() => {});
+				});
+				uncapture(() => {
+					teardown(() => {});
 				});
 				return signal.value;
 			}, value => {
@@ -220,36 +223,66 @@ await test("signals", async ctx => {
 			assertEvents(events, [2]);
 		});
 
-		await ctx.test("lifecycle isolation", () => {
+		await ctx.test("teardown un-support", () => {
 			const events: unknown[] = [];
-			const inner = sig(1);
-			const outer = sig(1);
+			const signal = sig(1);
 
 			strictEqual(isTracking(), false);
 			uncapture(() => watch(() => {
 				strictEqual(isTracking(), true);
-				let tracking = true;
-				watch(() => {
-					strictEqual(isTracking(), true);
-					return inner.value;
-				}, value => {
-					strictEqual(isTracking(), tracking);
-					events.push(`i${value}`);
+
+				throws(() => {
+					teardown(() => {});
 				});
-				strictEqual(isTracking(), true);
-				tracking = false;
-				return outer.value;
+				throws(() => {
+					watch(() => {}, () => {});
+				});
+				throws(() => {
+					watchUpdates(() => {}, () => {});
+				});
+				throws(() => {
+					effect(() => {});
+				});
+
+				return signal.value;
 			}, value => {
 				strictEqual(isTracking(), false);
-				events.push(`o${value}`);
+				events.push(value);
 			}));
 			strictEqual(isTracking(), false);
 
-			assertEvents(events, ["i1", "o1"]);
-			inner.value = 2;
-			assertEvents(events, ["i2"]);
-			outer.value = 2;
-			assertEvents(events, ["i2", "o2"]);
+			assertEvents(events, [1]);
+			signal.value = 2;
+			assertEvents(events, [2]);
+		});
+
+		await ctx.test("access isolation", () => {
+			const events: unknown[] = [];
+			const outer = sig(1);
+			const inner = sig(1);
+			let innerHook: TeardownHook | undefined;
+			uncapture(() => {
+				watch(() => {
+					events.push("o");
+					innerHook?.();
+					innerHook = capture(() => {
+						watch(() => {
+							events.push("i");
+							return inner.value;
+						}, value => {
+							events.push(`i${value}`);
+						});
+					});
+					return outer.value;
+				}, value => {
+					events.push(`o${value}`);
+				});
+			});
+			assertEvents(events, ["o", "i", "i1", "o1"]);
+			inner.value++;
+			assertEvents(events, ["i", "i2"]);
+			outer.value++;
+			assertEvents(events, ["o", "i", "i2", "o2"]);
 		});
 
 		await ctx.test("context", () => {

@@ -357,6 +357,45 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, tri
 }
 
 /**
+ * Run and watch a function until the current lifecycle is disposed.
+ *
+ * Note, that this doesn't separate signal accesses from side effects which makes it easier to accidentally cause infinite loops. If possible, use {@link watch} or {@link watchUpdates} instead.
+ *
+ * @param fn The function to run. Lifecycle hooks  are called before the next function call or when the current lifecycle is disposed.
+ * @param trigger If true, batches are ignored and the expression and function run before all non-triggers. Default is false.
+ */
+export function effect(fn: () => void, trigger = false): void {
+	const context = getContext();
+
+	let disposed = false;
+	let disposeFn: TeardownHook | undefined;
+	let cycle = 0;
+
+	teardown(() => {
+		disposed = true;
+		disposeFn?.();
+	});
+
+	(function dependant(accessedCycle: number): void {
+		if (disposed || cycle !== accessedCycle) {
+			return;
+		}
+		cycle++;
+		runInContext(context, () => {
+			disposeFn?.();
+			TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
+			DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
+			try {
+				disposeFn = capture(fn);
+			} finally {
+				TRIGGERS_STACK.pop();
+				DEPENDANTS_STACK.pop();
+			}
+		});
+	})(cycle);
+}
+
+/**
  * Evaluate an expression and call a function once when any accessed signals are updated.
  *
  * It is guaranteed that all triggers are called before other non-trigger dependants per signal update or batch.

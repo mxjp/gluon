@@ -40,6 +40,55 @@ await test("signals", async ctx => {
 		strictEqual(c, 7);
 	});
 
+	await ctx.test("access cycles", () => {
+		const a = sig(false);
+		const b = sig(7);
+		const events: unknown[] = [];
+
+		strictEqual(isTracking(), false);
+		uncapture(() => watch(() => {
+			strictEqual(isTracking(), true);
+			return a.value ? b.value : 0;
+		}, value => {
+			strictEqual(isTracking(), false);
+			events.push(value);
+		}));
+		strictEqual(isTracking(), false);
+		strictEqual(a.active, true);
+		strictEqual(b.active, false);
+		assertEvents(events, [0]);
+
+		b.value = 3;
+		strictEqual(a.active, true);
+		strictEqual(b.active, false);
+		assertEvents(events, []);
+
+		a.value = true;
+		strictEqual(a.active, true);
+		strictEqual(b.active, true);
+		assertEvents(events, [3]);
+
+		b.value = 42;
+		strictEqual(a.active, true);
+		strictEqual(b.active, true);
+		assertEvents(events, [42]);
+
+		a.value = false;
+		strictEqual(a.active, true);
+		strictEqual(b.active, true);
+		assertEvents(events, [0]);
+
+		b.value = 2;
+		strictEqual(a.active, true);
+		strictEqual(b.active, false);
+		assertEvents(events, []);
+
+		a.value = true;
+		strictEqual(a.active, true);
+		strictEqual(b.active, true);
+		assertEvents(events, [2]);
+	});
+
 	for (const isTrigger of [false, true]) {
 		await ctx.test(`watch (${isTrigger ? "trigger" : "default"})`, async ctx => {
 			await ctx.test("static", () => {
@@ -175,55 +224,6 @@ await test("signals", async ctx => {
 				assertEvents(events, []);
 			});
 
-			await ctx.test("access cycles", () => {
-				const a = sig(false);
-				const b = sig(7);
-				const events: unknown[] = [];
-
-				strictEqual(isTracking(), false);
-				uncapture(() => watch(() => {
-					strictEqual(isTracking(), true);
-					return a.value ? b.value : 0;
-				}, value => {
-					strictEqual(isTracking(), false);
-					events.push(value);
-				}, isTrigger));
-				strictEqual(isTracking(), false);
-				strictEqual(a.active, true);
-				strictEqual(b.active, false);
-				assertEvents(events, [0]);
-
-				b.value = 3;
-				strictEqual(a.active, true);
-				strictEqual(b.active, false);
-				assertEvents(events, []);
-
-				a.value = true;
-				strictEqual(a.active, true);
-				strictEqual(b.active, true);
-				assertEvents(events, [3]);
-
-				b.value = 42;
-				strictEqual(a.active, true);
-				strictEqual(b.active, true);
-				assertEvents(events, [42]);
-
-				a.value = false;
-				strictEqual(a.active, true);
-				strictEqual(b.active, true);
-				assertEvents(events, [0]);
-
-				b.value = 2;
-				strictEqual(a.active, true);
-				strictEqual(b.active, false);
-				assertEvents(events, []);
-
-				a.value = true;
-				strictEqual(a.active, true);
-				strictEqual(b.active, true);
-				assertEvents(events, [2]);
-			});
-
 			await ctx.test("teardown un-support", () => {
 				const events: unknown[] = [];
 				const signal = sig(1);
@@ -306,9 +306,92 @@ await test("signals", async ctx => {
 				assertEvents(events, ["e42", "c42"]);
 			});
 		});
+
+		await ctx.test(`effect (${isTrigger ? "trigger" : "default"})`, async ctx => {
+			await ctx.test("normal usage", () => {
+				const events: unknown[] = [];
+				const signal = sig(1);
+				const dispose = capture(() => {
+					effect(() => {
+						strictEqual(isTracking(), true);
+						const value = signal.value;
+						events.push(`s${value}`);
+						teardown(() => {
+							events.push(`e${value}`);
+						});
+					}, isTrigger);
+				});
+				strictEqual(isTracking(), false);
+				assertEvents(events, ["s1"]);
+				signal.value++;
+				assertEvents(events, ["e1", "s2"]);
+				signal.value++;
+				assertEvents(events, ["e2", "s3"]);
+				dispose();
+				assertEvents(events, ["e3"]);
+				signal.value++;
+				assertEvents(events, []);
+			});
+
+			await ctx.test("batch", () => {
+				const events: unknown[] = [];
+				const a = sig("a");
+				const b = sig(1);
+				uncapture(() => {
+					effect(() => {
+						events.push(`${a.value}${b.value}`);
+					}, isTrigger);
+				});
+				assertEvents(events, ["a1"]);
+				batch(() => {
+					a.value = "b";
+					assertEvents(events, isTrigger ? ["b1"] : []);
+					b.value++;
+					assertEvents(events, isTrigger ? ["b2"] : []);
+				});
+				assertEvents(events, isTrigger ? [] : ["b2"]);
+			});
+
+			await ctx.test("access isolation", () => {
+				const events: unknown[] = [];
+				const outer = sig(1);
+				const inner = sig(1);
+				uncapture(() => {
+					effect(() => {
+						events.push(`o${outer.value}`);
+						effect(() => {
+							events.push(`i${inner.value}`);
+						});
+					});
+				});
+				assertEvents(events, ["o1", "i1"]);
+				outer.value++;
+				assertEvents(events, ["o2", "i1"]);
+				inner.value++;
+				assertEvents(events, ["i2"]);
+				outer.value++;
+				assertEvents(events, ["o3", "i2"]);
+				inner.value++;
+				assertEvents(events, ["i3"]);
+			});
+
+			await ctx.test("expected infinite loop", () => {
+				let count = 0;
+				const signal = sig(0);
+				uncapture(() => {
+					effect(() => {
+						if (count < 5) {
+							count++;
+							signal.value++;
+						}
+					});
+				});
+				strictEqual(count, 5);
+			});
+		});
 	}
 
-	await ctx.test("watchUpdates", async () => {
+	await ctx.test("watchUpdates", () => {
 		const events: unknown[] = [];
 		const signal = sig("a");
 		strictEqual(signal.active, false);

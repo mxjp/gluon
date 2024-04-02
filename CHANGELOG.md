@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.1
++ Add `nocapture` utility to explicitly un-support teardown hooks in specific contexts.
+
 ## 8.0
 + **Breaking:** Fix nested batch behavior: Updates during batches are now deferred until all current batches are complete.
 

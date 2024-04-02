@@ -1,4 +1,5 @@
 import { INTERNAL_GLOBALS } from "./internals.js";
+import type { TeardownFrame } from "./lifecycle-types.js";
 
 const { TEARDOWN_STACK } = INTERNAL_GLOBALS;
 
@@ -73,10 +74,37 @@ export function uncapture<T>(fn: () => T): T {
 	}
 }
 
+const NOCAPTURE: TeardownFrame = {
+	push() {
+		throw new Error("teardown hooks are not supported in this context.");
+	},
+};
+
+/**
+ * Run a function and explicitly un-support teardown hooks.
+ *
+ * Teardown hooks are still supported when using {@link capture}, {@link captureSelf} or {@link uncapture} inside of the function.
+ *
+ * This should be used in places where lifecycle side are never expected.
+ *
+ * @param fn The function to run.
+ * @returns The function's return value.
+ */
+export function nocapture<T>(fn: () => T): T {
+	TEARDOWN_STACK.push(NOCAPTURE);
+	try {
+		return fn();
+	} finally {
+		TEARDOWN_STACK.pop();
+	}
+}
+
 /**
  * Register a teardown hook.
  *
  * This has no effect if teardown hooks are not captured in the current context.
+ *
+ * @throws An error if teardown hooks are {@link nocapture explicitly un-supported}.
  */
 export function teardown(hook: TeardownHook): void {
 	TEARDOWN_STACK[TEARDOWN_STACK.length - 1]?.push(hook);

@@ -291,6 +291,11 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 		let disposeFn: TeardownHook | undefined;
 		let cycle = 0;
 
+		teardown(() => {
+			disposed = true;
+			disposeFn?.();
+		});
+
 		let value: T;
 		let runExpr: () => void;
 		if (expr instanceof Signal) {
@@ -323,11 +328,6 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 				disposeFn = capture(runFn);
 			});
 		})(cycle);
-
-		teardown(() => {
-			disposed = true;
-			disposeFn?.();
-		});
 	} else {
 		fn(expr);
 	}

@@ -9,6 +9,7 @@ await new Promise(resolve => {
 
 const exampleNames: string[] = [
 	"counter",
+	"todo-app",
 	"data-binding",
 	"stopwatch",
 	"routing",

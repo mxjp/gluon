@@ -1,7 +1,7 @@
 import { shareInstancesOf } from "./globals.js";
 import { capture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
-import { Expression, get, memo, sig, Signal, watch } from "./signals.js";
+import { effect, Expression, get, memo, sig, Signal, watch } from "./signals.js";
 import { Falsy } from "./types.js";
 
 /**
@@ -339,7 +339,7 @@ export function For<T>(props: {
 			}
 		});
 
-		watch(props.each, values => {
+		effect(() => {
 			let parent = self.parent;
 			if (!parent) {
 				parent = document.createDocumentFragment();
@@ -347,7 +347,7 @@ export function For<T>(props: {
 			}
 			let index = 0;
 			let last = first;
-			for (const value of values) {
+			for (const value of get(props.each)) {
 				let instance: Instance | undefined = instances[index];
 				if (instance && instance.value === value) {
 					instance.cycle = cycle;
@@ -479,7 +479,7 @@ export function IndexFor<T>(props: {
 
 		const instances: Instance[] = [];
 
-		watch(props.each, values => {
+		effect(() => {
 			let parent = self.parent;
 			if (!parent) {
 				parent = document.createDocumentFragment();
@@ -487,7 +487,7 @@ export function IndexFor<T>(props: {
 			}
 			let index = 0;
 			let last = first;
-			for (const value of values) {
+			for (const value of get(props.each)) {
 				if (index < instances.length) {
 					const current = instances[index];
 					if (current.value === value) {

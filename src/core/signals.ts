@@ -261,6 +261,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately. Lifecycle hooks are called before the next function call or when the current lifecycle is disposed.
+ * @param trigger If true, batches are ignored and the expression and function run before all non-triggers. Default is false.
  *
  * @example
  * ```tsx
@@ -284,7 +285,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  * count.value = 2;
  * ```
  */
-export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
+export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false): void {
 	if (expr instanceof Signal || typeof expr === "function") {
 		const context = getContext();
 		let disposed = false;
@@ -316,8 +317,8 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 			}
 			cycle++;
 			runInContext(context, () => {
-				TRIGGERS_STACK.push([]);
-				DEPENDANTS_STACK.push([[dependant, cycle]]);
+				TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
+				DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
 				try {
 					nocapture(runExpr);
 				} finally {
@@ -338,9 +339,10 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result when any updates occur.
+ * @param trigger If true, batches are ignored and the expression and function run before all non-triggers. Default is false.
  * @returns The first expression result.
  */
-export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void): T {
+export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, trigger?: boolean): T {
 	let first: T;
 	let update = false;
 	watch(expr, value => {
@@ -350,7 +352,7 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void): T 
 			first = value;
 			update = true;
 		}
-	});
+	}, trigger);
 	return first!;
 }
 

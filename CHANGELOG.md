@@ -1,7 +1,9 @@
 # Changelog
 
-## 8.1
+## 9.0
++ **Breaking:** Using teardown hooks inside expressions now throws an error.
 + Add `nocapture` utility to explicitly un-support teardown hooks in specific contexts.
++ Add `trigger` parameter to `watch` and `watchUpdates`.
 
 ## 8.0
 + **Breaking:** Fix nested batch behavior: Updates during batches are now deferred until all current batches are complete.

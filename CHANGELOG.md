@@ -2,6 +2,7 @@
 
 ## 9.0
 + **Breaking:** Using teardown hooks inside expressions now throws an error.
++ **Breaking:** `<For>` and `<IndexFor>` now also re-render when anything that is accessed during iteration is updated.
 + Add `nocapture` utility to explicitly un-support teardown hooks in specific contexts.
 + Add `trigger` parameter to `watch` and `watchUpdates`.
 + Add `effect` utility.

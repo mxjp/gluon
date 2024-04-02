@@ -1,7 +1,7 @@
 import { getContext, runInContext, wrapContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
 import { INTERNAL_GLOBALS } from "./internals.js";
-import { capture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
+import { capture, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 import type { Dependant, DependantFn } from "./signal-types.js";
 
 const { BATCH_STACK, TRACKING_STACK, TRIGGERS_STACK, DEPENDANTS_STACK } = INTERNAL_GLOBALS;
@@ -319,7 +319,7 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 				TRIGGERS_STACK.push([]);
 				DEPENDANTS_STACK.push([[dependant, cycle]]);
 				try {
-					uncapture(runExpr);
+					nocapture(runExpr);
 				} finally {
 					TRIGGERS_STACK.pop();
 					DEPENDANTS_STACK.pop();

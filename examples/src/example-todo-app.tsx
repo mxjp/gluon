@@ -10,7 +10,9 @@ export function example() {
 	const name = sig("");
 
 	// "wrap" creates a deep reactive wrapper:
-	const data = wrap<Data>(JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? "{}"));
+	const data = wrap<Data>(JSON.parse(sessionStorage.getItem(STORAGE_KEY)!) ?? {
+		items: [],
+	});
 
 	effect(() => {
 		// Since JSON.stringify accesses every part of data,

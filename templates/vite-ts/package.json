@@ -10,6 +10,6 @@
 		"vite": "^5.1.6"
 	},
 	"dependencies": {
-		"@mxjp/gluon": "^7.0.0"
+		"@mxjp/gluon": "^9.0.0"
 	}
 }

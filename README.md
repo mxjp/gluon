@@ -850,6 +850,17 @@ const initialValue = watchUpdates(count, count => {
 console.log("Initial count:", initialValue);
 ```
 
+The **effect** function can be used when separation of expressions and side effects isn't desired:
+```tsx
+import { effect } from "@mxjp/gluon";
+
+const count = sig(0);
+
+effect(() => {
+  console.log(count.value);
+});
+```
+
 ## Conversion
 Sometimes it can be useful to convert user inputs in some way, e.g. trimming whitespace or parsing a number.
 

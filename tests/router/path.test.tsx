@@ -3,7 +3,7 @@ import "../env.js";
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { join, normalize } from "@mxjp/gluon/router";
+import { join, normalize, trimBase } from "@mxjp/gluon/router";
 
 await test("router/path", async ctx => {
 	await ctx.test("normalize", () => {
@@ -56,5 +56,26 @@ await test("router/path", async ctx => {
 		strictEqual(join("/foo", "bar/"), "/foo/bar/");
 		strictEqual(join("/foo", "/bar/"), "/foo/bar/");
 		strictEqual(join("/foo/", "/bar/"), "/foo/bar/");
+	});
+
+	await ctx.test("trimBase", () => {
+		strictEqual(trimBase("", ""), "");
+		strictEqual(trimBase("", "/"), "");
+		strictEqual(trimBase("/", ""), "");
+
+		strictEqual(trimBase("/", "foo"), "/foo");
+		strictEqual(trimBase("", "foo/bar"), "/foo/bar");
+
+		strictEqual(trimBase("foo", "foo/bar"), "/bar");
+		strictEqual(trimBase("foo", "/foo/bar"), "/bar");
+		strictEqual(trimBase("/foo", "foo/bar"), "/bar");
+		strictEqual(trimBase("foo", "foo/bar/"), "/bar/");
+		strictEqual(trimBase("foo/", "foo/bar"), "/bar");
+		strictEqual(trimBase("foo/bar", "foo/bar/baz/boo"), "/baz/boo");
+
+		strictEqual(trimBase("foo", "bar"), undefined);
+		strictEqual(trimBase("foo/", "bar"), undefined);
+		strictEqual(trimBase("foo", "foobar"), undefined);
+		strictEqual(trimBase("foo/", "foobar"), undefined);
 	});
 });

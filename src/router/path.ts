@@ -36,3 +36,23 @@ export function join(parent: string, child: string, preserveDir = true): string 
 	}
 	return parent + normalize(child, preserveDir);
 }
+
+/**
+ * Remove the leading base from the specified path.
+ *
+ * @param base The base path.
+ * @param path The path to remove the leading base from.
+ * @param preserveDir True to keep trailing slashes.
+ * @returns The normalized path or undefined if path did not start with the specified base.
+ */
+export function trimBase(base: string, path: string, preserveDir = true): string | undefined {
+	base = normalize(base, false);
+	path = normalize(path, preserveDir);
+	if (base === path) {
+		return "";
+	}
+	if (path.startsWith(base) && path[base.length] === "/") {
+		return path.slice(base.length);
+	}
+	return undefined;
+}

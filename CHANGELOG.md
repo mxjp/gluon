@@ -2,6 +2,7 @@
 
 ## 9.1
 + Add `trimBase` router path utility.
++ Add `basePath` option to history router.
 
 ## 9.0
 + **Breaking:** Using teardown hooks inside expressions now throws an error.

@@ -39,42 +39,75 @@ globalThis.location = {
 	},
 } as typeof globalThis.location;
 
-await test("router/history router", () => {
-	locationPath = "/";
-	locationSearch = "";
+await test("router/history router", async ctx => {
+	await ctx.test("general usage", async () => {
+		locationPath = "/";
+		locationSearch = "";
 
-	const events: unknown[] = [];
-	const router = uncapture(() => new HistoryRouter());
-	strictEqual(router.root, router);
-	strictEqual(router.parent, undefined);
+		const events: unknown[] = [];
+		const router = uncapture(() => new HistoryRouter());
+		strictEqual(router.root, router);
+		strictEqual(router.parent, undefined);
 
-	uncapture(() => {
-		watch(() => [router.path, router.query] as const, ([path, query]) => {
-			events.push([path, query?.toString()]);
+		uncapture(() => {
+			watch(() => [router.path, router.query] as const, ([path, query]) => {
+				events.push([path, query?.toString()]);
+			});
 		});
+
+		assertEvents(events, [["", undefined]]);
+
+		router.push("/a", undefined);
+		assertEvents(events, [["/a", undefined]]);
+
+		router.push("/b", "test=1");
+		assertEvents(events, [["/b", "test=1"]]);
+
+		router.replace("/c", undefined);
+		assertEvents(events, [["/c", undefined]]);
+
+		router.push("/d", "test=2");
+		assertEvents(events, [["/d", "test=2"]]);
+
+		locationPath = "/e";
+		locationSearch = "?test=3";
+		window.dispatchEvent(new CustomEvent("popstate"));
+		assertEvents(events, [["/e", "test=3"]]);
+
+		locationPath = "/f";
+		locationSearch = "?test=4";
+		window.dispatchEvent(new CustomEvent("gluon:router:update"));
+		assertEvents(events, [["/f", "test=4"]]);
 	});
 
-	assertEvents(events, [["", undefined]]);
+	await ctx.test("base path", async () => {
+		locationPath = "/";
+		locationSearch = "";
 
-	router.push("/a", undefined);
-	assertEvents(events, [["/a", undefined]]);
+		const events: unknown[] = [];
+		const router = uncapture(() => new HistoryRouter({ basePath: "foo" }));
 
-	router.push("/b", "test=1");
-	assertEvents(events, [["/b", "test=1"]]);
+		uncapture(() => {
+			watch(() => router.path, path => {
+				events.push(path);
+			});
+		});
 
-	router.replace("/c", undefined);
-	assertEvents(events, [["/c", undefined]]);
+		assertEvents(events, [""]);
 
-	router.push("/d", "test=2");
-	assertEvents(events, [["/d", "test=2"]]);
+		router.push("/test");
+		assertEvents(events, ["/test"]);
 
-	locationPath = "/e";
-	locationSearch = "?test=3";
-	window.dispatchEvent(new CustomEvent("popstate"));
-	assertEvents(events, [["/e", "test=3"]]);
+		router.push("/test/");
+		assertEvents(events, ["/test/"]);
 
-	locationPath = "/f";
-	locationSearch = "?test=4";
-	window.dispatchEvent(new CustomEvent("gluon:router:update"));
-	assertEvents(events, [["/f", "test=4"]]);
+		router.push("/foo");
+		assertEvents(events, [""]);
+
+		router.push("/foo/bar");
+		assertEvents(events, ["/bar"]);
+
+		router.push("/foo/bar/");
+		assertEvents(events, ["/bar/"]);
+	});
 });

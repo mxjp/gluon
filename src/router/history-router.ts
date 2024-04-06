@@ -1,6 +1,6 @@
 import { teardown } from "../core/lifecycle.js";
 import { batch, sig } from "../core/signals.js";
-import { normalize } from "./path.js";
+import { normalize, trimBase } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 
 export interface HistoryRouterOptions {
@@ -10,16 +10,25 @@ export interface HistoryRouterOptions {
 	 * @default ["popstate", "gluon:router:update"]
 	 */
 	parseEvents?: string[];
+
+	/**
+	 * The leading base path to ignore when matching routes.
+	 *
+	 * @default ""
+	 */
+	basePath?: string;
 }
 
 /**
  * A router that uses the history API.
  */
 export class HistoryRouter implements Router {
+	#basePath: string;
 	#path = sig<string>(undefined!);
 	#query = sig<URLSearchParams | undefined>(undefined!);
 
 	constructor(options?: HistoryRouterOptions) {
+		this.#basePath = options?.basePath ?? "";
 		const parseEvents = options?.parseEvents ?? ["popstate", "gluon:router:update"];
 		for (const name of parseEvents) {
 			window.addEventListener(name, this.#parse, { passive: true });
@@ -30,7 +39,7 @@ export class HistoryRouter implements Router {
 
 	#parse = () => {
 		batch(() => {
-			this.#path.value = normalize(location.pathname);
+			this.#path.value = trimBase(this.#basePath, location.pathname) ?? normalize(location.pathname);
 			const query = location.search.slice(1);
 			this.#query.value = query ? new URLSearchParams(query) : undefined;
 		});

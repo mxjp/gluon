@@ -1,6 +1,6 @@
 import { teardown } from "../core/lifecycle.js";
 import { batch, sig } from "../core/signals.js";
-import { normalize, trimBase } from "./path.js";
+import { join, relative } from "./path.js";
 import { QueryInit, Router } from "./router.js";
 
 export interface HistoryRouterOptions {
@@ -39,11 +39,19 @@ export class HistoryRouter implements Router {
 
 	#parse = () => {
 		batch(() => {
-			this.#path.value = trimBase(this.#basePath, location.pathname) ?? normalize(location.pathname);
+			this.#path.value = relative(this.#basePath, location.pathname);
 			const query = location.search.slice(1);
 			this.#query.value = query ? new URLSearchParams(query) : undefined;
 		});
 	};
+
+	#format(path: string, query?: QueryInit): string {
+		let href = join(this.#basePath, path) || "/";
+		if (query !== undefined) {
+			href += "?" + new URLSearchParams(query).toString();
+		}
+		return href;
+	}
 
 	get root(): Router {
 		return this;
@@ -62,12 +70,12 @@ export class HistoryRouter implements Router {
 	}
 
 	push(path: string, query?: QueryInit): void {
-		history.pushState(null, "", formatPath(path, query));
+		history.pushState(null, "", this.#format(path, query));
 		window.dispatchEvent(new CustomEvent("gluon:router:update"));
 	}
 
 	replace(path: string, query?: QueryInit): void {
-		history.replaceState(null, "", formatPath(path, query));
+		history.replaceState(null, "", this.#format(path, query));
 		window.dispatchEvent(new CustomEvent("gluon:router:update"));
 	}
 }

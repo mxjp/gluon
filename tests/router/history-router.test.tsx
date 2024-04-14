@@ -85,7 +85,7 @@ await test("router/history router", async ctx => {
 		locationSearch = "";
 
 		const events: unknown[] = [];
-		const router = uncapture(() => new HistoryRouter({ basePath: "foo" }));
+		const router = uncapture(() => new HistoryRouter({ basePath: "foo/bar" }));
 
 		uncapture(() => {
 			watch(() => router.path, path => {
@@ -93,21 +93,29 @@ await test("router/history router", async ctx => {
 			});
 		});
 
-		assertEvents(events, [""]);
+		assertEvents(events, ["/../.."]);
 
-		router.push("/test");
-		assertEvents(events, ["/test"]);
+		for (const fn of ["push", "replace"] as const) {
+			router[fn]("/test");
+			strictEqual(locationPath, "/foo/bar/test");
+			assertEvents(events, ["/test"]);
 
-		router.push("/test/");
-		assertEvents(events, ["/test/"]);
+			router[fn]("/test/");
+			strictEqual(locationPath, "/foo/bar/test/");
+			assertEvents(events, ["/test/"]);
 
-		router.push("/foo");
-		assertEvents(events, [""]);
+			router[fn]("foo/bar");
+			strictEqual(locationPath, "/foo/bar/foo/bar");
+			assertEvents(events, ["/foo/bar"]);
+		}
 
-		router.push("/foo/bar");
-		assertEvents(events, ["/bar"]);
+		const router2 = uncapture(() => new HistoryRouter());
+		router2.push("/test");
+		strictEqual(locationPath, "/test");
+		assertEvents(events, ["/../../test"]);
 
-		router.push("/foo/bar/");
-		assertEvents(events, ["/bar/"]);
+		router2.push("/foo/test/bar");
+		strictEqual(locationPath, "/foo/test/bar");
+		assertEvents(events, ["/../test/bar"]);
 	});
 });

@@ -24,6 +24,8 @@ export function normalize(path: string, preserveDir = true): string {
 /**
  * Join two paths.
  *
+ * Note, that this dosn't handle empty, ".." or "." parts.
+ *
  * @param parent The parent path.
  * @param child The child path.
  * @param preserveDir True to keep trailing slashes from the child path.
@@ -38,21 +40,33 @@ export function join(parent: string, child: string, preserveDir = true): string 
 }
 
 /**
- * Remove the leading base from the specified path.
- *
- * @param base The base path.
- * @param path The path to remove the leading base from.
- * @param preserveDir True to keep trailing slashes.
- * @returns The normalized path or undefined if path did not start with the specified base.
+ * Get a normalized relative path
  */
-export function trimBase(base: string, path: string, preserveDir = true): string | undefined {
-	base = normalize(base, false);
-	path = normalize(path, preserveDir);
-	if (base === path) {
-		return "";
+export function relative(from: string, to: string, preserveDir = true): string {
+	const base = normalize(from, false);
+	to = normalize(to, preserveDir);
+	if (base.length === 0) {
+		return to;
 	}
-	if (path.startsWith(base) && path[base.length] === "/") {
-		return path.slice(base.length);
+	let basePos = 0;
+	for (;;) {
+		const sep = base.indexOf("/", basePos + 1);
+		const end = sep < 0 ? base.length : sep;
+		const part = base.slice(basePos, end);
+		if (to === part || (to.startsWith(part, basePos) && to[basePos + part.length] === "/")) {
+			basePos = end;
+		} else {
+			break;
+		}
+		if (sep < 0) {
+			break;
+		}
 	}
-	return undefined;
+	let back = 0;
+	for (let i = basePos; i < base.length; i++) {
+		if (base[i] === "/") {
+			back++;
+		}
+	}
+	return "/..".repeat(back) + to.slice(basePos);
 }

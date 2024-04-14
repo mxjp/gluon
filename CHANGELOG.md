@@ -1,5 +1,9 @@
 # Changelog
 
+## 10.0
++ **Breaking:** Remove `trimBase` path utility. Use `relative` instead.
++ Add `relative` path utility.
+
 ## 9.1
 + Add `trimBase` router path utility.
 + Add `basePath` option to history router.

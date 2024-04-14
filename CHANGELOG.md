@@ -3,6 +3,7 @@
 ## 10.0
 + **Breaking:** Remove `trimBase` path utility. Use `relative` instead.
 + **Breaking:** Fix nested routing behavior for history routers with a base path.
++ **Breaking:** Remove previously exported internal `formatPath`.
 + Add `relative` path utility.
 
 ## 9.1

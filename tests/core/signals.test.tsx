@@ -89,6 +89,23 @@ await test("signals", async ctx => {
 		assertEvents(events, [2]);
 	});
 
+	await ctx.test("same values", () => {
+		const events: unknown[] = [];
+		const signal = sig(42);
+		uncapture(() => watch(signal, value => {
+			events.push(value);
+		}));
+		assertEvents(events, [42]);
+		signal.value = 7;
+		assertEvents(events, [7]);
+		signal.value = 7;
+		assertEvents(events, []);
+		signal.value = NaN;
+		assertEvents(events, [NaN]);
+		signal.value = NaN;
+		assertEvents(events, []);
+	});
+
 	for (const isTrigger of [false, true]) {
 		await ctx.test(`watch (${isTrigger ? "trigger" : "default"})`, async ctx => {
 			await ctx.test("static", () => {

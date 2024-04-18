@@ -92,7 +92,7 @@ export class Signal<T> {
 		this.#value = value;
 		this.#equals = typeof equals === "function"
 			? equals
-			: (equals ? (a, b) => a === b : () => false);
+			: (equals ? (a, b) => Object.is(a, b) : () => false);
 	}
 
 	/**

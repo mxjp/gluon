@@ -1,5 +1,9 @@
 # Changelog
 
+## 10.1
++ Add `GluonElement` as a base for web components.
++ Fix signal equality check of `NaN` values.
+
 ## 10.0
 + **Breaking:** Remove `trimBase` path utility. Use `relative` instead.
 + **Breaking:** Fix nested routing behavior for history routers with a base path.

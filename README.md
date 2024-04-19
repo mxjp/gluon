@@ -232,6 +232,9 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
   + [Path Normalization](#path-normalization)
   + [Navigation](#navigation)
   + [Nested Routing](#nested-routing)
++ [Web Components](#web-components)
+  + [Reflecting Attributes](#reflecting-attributes)
+  + [Manual Implementation](#manual-implementation)
 + [State Management](#state-management)
   + [Updates](#updates)
   + [Classes](#classes-1)
@@ -245,7 +248,6 @@ You can also [view them in your browser](https://mxjp.github.io/gluon/).
   + [Waiting For Expressions](#waiting-for-expressions)
   + [Leak Detection](#leak-detection)
   + [Concurrency](#concurrency)
-+ [Web Components](#web-components)
 + [Shared Globals & Compatibility](#shared-globals--compatibility)
 + [Security](#security)
 
@@ -1364,9 +1366,69 @@ innerRouter.root.push("/foo/bar");
 
 
 # Web Components
-Due to it's simple lifecycle system, gluon can be used to implement web components without any additional libraries.
+Gluon supports using web components just like any other native element.
+```tsx
+import { mount } from "@mxjp/gluon";
 
-The example below shows a minimal web component that is initialized when connected to the tree and disposed when disconnected from the tree.
+mount(
+  document.body,
+  <some-web-component />
+);
+```
+
+To implement a web component, you can extend the **GluonElement** class which takes care of creating a shadow root and renders content when the element is connected to the document:
+```tsx
+import { GluonElement } from "@mxjp/gluon/element";
+
+class ExampleComponent extends GluonElement {
+  render() {
+    return <h1>Hello World!</h1>;
+  }
+}
+
+customElements.define("example-component", ExampleComponent);
+```
+
+## Reflecting Attributes
+The **reflect** method can be used to get a signal that reflects an attribute value.
+```tsx
+import { GluonElement, attribute } from "@mxjp/gluon/element";
+
+class ExampleCounter extends GluonElement {
+  // Allow this component to detect changes to the "count" attribute:
+  static observedAttributes = ["count"];
+
+  // Create a signal that reflects the "count" attribute:
+  #count = this.reflect("count");
+
+  render() {
+    return <button $click={() => {
+      const newCount = Number(this.#count) + 1;
+
+      // Updating the signal will also update the "count" attribute:
+      this.#count.value = newCount;
+
+      // Dispatch an event to notify users of your web component:
+      this.dispatchEvent(new CustomEvent("count-changed", { detail: newCount }));
+    }}>
+      Clicked {this.#count} times!
+    </button>;
+  }
+
+  // Optionally, you can implement property accessors:
+  get count() {
+    return Number(this.#count.value);
+  }
+  set count(value: number) {
+    this.#count.value = String(value);
+  }
+}
+
+customElements.define("example-counter", ExampleComponent);
+```
+
+## Manual Implementation
+Due to it's simple lifecycle system, you can also implement web components manually:
 ```tsx
 import { mount, capture, teardown, TeardownHook } from "@mxjp/gluon";
 

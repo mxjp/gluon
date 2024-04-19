@@ -42,6 +42,10 @@
 			"types": "./dist/es/async/index.d.ts",
 			"default": "./dist/es/async/index.js"
 		},
+		"./element": {
+			"types": "./dist/es/element/index.d.ts",
+			"default": "./dist/es/element/index.js"
+		},
 		"./router": {
 			"types": "./dist/es/router/index.d.ts",
 			"default": "./dist/es/router/index.js"
@@ -66,7 +70,7 @@
 		"start:es": "tsc -p tsconfig-es.json -w --preserveWatchOutput",
 		"start:types": "tsc -p tsconfig-types.json -w --preserveWatchOutput",
 		"start:tests": "tsc -p tests/tsconfig.json -w --preserveWatchOutput",
-		"test": "node --enable-source-maps --test ./tests_out",
+		"test": "node --enable-source-maps --test ./tests_out/element",
 		"lint": "eslint --config .eslintrc.cjs ./{src,tests}/**/*.{ts,tsx}",
 		"prepack": "npm run build && npm run lint && npm test && node scripts/prepack.js"
 	},

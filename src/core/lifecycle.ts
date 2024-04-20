@@ -104,6 +104,7 @@ export function nocapture<T>(fn: () => T): T {
  *
  * This has no effect if teardown hooks are not captured in the current context.
  *
+ * @param hook The hook to register. This may be called multiple times.
  * @throws An error if teardown hooks are {@link nocapture explicitly un-supported}.
  */
 export function teardown(hook: TeardownHook): void {

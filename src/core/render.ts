@@ -39,13 +39,13 @@ export function createText(expr: Expression<unknown>): Text {
  *
  * // Arbitrarily nested arrays/fragments of content:
  * render([["Hello"], " World!"]);
- * render(<><>"Hello"</>{" World!"}</>);
+ * render(<>{<>"Hello"</>}{" World!"}</>);
  *
  * // DOM nodes:
  * render(<h1>Hello World!</h1>);
  * render(document.createElement("input"));
  * render(document.createTextNode("Hello World!"));
- * render(someTemplate.cloneNode(true));
+ * render(someTemplate.content.cloneNode(true));
  *
  * // Views:
  * render(render("Hello World!"));

@@ -11,6 +11,22 @@ export interface Event<T extends unknown[]> {
 	(listener: EventFn<T>): void;
 }
 
+/**
+ * An emitter for a single event type.
+ *
+ * @example
+ * ```tsx
+ * import { Emitter } from "@mxjp/gluon";
+ *
+ * const emitter = new Emitter<[address: string, port: number]>();
+ *
+ * emitter.event((address, port) => {
+ *   console.log("Connected:", address, port);
+ * });
+ *
+ * emitter.emit("127.0.0.1", 12345);
+ * ```
+ */
 export class Emitter<T extends unknown[]> {
 	#listeners = new Set<EventFn<T>>();
 

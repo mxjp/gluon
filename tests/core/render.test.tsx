@@ -57,6 +57,21 @@ await test("render", async ctx => {
 		strictEqual(b.parentNode, next);
 	});
 
+	await ctx.test("empty document fragment", () => {
+		const view = render(document.createDocumentFragment());
+		strictEqual(view.first instanceof Comment, true);
+		strictEqual(view.first, view.last);
+	});
+
+	await ctx.test("empty document fragment in array", () => {
+		const view = render([
+			document.createDocumentFragment(),
+			document.createDocumentFragment(),
+		]);
+		strictEqual(view.first instanceof Comment, true);
+		strictEqual(view.first, view.last);
+	});
+
 	await ctx.test("node", () => {
 		for (const node of [
 			document.createElement("div"),
@@ -114,24 +129,21 @@ await test("render", async ctx => {
 
 			{
 				const nodes = Array.from(viewNodes(view));
-				strictEqual(nodes.length, 7);
+				strictEqual(nodes.length, 5);
 				strictEqual(text(nodes[0]), "foo");
-				strictEqual(nodes[1] instanceof Comment, true);
-				strictEqual(text(nodes[2]), "f");
-				strictEqual(text(nodes[3]), "l");
-				strictEqual(text(nodes[4]), "bar");
-				strictEqual(nodes[5], fragmentChild);
-				strictEqual(nodes[6] instanceof Comment, true);
+				strictEqual(text(nodes[1]), "f");
+				strictEqual(text(nodes[2]), "l");
+				strictEqual(text(nodes[3]), "bar");
+				strictEqual(nodes[4], fragmentChild);
 			}
 
 			{
 				inner.nextFirst();
 				inner.nextLast();
 				const nodes = Array.from(viewNodes(view));
-				strictEqual(nodes.length, 7);
-				strictEqual(text(nodes[2]), "f0");
-				strictEqual(text(nodes[3]), "l1");
-				strictEqual(nodes[6] instanceof Comment, true);
+				strictEqual(nodes.length, 5);
+				strictEqual(text(nodes[1]), "f0");
+				strictEqual(text(nodes[2]), "l1");
 			}
 		});
 

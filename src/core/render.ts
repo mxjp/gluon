@@ -1,6 +1,6 @@
 import { teardown } from "./lifecycle.js";
 import { Expression, watch } from "./signals.js";
-import { View } from "./view.js";
+import { View, ViewSetBoundaryFn } from "./view.js";
 
 /**
  * Create a text node that displays the result of an expression.
@@ -13,6 +13,25 @@ export function createText(expr: Expression<unknown>): Text {
 		text.textContent = String(value ?? "");
 	});
 	return text;
+}
+
+/**
+ * Internal shorthand for creating the boundary comment of an empty view.
+ */
+function empty(setBoundary: ViewSetBoundaryFn): void {
+	const node = document.createComment("g");
+	setBoundary(node, node);
+}
+
+/**
+ * Internal shorthand for using the children of a node as boundary.
+ */
+function use(setBoundary: ViewSetBoundaryFn, node: Node): void {
+	if (node.firstChild === null) {
+		empty(setBoundary);
+	} else {
+		setBoundary(node.firstChild, node.lastChild!);
+	}
 }
 
 /**
@@ -70,9 +89,7 @@ export function render(content: unknown): View {
 				const parent = document.createDocumentFragment();
 				for (let i = 0; i < flat.length; i++) {
 					const part = flat[i];
-					if (part === null || part === undefined) {
-						parent.appendChild(document.createComment("g"));
-					} else if (part instanceof Node) {
+					if (part instanceof Node) {
 						parent.appendChild(part);
 					} else if (part instanceof View) {
 						parent.appendChild(part.take());
@@ -89,21 +106,20 @@ export function render(content: unknown): View {
 								}
 							});
 						}
-					} else {
+					} else if (part !== null && part !== undefined) {
 						parent.appendChild(createText(part));
 					}
 				}
-				setBoundary(parent.firstChild!, parent.lastChild!);
+				use(setBoundary, parent);
 				return;
 			}
 			content = flat[0];
 		}
 		if (content === null || content === undefined) {
-			const node = document.createComment("g");
-			setBoundary(node, node);
+			empty(setBoundary);
 		} else if (content instanceof Node) {
 			if (content.nodeName === "#document-fragment") {
-				setBoundary(content.firstChild!, content.lastChild!);
+				use(setBoundary, content);
 			} else {
 				setBoundary(content, content);
 			}

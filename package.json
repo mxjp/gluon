@@ -21,6 +21,7 @@
 	"version": "10.1.2",
 	"type": "module",
 	"main": "./dist/es/core/index.js",
+	"sideEffects": false,
 	"exports": {
 		".": {
 			"types": "./dist/es/core/index.d.ts",

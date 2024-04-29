@@ -665,6 +665,15 @@ export function map<I, O>(input: Expression<I>, mapFn: MapFn<I, O>): Expression<
  * Map an expression value to strings.
  *
  * See {@link map}.
+ *
+ * @example
+ * ```tsx
+ * import { string } from "@mxjp/gluon";
+ *
+ * <div some-value={string(true)} />; // <div some-value="true" />
+ * <div some-value={string(false)} />; // <div some-value="false" />
+ * <div some-value={string(null)} />; // <div some-value="null" />
+ * ```
  */
 export function string(input: Expression<unknown>): Expression<string> {
 	return map(input, value => String(value));
@@ -674,6 +683,14 @@ export function string(input: Expression<unknown>): Expression<string> {
  * Map an expression value to strings unless it's null or undefined.
  *
  * See {@link map}.
+ *
+ * @example
+ * ```tsx
+ * import { optionalString } from "@mxjp/gluon";
+ *
+ * <div some-value={optionalString(false)} />; // <div some-value="false" />
+ * <div some-value={optionalString(null)} />; // <div />
+ * ```
  */
 export function optionalString<T>(input: Expression<T>): Expression<string | Exclude<T, Exclude<T, null | undefined>>> {
 	return map<T, unknown>(input, value => {

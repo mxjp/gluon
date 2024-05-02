@@ -32,9 +32,9 @@ await test("router/path", async ctx => {
 		strictEqual(join("/foo", ""), "/foo");
 		strictEqual(join("", "foo"), "/foo");
 		strictEqual(join("", "/foo"), "/foo");
-		strictEqual(join("foo/", ""), "/foo");
+		strictEqual(join("foo/", ""), "/foo/");
 		strictEqual(join("foo/", "", false), "/foo");
-		strictEqual(join("/foo/", ""), "/foo");
+		strictEqual(join("/foo/", ""), "/foo/");
 		strictEqual(join("/foo/", "", false), "/foo");
 
 		strictEqual(join("", "foo/"), "/foo/");
@@ -66,10 +66,17 @@ await test("router/path", async ctx => {
 		strictEqual(relative("/", "foo"), "/foo");
 		strictEqual(relative("", "foo/bar"), "/foo/bar");
 
+		strictEqual(relative("foo/", "foo/"), "");
+		strictEqual(relative("foo/", "foo/", false), "");
+		strictEqual(relative("foo/", "/foo"), "");
+		strictEqual(relative("/foo", "foo/"), "");
+		strictEqual(relative("/foo", "foo/", false), "");
+
 		strictEqual(relative("foo", "foo/bar"), "/bar");
 		strictEqual(relative("foo", "/foo/bar"), "/bar");
 		strictEqual(relative("/foo", "foo/bar"), "/bar");
 		strictEqual(relative("foo", "foo/bar/"), "/bar/");
+		strictEqual(relative("foo", "foo/bar/", false), "/bar");
 		strictEqual(relative("foo/", "foo/bar"), "/bar");
 
 		strictEqual(relative("foo/bar", "foo/baz/boo"), "/../baz/boo");
@@ -79,6 +86,7 @@ await test("router/path", async ctx => {
 		strictEqual(relative("foo/", "bar"), "/../bar");
 		strictEqual(relative("foo", "foobar"), "/../foobar");
 		strictEqual(relative("foo/", "foobar/"), "/../foobar/");
+		strictEqual(relative("foo/", "foobar/", false), "/../foobar");
 		strictEqual(relative("foo/bar", "baz/boo"), "/../../baz/boo");
 	});
 });

@@ -5,7 +5,7 @@
  * + Non-empty paths start with a slash.
  *
  * @param path The path to normalize.
- * @param preserveDir True to keep trailing slashes. Default is `true`.
+ * @param preserveDir True to keep trailing slashes in non-empty paths. Default is `true`.
  * @returns The normalized path.
  */
 export function normalize(path: string, preserveDir = true): string {
@@ -28,15 +28,13 @@ export function normalize(path: string, preserveDir = true): string {
  *
  * @param parent The parent path.
  * @param child The child path.
- * @param preserveDir True to keep trailing slashes from the child path. Default is `true`.
+ * @param preserveDir True to keep trailing slashes. Default is `true`.
  * @returns A {@link normalize normalized} path.
  */
 export function join(parent: string, child: string, preserveDir = true): string {
-	parent = normalize(parent);
-	if (parent.endsWith("/")) {
-		parent = parent.slice(0, -1);
-	}
-	return parent + normalize(child, preserveDir);
+	child = normalize(child, preserveDir);
+	parent = normalize(parent, child === "" ? preserveDir : false);
+	return parent + child;
 }
 
 /**
@@ -46,7 +44,8 @@ export function join(parent: string, child: string, preserveDir = true): string 
  *
  * @param from The path from which the relative path starts.
  * @param to The path to which the relative path points.
- * @param preserveDir True to keep trailing slashes from the `to` path. Default is `true`.
+ * @param preserveDir True to keep trailing slashes from the `to` path. Trailing slashes from the `from` path are always discarded. Default is `true`.
+ * @returns A {@link normalize normalized} path.
  */
 export function relative(from: string, to: string, preserveDir = true): string {
 	const base = normalize(from, false);
@@ -74,5 +73,9 @@ export function relative(from: string, to: string, preserveDir = true): string {
 			back++;
 		}
 	}
-	return "/..".repeat(back) + to.slice(basePos);
+	to = to.slice(basePos);
+	if (back === 0 && to === "/") {
+		return "";
+	}
+	return "/..".repeat(back) + to;
 }

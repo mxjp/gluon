@@ -5,7 +5,7 @@
  * + Non-empty paths start with a slash.
  *
  * @param path The path to normalize.
- * @param preserveDir True to keep trailing slashes.
+ * @param preserveDir True to keep trailing slashes. Default is `true`.
  * @returns The normalized path.
  */
 export function normalize(path: string, preserveDir = true): string {
@@ -28,7 +28,7 @@ export function normalize(path: string, preserveDir = true): string {
  *
  * @param parent The parent path.
  * @param child The child path.
- * @param preserveDir True to keep trailing slashes from the child path.
+ * @param preserveDir True to keep trailing slashes from the child path. Default is `true`.
  * @returns A {@link normalize normalized} path.
  */
 export function join(parent: string, child: string, preserveDir = true): string {
@@ -40,7 +40,13 @@ export function join(parent: string, child: string, preserveDir = true): string 
 }
 
 /**
- * Get a normalized relative path
+ * Get a normalized relative path.
+ *
+ * Note, that this dosn't handle empty, ".." or "." parts, but inserts ".." parts if necessary.
+ *
+ * @param from The path from which the relative path starts.
+ * @param to The path to which the relative path points.
+ * @param preserveDir True to keep trailing slashes from the `to` path. Default is `true`.
  */
 export function relative(from: string, to: string, preserveDir = true): string {
 	const base = normalize(from, false);

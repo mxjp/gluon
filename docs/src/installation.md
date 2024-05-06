@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # Installation
 Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon).
 ```bash

@@ -2,9 +2,6 @@
 title: Overview
 ---
 
-## Work in progress!
-This documentation is not complete yet.
-
 ![](../../assets/banner.svg)
 
 # Gluon

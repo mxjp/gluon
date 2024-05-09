@@ -1,5 +1,5 @@
 import { shareInstancesOf } from "./globals.js";
-import { capture, teardown, TeardownHook } from "./lifecycle.js";
+import { capture, nocapture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
 import { effect, Expression, get, memo, sig, Signal, watch } from "./signals.js";
 import { Falsy } from "./types.js";
@@ -347,7 +347,7 @@ export function For<T>(props: {
 			}
 			let index = 0;
 			let last = first;
-			for (const value of get(props.each)) {
+			for (const value of nocapture(() => get(props.each))) {
 				let instance: Instance | undefined = instances[index];
 				if (instance && instance.value === value) {
 					instance.cycle = cycle;
@@ -487,7 +487,7 @@ export function IndexFor<T>(props: {
 			}
 			let index = 0;
 			let last = first;
-			for (const value of get(props.each)) {
+			for (const value of nocapture(() => get(props.each))) {
 				if (index < instances.length) {
 					const current = instances[index];
 					if (current.value === value) {

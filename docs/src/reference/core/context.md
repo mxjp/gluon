@@ -89,3 +89,69 @@ inject("message", "Hello World!", async () => {
   });
 });
 ```
+
+## Troubleshooting
+
+## Context Key Typos
+Ensure that the `key` argument is the same everywhere.
+```tsx
+inject("message", "Hello World!", () => {
+  // There is a typo here:
+  extract("nessage");
+});
+```
+
+To avoid this, you can use [typed context keys](#typed-keys):
+```tsx
+const MESSAGE = Symbol.for("example-message") as ContextKey<string>;
+
+inject(MESSAGE, "Hello World!", () => {
+  // This typo is now a compiler error:
+  extract(NESSAGE);
+});
+```
+
+## Extract Running Too Late
+`extract` must be called synchronously while the callback passed to `inject` or `deriveContext` is running.
+```tsx
+inject(MESSAGE, "Hello World!", () => {
+  queueMicrotask(() => {
+    // This runs after the inject call has already ended:
+    extract(MESSAGE); // undefined
+  });
+});
+```
+
+To solve this, you can [forward the context](#async-code) as follows:
+```tsx
+inject(MESSAGE, "Hello World!", () => {
+
+  // Bind the current context to your callback:
+  queueMicrotask(wrapContext(() => {
+    extract(MESSAGE); // "Hello World!"
+  }));
+
+  // Or manually pass the context to somewhere else:
+  const context = getContext();
+  queueMicrotask(() => {
+    runInContext(context, () => {
+      extract(MESSAGE); // "Hello World!"
+    });
+  });
+
+});
+```
+
+## Extract Running Too Early
+When using `deriveContext`, the context must be modified before `extract` is called.
+```tsx
+deriveContext(ctx => {
+  // This doesn't work:
+  extract(MESSAGE); // undefined
+
+  ctx.set(MESSAGE, "Hello World!");
+
+  // This works:
+  extract(MESSAGE); // "Hello World!"
+});
+```

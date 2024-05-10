@@ -35,10 +35,10 @@ The entire gluon core module has a size of [~4KB gzipped](https://bundlephobia.c
 Gluon only requires a standard JSX transpiler and therefore works with all modern bundlers and build systems. There also is a human readable pre-bundled version for use in environments where no build system can be used.
 
 ### Strongly Typed Reactivity
-When using gluon with TypeScript, the fact which component properties may be reactive is encoded in the type system. This allows developers to know what to expect of a component and eliminates weird caveats when accessing properties from a component's props argument.
+When using gluon with TypeScript, the fact which component properties may be reactive is [encoded in the type system](reference/core/components.md#expressions). This allows developers to know what to expect of a component and eliminates weird caveats when accessing properties from a component's props argument.
 
 ### Low Maintenance Costs
-The core principles of gluon will never change and it's guaranteed that new major versions are interoperable with older ones to allow you to update dependencies when you have time to do so. For instance, using a UI component library based on gluon v6 will still work just fine with the most recent version including reactivity, lifecycle hooks etc.
+The core principles of gluon will never change and it's guaranteed that new major versions are [interoperable with older ones](reference/compatibility.md#shared-globals--compatibility) to allow you to update dependencies when you have time to do so. For instance, using a UI component library based on gluon v6 will still work just fine with the most recent version including reactivity, lifecycle hooks etc.
 
 ## Feature Parity
 Gluon supports all the client side features you would expect from a modern framework including:

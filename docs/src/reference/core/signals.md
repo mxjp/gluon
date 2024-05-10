@@ -203,3 +203,59 @@ map(6, value => value * 7);
 // This returns a function to compute the value:
 map(sig(6), value => value * 7);
 ```
+
+## Troubleshooting
+For signal based reactivity to work, the following is required:
++ The value in a signal must be replaced, or the signal must notify dependants using `notify` or `update`.
++ The place where the value is used must be able to access the signal by calling a function.
+
+### Deep Updates
+Signals don't automatically detect when values are deeply changed. They only detect when values are entirely replaced.
+```tsx
+const counter = sig({ count: 0 });
+// This will not trigger any updates:
+counter.value.count++;
+```
+
+When possible, you should wrap the inner values into signals:
+```tsx
+const counter = { count: sig(0) };
+// Signals can also be deeply nested:
+const counter = sig({ count: sig(0) });
+```
+
+When this isn't possible, you can use one of the following options:
+```tsx
+// Use the update function:
+counter.update(value => {
+  value.count++;
+});
+
+// Replace the entire value:
+counter.value = { count: 1 };
+
+// Manually notify dependants:
+counter.value.count++;
+counter.notify();
+```
+
+If you need deeply reactive objects, you can use the [store API](../store.md).
+
+### Static Values
+The value of signals or expressions can always be accessed in a non reactive ways:
+```tsx
+const count = sig(0);
+
+// This isn't reactive:
+<>{count.value}</>;
+<>{get(count)}</>;
+```
+For signal accesses to be reactive, they need to be done in a function call:
+```tsx
+// This is now reactive:
+<>{() => count.value}</>;
+<>{() => get(count)}</>;
+
+// Using the signal itself is also reactive:
+<>{count}</>;
+```

@@ -174,10 +174,6 @@ mount(
 )
 ```
 
-## Examples
-There are a bunch of examples in the repositories [examples](https://github.com/mxjp/gluon/tree/main/examples) directory.<br>
-You can also [view them in your browser](https://mxjp.github.io/gluon/).
-
 <br>
 
 

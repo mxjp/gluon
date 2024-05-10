@@ -27,10 +27,10 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run build
-      - run: npm ci --prefix examples
-      - run: npm run build --prefix examples
+      - run: npm ci --prefix docs
+      - run: npm run build --prefix docs
       - uses: actions/upload-pages-artifact@v2
         with:
-          path: './examples/dist'
+          path: './docs/dist'
       - uses: actions/deploy-pages@v2
         id: deployment

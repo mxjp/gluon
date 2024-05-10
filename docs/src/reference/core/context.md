@@ -92,7 +92,7 @@ inject("message", "Hello World!", async () => {
 
 ## Troubleshooting
 
-## Context Key Typos
+### Context Key Typos
 Ensure that the `key` argument is the same everywhere.
 ```tsx
 inject("message", "Hello World!", () => {
@@ -111,7 +111,7 @@ inject(MESSAGE, "Hello World!", () => {
 });
 ```
 
-## Extract Running Too Late
+### Extract Running Too Late
 `extract` must be called synchronously while the callback passed to `inject` or `deriveContext` is running.
 ```tsx
 inject(MESSAGE, "Hello World!", () => {
@@ -142,7 +142,7 @@ inject(MESSAGE, "Hello World!", () => {
 });
 ```
 
-## Extract Running Too Early
+### Extract Running Too Early
 When using `deriveContext`, the context must be modified before `extract` is called.
 ```tsx
 deriveContext(ctx => {

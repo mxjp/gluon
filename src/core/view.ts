@@ -44,7 +44,7 @@ export interface ViewInitFn {
  *
  * Consumers of the view API need to guarantee that:
  * + The sequence of nodes is not modified from the outside.
- * + If there are multiple nodes, all nodes must have a single parent node.
+ * + If there are multiple nodes, all nodes must have a common parent node at all time.
  */
 export class View {
 	static {
@@ -59,10 +59,10 @@ export class View {
 	 * Create a new view.
 	 *
 	 * View implementations need to guarantee that:
-	 * + The view doesn't break if the parent is replaced from the outside.
-	 * + The boundary is updated when the first or last node has been replaced.
+	 * + The view doesn't break when the parent node is replaced or when a view consisting of only a single node is detached from it's parent.
+	 * + The boundary is updated immediately after the first or last node has been updated.
 	 * + If there are multiple nodes, all nodes remain in the current parent.
-	 * + If there are multiple nodes, the initial nodes must have a parent.
+	 * + If there are multiple nodes, the initial nodes must have a common parent.
 	 */
 	constructor(init: ViewInitFn) {
 		init((first, last) => {

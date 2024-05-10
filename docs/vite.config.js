@@ -9,6 +9,7 @@ export default defineConfig({
 	build: {
 		outDir: "../dist",
 		target: "esnext",
+		emptyOutDir: true,
 	},
 	optimizeDeps: {
 		exclude: [
@@ -35,7 +36,7 @@ function historyFallback() {
 		configResolved(config) {
 			dist = resolve(config.root, config.build.outDir);
 		},
-		async buildEnd() {
+		async writeBundle() {
 			await copyFile(join(dist, "index.html"), join(dist, "404.html"));
 		},
 	};

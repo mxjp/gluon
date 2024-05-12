@@ -112,7 +112,7 @@ Attributes prefixed with `$` are added as event listeners. For capturing event l
 }}>Click me!</button>
 ```
 
-## Conditional & Repeated Rendering
+## Conditional Rendering
 To render conditional or repeated content gluon uses so called **Views** which are sequences of DOM nodes that can change over time.
 
 The `Show` component renders content when a condition is met:

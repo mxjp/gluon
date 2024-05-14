@@ -26,7 +26,7 @@ mount(
 JSX expressions in gluon directly create real DOM elements which is relatively fast and has a low memory footprint compared to virtual DOMs. For rendering conditional or repeated nodes, gluon uses so called Views which are just sequences of nodes that notify their owner of any boundary updates.
 
 ### Composability
-Everything you build using gluon is composable in any way you like without any restrictions. Additionally you can use or build web components.
+Everything in gluon is composable without any restrictions. You can define reactive state anywhere you like and use it anywhere else, dynamically define and pass around components, etc.
 
 ### Bundle Size
 The entire gluon core module has a size of [~4KB gzipped](https://bundlephobia.com/package/@mxjp/gluon) and almost everything in gluon is tree-shakeable, so you only pay for what you need.
@@ -37,19 +37,20 @@ Gluon only requires a standard JSX transpiler and therefore works with all moder
 ### Strongly Typed Reactivity
 When using gluon with TypeScript, the fact which component properties may be reactive is [encoded in the type system](reference/core/components.md#expressions). This allows developers to know what to expect of a component and eliminates weird caveats when accessing properties from a component's props argument.
 
+### Immediate Updates
+Signal updates are processed immediately. This results in more predictable behavior and makes your application easy to test. If needed, you can still use batching to process multiple updates in one instant.
+
 ### Low Maintenance Costs
 The core principles of gluon will never change and it's guaranteed that new major versions are [interoperable with older ones](reference/compatibility.md#shared-globals--compatibility) to allow you to update dependencies when you have time to do so. For instance, using a UI component library based on gluon v6 will still work just fine with the most recent version including reactivity, lifecycle hooks etc.
 
-## Feature Parity
+## Features
 Gluon supports all the client side features you would expect from a modern framework including:
-+ JSX fragments
 + Rendering SVG & MathML elements
-+ Custom events
 + Manually watching for state changes
-+ Two way data binding via mapped signals
 + Lazy & memoized computations
++ Two way data binding via mapped signals
 + Portaling elements
-+ Conditional & repeated rendering
++ Conditional rendering
 + Custom rendering logic
 + Lifecycle hooks
 + Components

@@ -16,11 +16,18 @@ Gluon provides the following components for common use cases:
 + [`<IndexFor>`](index-for.md) - Render content for each index in an iterable.
 + [`movable`](movable.md) - Wrap content for safely moving it somewhere else.
 
-You can also directly create views from arbitrary [content](../elements.md#content) using the `render` function:
+You can also directly create views from arbitrary [content](../elements.md#content) using the `render` and `mount` functions:
 ```tsx
 import { render } from "@mxjp/gluon";
 
 const view = render(<>Hello World!</>);
+
+```
+The `mount` function creates a view and appends it to an element until the current [lifecycle](../lifecycle.md) is disposed:
+```tsx
+import { mount } from "@mxjp/gluon";
+
+const view = mount(document.body, <>Hello World!</>);
 ```
 
 ## View API

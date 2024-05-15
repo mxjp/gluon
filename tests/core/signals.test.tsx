@@ -659,6 +659,51 @@ await test("signals", async ctx => {
 			strictEqual(memoized(), 2);
 		});
 
+		for (const useBatch of [false, true]) {
+			const batchType = useBatch ? "batch" : "non-batch";
+
+			await ctx.test(`${batchType} + memos + non-memos in same dependant`, () => {
+				const events: unknown[] = [];
+				const signal = sig(1);
+				const computed = uncapture(() => memo(() => signal.value * 2));
+				uncapture(() => watch(() => [signal.value, computed()], value => {
+					events.push(value);
+				}));
+				assertEvents(events, [[1, 2]]);
+				if (useBatch) {
+					batch(() => {
+						signal.value++;
+						assertEvents(events, []);
+					});
+				} else {
+					signal.value++;
+				}
+				assertEvents(events, [[2, 4]]);
+			});
+
+			await ctx.test(`${batchType} + memos + non-memos in distinct dependants`, () => {
+				const events: unknown[] = [];
+				const signal = sig(1);
+				const computed = uncapture(() => memo(() => signal.value * 2));
+				uncapture(() => watch(() => signal.value, value => {
+					events.push(["signal", value]);
+				}));
+				uncapture(() => watch(computed, value => {
+					events.push(["memo", value]);
+				}));
+				assertEvents(events, [["signal", 1], ["memo", 2]]);
+				if (useBatch) {
+					batch(() => {
+						signal.value++;
+						assertEvents(events, []);
+					});
+				} else {
+					signal.value++;
+				}
+				assertEvents(events.toSorted(), [["memo", 4], ["signal", 2]]);
+			});
+		}
+
 		await ctx.test("batch & nested memos", () => {
 			const events: unknown[] = [];
 			const signal = sig(1);
@@ -825,6 +870,52 @@ await test("signals", async ctx => {
 
 			assertEvents(events, ["eval", "x4", "y4"]);
 		});
+
+		for (const useBatch of [false, true]) {
+			const batchType = useBatch ? "batch" : "non-batch";
+
+			await ctx.test(`${batchType} + lazy + non-lazy in same dependant`, () => {
+				const events: unknown[] = [];
+				const signal = sig(1);
+				const computed = lazy(() => signal.value * 2);
+				uncapture(() => watch(() => [signal.value, computed()], value => {
+					events.push(value);
+				}));
+				assertEvents(events, [[1, 2]]);
+				if (useBatch) {
+					batch(() => {
+						signal.value++;
+						assertEvents(events, []);
+					});
+				} else {
+					signal.value++;
+				}
+				// Duplicate events are intended behavior here because lazy is it's own dependant:
+				assertEvents(events, [[2, 4], [2, 4]]);
+			});
+
+			await ctx.test(`${batchType} + lazy + non-lazy in distinct dependants`, () => {
+				const events: unknown[] = [];
+				const signal = sig(1);
+				const computed = lazy(() => signal.value * 2);
+				uncapture(() => watch(() => signal.value, value => {
+					events.push(["signal", value]);
+				}));
+				uncapture(() => watch(computed, value => {
+					events.push(["lazy", value]);
+				}));
+				assertEvents(events, [["signal", 1], ["lazy", 2]]);
+				if (useBatch) {
+					batch(() => {
+						signal.value++;
+						assertEvents(events, []);
+					});
+				} else {
+					signal.value++;
+				}
+				assertEvents(events, [["signal", 2], ["lazy", 4]]);
+			});
+		}
 
 		await ctx.test("trigger", () => {
 			const events: unknown[] = [];

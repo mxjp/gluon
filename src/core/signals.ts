@@ -33,18 +33,6 @@ function access(stack: Dependant[][], map: Map<DependantFn, number>): void {
 }
 
 /**
- * Internal utility for notifying captured dependants.
- *
- * @param top An array of captured dependants.
- */
-function notify(top: Dependant[]): void {
-	for (let i = 0; i < top.length; i++) {
-		const [fn, cycle] = top[i];
-		fn(cycle);
-	}
-}
-
-/**
  * Internal utility for calling a dependant when using forEach on a map of captured dependants.
  *
  * @param cycle The cycle the dependant was captured at.
@@ -461,8 +449,8 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  * ```
  */
 export function batch<T>(fn: () => T): T {
-	const batch: Dependant[] = [];
-	BATCH_STACK.push(batch);
+	const deps: Dependant[] = [];
+	BATCH_STACK.push(deps);
 	let value: T;
 	try {
 		value = fn();
@@ -470,9 +458,12 @@ export function batch<T>(fn: () => T): T {
 		BATCH_STACK.pop();
 	}
 	if (BATCH_STACK.length > 0) {
-		BATCH_STACK[BATCH_STACK.length - 1].push(...batch);
+		BATCH_STACK[BATCH_STACK.length - 1].push(...deps);
 	} else {
-		notify(batch);
+		for (let i = 0; i < deps.length; i++) {
+			const [fn, cycle] = deps[i];
+			fn(cycle);
+		}
 	}
 	return value;
 }

@@ -480,21 +480,21 @@ export function batch<T>(fn: () => T): T {
 /**
  * Watch an expression and create a function to reactively access it's latest result.
  *
- * This is similar to {@link lazy}, but the expression is also evaluated if it isn't used.
+ * This is similar to {@link lazy}, but the expression is always evaluated and then updates it's dependants.
  *
  * @param expr The expression to watch.
  * @param equals True to skip updates when a result is strictly equal to the previous one or a function to determine if the results are equal. Default is true.
  * @returns A function to access the latest result.
  *
  * @example
- * ```ts
+ * ```tsx
  * import { sig, memo, watch } from "@mxjp/gluon";
  *
  * const count = sig(42);
  *
- * const memoized = memo(() => count.value);
+ * const computed = memo(() => someExpensiveComputation(count.value));
  *
- * watch(memoized, count => {
+ * watch(computed, count => {
  *   console.log("Count:", count);
  * });
  * ```
@@ -510,10 +510,23 @@ export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolea
 /**
  * Wrap an expression to be evaulated only when any of the accessed signals have been updated.
  *
- * This is similar to {@link memo}, but the expression is only evaulated if it is used.
+ * This is similar to {@link memo}, but the expression is only evaulated if it is actually used.
  *
  * @param expr The expression to wrap.
  * @returns A function to lazily evaluate the expression.
+ *
+ * @example
+ * ```tsx
+ * import { sig, lazy, watch } from "@mxjp/gluon";
+ *
+ * const count = sig(42);
+ *
+ * const computed = lazy(() => someExpensiveComputation(count.value));
+ *
+ * watch(computed, count => {
+ *   console.log("Count:", count);
+ * });
+ * ```
  */
 export function lazy<T>(expr: Expression<T>): () => T {
 	let value: T;

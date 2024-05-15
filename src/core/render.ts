@@ -161,7 +161,7 @@ export function render(content: unknown): View {
  *   mount(
  *     document.body,
  *     <Show when={visible}>
- * 		{props.children}
+ *       {props.children}
  *     </Show>
  *   );
  *

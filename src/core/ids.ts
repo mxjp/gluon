@@ -16,17 +16,14 @@ export function uniqueId(): string {
  *
  * @example
  * ```tsx
- * import { mount, UseUniqueId } from "@mxjp/gluon";
+ * import { UseUniqueId } from "@mxjp/gluon";
  *
- * mount(
- *   document.body,
- *   <UseUniqueId>
- *     {id => <>
- *       <label for={id}>Text</label>
- *       <input type="text" id={id} />
- *     </>}
- *   </UseUniqueId>
- * );
+ * <UseUniqueId>
+ *   {id => <>
+ *     <label for={id}>Text</label>
+ *     <input type="text" id={id} />
+ *   </>}
+ * </UseUniqueId>
  * ```
  */
 export function UseUniqueId(props: {

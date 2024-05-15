@@ -24,16 +24,11 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  *
  * @example
  * ```tsx
- * import { mount, XMLNS, SVG, Inject } from "@mxjp/gluon";
+ * import { XMLNS, SVG, Inject } from "@mxjp/gluon";
  *
- * mount(
- *   document.body,
- *   <>
- *     <Inject key={XMLNS} value={SVG}>
- *       {() => <svg>...</svg>}
- *     </Inject>
- *   </>
- * );
+ * <Inject key={XMLNS} value={SVG}>
+ *   {() => <svg>...</svg>}
+ * </Inject>
  * ```
  */
 export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<typeof HTML | typeof SVG | typeof MATHML>;
@@ -216,30 +211,26 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 }
 
 /**
- * Create an element.
+ * Shorthand for creating an element in places where JSX can't be used.
  *
  * @param tagName The tag name.
  * @param attrs The attributes to set.
- * @param content The content to append.
+ * @param content An array of content to append.
  * @returns The element.
  *
  * @example
  * ```ts
- * import { mount, e } from "@mxjp/gluon";
+ * import { e } from "@mxjp/gluon";
  *
- * mount(
- *   document.body,
- *   // Element with content only:
- *   e("div", [
- *     // Element with attributes only:
- *     e("div", { class: "example" }),
- *
- *     // Element with attributes and content:
- *     e("div", { class: "example" }, [
- *       "Hello World!",
- *     ]),
+ * // Element with content only:
+ * e("div", [
+ *   // Element with attributes only:
+ *   e("div", { class: "example" }),
+ *   // Element with attributes and content:
+ *   e("div", { class: "example" }, [
+ *     "Hello World!",
  *   ]),
- * );
+ * ]);
  * ```
  */
 export function e<K extends keyof TagNameMap>(tagName: K, content?: unknown[]): TagNameMap[K];

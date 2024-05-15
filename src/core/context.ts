@@ -91,14 +91,11 @@ export function inject<K, R>(key: K, value: ContextValue<K>, fn: () => R): R {
  *
  * @example
  * ```tsx
- * import { mount, Inject, extract } from "@mxjp/gluon";
+ * import { Inject, extract } from "@mxjp/gluon";
  *
- * mount(
- *   document.body,
- *   <Inject key="message" value="Hello World!">
- *     {() => <h1>{extract("message")}</h1>}
- *   </Inject>
- * );
+ * <Inject key="message" value="Hello World!">
+ *   {() => <h1>{extract("message")}</h1>}
+ * </Inject>
  * ```
  */
 export function Inject<K>(props: {
@@ -126,17 +123,14 @@ export function deriveContext<R>(fn: (context: Context, parent?: ReadonlyContext
  *
  * @example
  * ```tsx
- * import { mount, DeriveContext, extract } from "@mxjp/gluon";
+ * import { DeriveContext, extract } from "@mxjp/gluon";
  *
- * mount(
- *   document.body,
- *   <DeriveContext>
- *     {context => {
- *       context.set("message", "Hello World!");
- *       return <h1>{extract("message")}</h1>;
- *     }}
- *   </DeriveContext>
- * );
+ * <DeriveContext>
+ *   {context => {
+ *     context.set("message", "Hello World!");
+ *     return <h1>{extract("message")}</h1>;
+ *   }}
+ * </DeriveContext>
  * ```
  */
 export function DeriveContext(props: {

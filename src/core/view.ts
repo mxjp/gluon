@@ -188,19 +188,16 @@ export function * viewNodes(view: View): IterableIterator<Node> {
  *
  * @example
  * ```tsx
- * import { mount, Nest, sig } from "@mxjp/gluon";
+ * import { Nest, sig } from "@mxjp/gluon";
  *
  * const count = sig(0);
  *
- * mount(
- *   document.body,
- *   <Nest>
- *     {() => {
- *       const value = count.value;
- *       return () => <>{value}</>;
- *     }}
- *   </Nest>
- * );
+ * <Nest>
+ *   {() => {
+ *     const value = count.value;
+ *     return () => <>{value}</>;
+ *   }}
+ * </Nest>
  * ```
  */
 export function Nest(props: {
@@ -230,16 +227,13 @@ export function Nest(props: {
  *
  * @example
  * ```tsx
- * import { mount, sig, Show } from "@mxjp/gluon";
+ * import { sig, Show } from "@mxjp/gluon";
  *
  * const message = sig<null | string>("Hello World!");
  *
- * mount(
- *   document.body,
- *   <Show when={message} else={() => <>No message...</>}>
- *     {value => <h1>{value}</h1>}
- *   </Show>
- * );
+ * <Show when={message} else={() => <>No message...</>}>
+ *   {value => <h1>{value}</h1>}
+ * </Show>
  * ```
  */
 export function Show<T>(props: {
@@ -287,16 +281,13 @@ export interface ForContentFn<T> {
  *
  * @example
  * ```tsx
- * import { ForUnique, mount, sig } from "@mxjp/gluon";
+ * import { ForUnique, sig } from "@mxjp/gluon";
  *
  * const items = sig([1, 2, 3]);
  *
- * mount(
- *   document.body,
- *   <ForUnique each={items}>
- *     {value => <li>{value}</li>}
- *   </ForUnique>
- * );
+ * <ForUnique each={items}>
+ *   {value => <li>{value}</li>}
+ * </ForUnique>
  * ```
  */
 export function For<T>(props: {
@@ -444,16 +435,13 @@ export interface IndexForContentFn<T> {
  *
  * @example
  * ```tsx
- * import { mount, IndexFor, sig } from "@mxjp/gluon";
+ * import { IndexFor, sig } from "@mxjp/gluon";
  *
  * const items = sig([1, 2, 3]);
  *
- * mount(
- *   document.body,
- *   <IndexFor each={items}>
- *     {value => <li>{value}</li>}
- *   </IndexFor>
- * );
+ * <IndexFor each={items}>
+ *   {value => <li>{value}</li>}
+ * </IndexFor>
  * ```
  */
 export function IndexFor<T>(props: {
@@ -598,16 +586,13 @@ export function movable(content: unknown): MovableView {
  *
  * @example
  * ```tsx
- * import { mount, sig, Attach } from "@mxjp/gluon";
+ * import { sig, Attach } from "@mxjp/gluon";
  *
  * const showMessage = sig(true);
  *
- * mount(
- *   document.body,
- *   <Attach when={showMessage}>
- *     <h1>Hello World!</h1>
- *   </Attach>
- * );
+ * <Attach when={showMessage}>
+ *   <h1>Hello World!</h1>
+ * </Attach>
  * ```
  */
 export function Attach(props: {

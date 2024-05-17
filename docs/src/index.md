@@ -41,7 +41,7 @@ When using gluon with TypeScript, the fact which component properties may be rea
 Signal updates are processed immediately. This results in more predictable behavior and makes your application easy to test. If needed, you can still use batching to process multiple updates in one instant.
 
 ### Low Maintenance Costs
-The core principles of gluon will never change and it's guaranteed that new major versions are [interoperable with older ones](reference/compatibility.md#shared-globals--compatibility) to allow you to update dependencies when you have time to do so. For instance, using a UI component library based on gluon v6 will still work just fine with the most recent version including reactivity, lifecycle hooks etc.
+The core principles of gluon will never change and it's guaranteed that new major versions are [interoperable with older ones](reference/core/globals.md) to allow you to update dependencies when you have time to do so. For instance, using a UI component library based on gluon v6 will still work just fine with the most recent version including reactivity, lifecycle hooks etc.
 
 ## Features
 Gluon supports all the client side features you would expect from a modern framework including:

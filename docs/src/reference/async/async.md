@@ -46,3 +46,25 @@ await ctx.complete();
 // Or manually track an async task:
 ctx.track(fetch("something"));
 ```
+
+## Dynamic Sources
+The `<Show>` or `<Nest>` components can be used to replace the `source` property over time:
+```tsx
+<Show when={someSignal}>
+  {source => <Async source={source}>...</Async>}
+</Show>
+```
+
+The example below fetches a file and aborts pending requests when the file name is changed early:
+```tsx
+const name = sig("example.txt");
+
+<Nest>
+  {() => {
+    const value = name.value;
+    return () => <Async source={fetch(value, { signal: useAbortSignal() }).then(r => r.text())}>
+      {text => <pre>{text}</pre>}
+    </Async>;
+  }}
+</Nest>
+```

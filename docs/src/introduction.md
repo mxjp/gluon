@@ -2,7 +2,7 @@
 order: 1
 ---
 
-_This guide assumes that you have basic JavaScript knowledge. If not, [MDN](https://developer.mozilla.org/docs/Web/JavaScript) is a good place to start._
+> This guide assumes that you have basic JavaScript knowledge. If not, [MDN](https://developer.mozilla.org/docs/Web/JavaScript) is a good place to start.
 
 # Introduction
 To develop a gluon application locally, you need a recent version of [NodeJS](https://nodejs.org/) or any other compatible JavaScript runtime.

@@ -1,7 +1,7 @@
 # Context
 Contexts can be used to implicitly pass static key value pairs along the call stack.
 
-Context automatically work with synchronous code & all gluon APIs.
+Contexts automatically work with synchronous code & all gluon APIs.
 
 + The `inject` function runs a callback and provides a single key value pair.
 + The `extract` function gets a value from the current context.

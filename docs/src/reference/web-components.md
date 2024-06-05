@@ -20,7 +20,7 @@ customElements.define("example-component", ExampleComponent);
 ## Reflecting Attributes
 The `reflect` function can be used to get a signal that reflects an attribute value.
 ```tsx
-import { GluonElement, attribute } from "@mxjp/gluon/element";
+import { GluonElement } from "@mxjp/gluon/element";
 
 class ExampleCounter extends GluonElement {
   // Allow this component to detect changes to the "count" attribute:
@@ -52,7 +52,7 @@ class ExampleCounter extends GluonElement {
   }
 }
 
-customElements.define("example-counter", ExampleComponent);
+customElements.define("example-counter", ExampleCounter);
 ```
 
 ## Manual Implementation
@@ -61,7 +61,7 @@ Due to it's simple lifecycle system, you can also implement web components manua
 import { mount, capture, teardown, TeardownHook } from "@mxjp/gluon";
 
 class ExampleComponent extends HTMLElement {
-  #dispose: TeardownHook;
+  #dispose?: TeardownHook;
 
   constructor() {
     super();

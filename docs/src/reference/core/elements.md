@@ -168,10 +168,10 @@ Content can be wrapped in arbitrarily nested arrays and JSX fragments.
 ```tsx
 <div>
   <>
-    [
+    {[
       "Hello World!",
       <div />,
-    ]
+    ]}
   </>
 </div>
 ```

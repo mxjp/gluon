@@ -3,7 +3,7 @@ import "../env.js";
 import { notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch } from "@mxjp/gluon";
+import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
 
 import { assertEvents, assertSharedInstance, boundaryEvents, TestView, testView, text } from "../common.js";
 
@@ -341,7 +341,7 @@ await test("view", async ctx => {
 			]);
 		});
 
-		await ctx.test("diff (random fuzzing)", ctx => {
+		await ctx.test("diff (random)", ctx => {
 			const SEQ_SIZE = 100;
 			const MAX_COUNT = 20;
 			const MAX_OFFSET = 8;
@@ -371,6 +371,55 @@ await test("view", async ctx => {
 				ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
 				throw error;
 			}
+		});
+
+		await ctx.test("lifecycle & update order", () => {
+			const events: unknown[] = [];
+			const signal = sig(["a", "b"]);
+
+			uncapture(() => {
+				<For each={signal}>
+					{(value, index) => {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+						events.push(["create", value, index()]);
+						watchUpdates(index, index => {
+							events.push(["index", value, index]);
+						});
+						teardown(() => {
+							// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+							events.push(["dispose", value, index()]);
+						});
+					}}
+				</For>;
+			});
+			assertEvents(events, [
+				["create", "a", 0],
+				["create", "b", 1],
+			]);
+
+			signal.update(values => {
+				values.splice(1, 0, "c");
+			});
+			assertEvents(events, [
+				["create", "c", 1],
+				["index", "b", 2],
+			]);
+
+			signal.update(values => {
+				values[1] = "d";
+			});
+			assertEvents(events, [
+				["create", "d", 1],
+				["dispose", "c", 1],
+			]);
+
+			signal.update(values => {
+				values.splice(1, 1);
+			});
+			assertEvents(events, [
+				["index", "b", 1],
+				["dispose", "d", 1],
+			]);
 		});
 	});
 
@@ -427,6 +476,75 @@ await test("view", async ctx => {
 				[2, 4, 5, 6],
 				[1, 2, 3],
 				[],
+			]);
+		});
+
+		await ctx.test("diff (random)", ctx => {
+			const SEQ_SIZE = 100;
+			const MAX_COUNT = 20;
+			const MAX_VALUE = 5;
+
+			const sequence: unknown[][] = [];
+			for (let i = 0; i < SEQ_SIZE; i++) {
+				const count = Math.floor(Math.random() * MAX_COUNT);
+				const values: unknown[] = [];
+				for (let c = 0; c < count; c++) {
+					values.push(Math.floor(Math.random() * MAX_VALUE));
+				}
+				sequence.push(values);
+			}
+
+			try {
+				sequenceTest(sequence);
+			} catch (error) {
+				ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
+				throw error;
+			}
+		});
+
+		await ctx.test("lifecycle & update order", () => {
+			const events: unknown[] = [];
+			const signal = sig(["a", "b"]);
+
+			uncapture(() => {
+				<IndexFor each={signal}>
+					{(value, index) => {
+						events.push(["create", value, index]);
+						teardown(() => {
+							events.push(["dispose", value, index]);
+						});
+					}}
+				</IndexFor>;
+			});
+			assertEvents(events, [
+				["create", "a", 0],
+				["create", "b", 1],
+			]);
+
+			signal.update(values => {
+				values.splice(1, 0, "c");
+			});
+			assertEvents(events, [
+				["dispose", "b", 1],
+				["create", "c", 1],
+				["create", "b", 2],
+			]);
+
+			signal.update(values => {
+				values[1] = "d";
+			});
+			assertEvents(events, [
+				["dispose", "c", 1],
+				["create", "d", 1],
+			]);
+
+			signal.update(values => {
+				values.splice(1, 1);
+			});
+			assertEvents(events, [
+				["dispose", "d", 1],
+				["create", "b", 1],
+				["dispose", "b", 2],
 			]);
 		});
 	});

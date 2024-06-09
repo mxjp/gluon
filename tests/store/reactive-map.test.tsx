@@ -1,10 +1,10 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watch } from "@mxjp/gluon";
+import { For, uncapture, View, watch } from "@mxjp/gluon";
 import { ReactiveMap, wrap } from "@mxjp/gluon/store";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, text } from "../common.js";
 import { WrapTest } from "./common.js";
 
 await test("store/reactive-map", async ctx => {
@@ -135,6 +135,20 @@ await test("store/reactive-map", async ctx => {
 				strictEqual(value.wrapped, wrapped);
 			});
 		}
+	});
+
+	await ctx.test("view compat", async () => {
+		const proxy = wrap(new Map<string, number>([["foo", 0]]));
+		const view = uncapture(() => {
+			return <For each={proxy}>{v => `(${v[0]}:${v[1]})`}</For> as View;
+		});
+		strictEqual(text(view.take()), "(foo:0)");
+		proxy.set("foo", 1);
+		strictEqual(text(view.take()), "(foo:1)");
+		proxy.set("bar", 2);
+		strictEqual(text(view.take()), "(foo:1)(bar:2)");
+		proxy.delete("foo");
+		strictEqual(text(view.take()), "(bar:2)");
 	});
 
 	function assertEntries<K, V>(targets: Map<K, V>[], entries: [K, V][]) {

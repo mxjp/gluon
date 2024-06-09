@@ -1,10 +1,10 @@
 import { deepStrictEqual, notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watch } from "@mxjp/gluon";
+import { For, uncapture, View, watch } from "@mxjp/gluon";
 import { unwrap, wrap, wrapInstancesOf } from "@mxjp/gluon/store";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, text } from "../common.js";
 import { WrapTest } from "./common.js";
 
 await test("store/reactive-proxy", async ctx => {
@@ -192,6 +192,20 @@ await test("store/reactive-proxy", async ctx => {
 			strictEqual(Object.values(target).every(x => x.wrapped === wrapped), true);
 			strictEqual(Object.entries(target).every(x => x[1].wrapped === wrapped), true);
 		}
+	});
+
+	await ctx.test("view compat", () => {
+		const proxy = wrap<Record<string, number>>({ foo: 0 });
+		const view = uncapture(() => {
+			return <For each={() => Object.entries(proxy)}>{v => `(${v[0]}:${v[1]})`}</For> as View;
+		});
+		strictEqual(text(view.take()), "(foo:0)");
+		proxy.foo = 1;
+		strictEqual(text(view.take()), "(foo:1)");
+		proxy.bar = 2;
+		strictEqual(text(view.take()), "(foo:1)(bar:2)");
+		delete proxy.foo;
+		strictEqual(text(view.take()), "(bar:2)");
 	});
 
 	function assertEntries<T extends object>(targets: T[], entries: [keyof T, T[keyof T]][]) {

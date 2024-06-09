@@ -1,10 +1,10 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watch } from "@mxjp/gluon";
+import { For, uncapture, View, watch } from "@mxjp/gluon";
 import { ReactiveSet, wrap } from "@mxjp/gluon/store";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, text } from "../common.js";
 import { WrapTest } from "./common.js";
 
 await test("store/reactive-set", async ctx => {
@@ -127,6 +127,18 @@ await test("store/reactive-set", async ctx => {
 				strictEqual(value.wrapped, wrapped);
 			});
 		}
+	});
+
+	await ctx.test("view compat", async () => {
+		const proxy = wrap(new Set<string>(["a"]));
+		const view = uncapture(() => {
+			return <For each={proxy}>{v => v}</For> as View;
+		});
+		strictEqual(text(view.take()), "a");
+		proxy.add("b");
+		strictEqual(text(view.take()), "ab");
+		proxy.delete("a");
+		strictEqual(text(view.take()), "b");
 	});
 
 	function assertEntries<T>(targets: Set<T>[], entries: T[]) {

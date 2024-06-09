@@ -4,6 +4,7 @@ import { notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
 import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
+import { wrap } from "@mxjp/gluon/store";
 
 import { assertEvents, assertSharedInstance, boundaryEvents, TestView, testView, text } from "../common.js";
 
@@ -421,6 +422,16 @@ await test("view", async ctx => {
 				["dispose", "d", 1],
 			]);
 		});
+
+		await ctx.test("iterator internal updates", async () => {
+			const proxy = wrap(["a", "b"]);
+			const view = uncapture(() => {
+				return <For each={proxy}>{v => v}</For> as View;
+			});
+			strictEqual(text(view.take()), "ab");
+			proxy.splice(1, 0, "c");
+			strictEqual(text(view.take()), "acb");
+		});
 	});
 
 	await ctx.test("IndexFor", async ctx => {
@@ -546,6 +557,16 @@ await test("view", async ctx => {
 				["create", "b", 1],
 				["dispose", "b", 2],
 			]);
+		});
+
+		await ctx.test("iterator internal updates", async () => {
+			const proxy = wrap(["a", "b"]);
+			const view = uncapture(() => {
+				return <IndexFor each={proxy}>{v => v}</IndexFor> as View;
+			});
+			strictEqual(text(view.take()), "ab");
+			proxy.splice(1, 0, "c");
+			strictEqual(text(view.take()), "acb");
 		});
 	});
 

@@ -1,10 +1,10 @@
 import { deepStrictEqual, fail, notStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watchUpdates } from "@mxjp/gluon";
+import { For, uncapture, View, watchUpdates } from "@mxjp/gluon";
 import { wrap } from "@mxjp/gluon/store";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, text } from "../common.js";
 import { WrapTest } from "./common.js";
 
 await test("store/reactive-array-proxy", async ctx => {
@@ -358,6 +358,16 @@ await test("store/reactive-array-proxy", async ctx => {
 				proxy[1] = "d";
 			});
 		}
+	});
+
+	await ctx.test("view compat", async () => {
+		const proxy = wrap(["a", "b"]);
+		const view = uncapture(() => {
+			return <For each={proxy}>{v => v}</For> as View;
+		});
+		strictEqual(text(view.take()), "ab");
+		proxy.splice(1, 0, "c");
+		strictEqual(text(view.take()), "acb");
 	});
 
 	function assertEntries<T>(targets: T[][], entries: T[]) {

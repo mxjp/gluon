@@ -4,7 +4,7 @@ Render [content](../elements.md#content) for each index in an iterable [expressi
 import { IndexFor } from "@mxjp/gluon";
 
 <IndexFor each={someIterable}>
-  {value => <li>{value}</li>}
+	{value => <li>{value}</li>}
 </IndexFor>
 ```
 
@@ -12,6 +12,6 @@ import { IndexFor } from "@mxjp/gluon";
 The index is passed as the second argument:
 ```jsx
 <IndexFor each={someIterable}>
-  {(value, index) => <li>{() => index + 1}: {value}</li>}
+	{(value, index) => <li>{() => index + 1}: {value}</li>}
 </IndexFor>
 ```

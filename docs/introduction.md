@@ -24,8 +24,8 @@ After setting up the quick start template, you can find the main entry point in 
 import { mount } from "@mxjp/gluon";
 
 mount(
-  document.body,
-  <h1>Hello World!</h1>
+	document.body,
+	<h1>Hello World!</h1>
 );
 ```
 The `<h1>Hello World!</h1>` expression directly creates an element and the `mount` function takes whatever content is supported by gluon and appends it to the document body.
@@ -45,20 +45,20 @@ import { mount, sig } from "@mxjp/gluon";
 const count = sig(0);
 
 mount(
-  document.body,
-  <>
-    {/* Using the signal directly is reactive: */}
-    Current count: {count}
+	document.body,
+	<>
+		{/* Using the signal directly is reactive: */}
+		Current count: {count}
 
-    {/* Accessing it's value through a function is reactive: */}
-    Is even count: {() => (count.value & 1) === 0}
+		{/* Accessing it's value through a function is reactive: */}
+		Is even count: {() => (count.value & 1) === 0}
 
-    {/*
-      Using the value directly is not reactive because
-      gluon has no way of re-evaluating the expression:
-    */}
-    Initial count: {count.value}
-  </>
+		{/*
+			Using the value directly is not reactive because
+			gluon has no way of re-evaluating the expression:
+		*/}
+		Initial count: {count.value}
+	</>
 );
 ```
 To replace a signal value, you can set the `value` property:
@@ -71,7 +71,7 @@ const values = sig([7, 42]);
 
 // This will modify the inner value and then notify dependants:
 values.update(values => {
-  values.push(77);
+	values.push(77);
 });
 
 // Note, that deeply modifying objects directly does nothing:
@@ -104,7 +104,7 @@ Attributes prefixed with `prop:` are set using JavaScript properties:
 Attributes prefixed with `$` are added as event listeners. For capturing event listeners use `$$`.
 ```jsx
 <button $click={event => {
-  console.log("Clicked", event.target);
+	console.log("Clicked", event.target);
 }}>Click me!</button>
 ```
 
@@ -118,16 +118,16 @@ import { mount, sig, Show } from "@mxjp/gluon";
 const showMessage = sig(false);
 
 mount(
-  document.body,
-  <>
-    <button $click={() => { showMessage.value = !showMessage.value }}>
-      Toggle message
-    </button>
+	document.body,
+	<>
+		<button $click={() => { showMessage.value = !showMessage.value }}>
+			Toggle message
+		</button>
 
-    <Show when={showMessage}>
-      {() => <h1>Hello World!</h1>}
-    </Show>
-  </>
+		<Show when={showMessage}>
+			{() => <h1>Hello World!</h1>}
+		</Show>
+	</>
 );
 ```
 
@@ -138,18 +138,18 @@ import { mount, sig, For } from "@mxjp/gluon";
 const values = sig([]);
 
 mount(
-  document.body,
-  <>
-    <button $click={() => { values.update(v => v.push(Date.now())) }}>
-      Add current time
-    </button>
+	document.body,
+	<>
+		<button $click={() => { values.update(v => v.push(Date.now())) }}>
+			Add current time
+		</button>
 
-    <ul>
-      <For each={values}>
-        {value => <li>{value}</li>}
-      </For>
-    </ul>
-  </>
+		<ul>
+			<For each={values}>
+				{value => <li>{value}</li>}
+			</For>
+		</ul>
+	</>
 );
 ```
 
@@ -159,7 +159,7 @@ In addition to `Show` and `For`, gluon provides some more view types you can fin
 Components in gluon are just functions that return arbitrary content. They are called once when the component is rendered.
 ```jsx
 function Message() {
-  return <h1>Hello World!</h1>;
+	return <h1>Hello World!</h1>;
 }
 
 // Using the component:
@@ -169,7 +169,7 @@ function Message() {
 Properties are passed as is via the `props` argument. Properties are static by default.
 ```jsx
 function Message(props: { message: string; }) {
-  return <h1>{props.message}</h1>;
+	return <h1>{props.message}</h1>;
 }
 
 // Using the component:
@@ -181,7 +181,7 @@ To make properties reactive, you can use the `Expression` type which can be a st
 import { Expression } from "@mxjp/gluon";
 
 function Message(props: { message: Expression<string>; }) {
-  return <h1>{props.message}</h1>;
+	return <h1>{props.message}</h1>;
 }
 
 // Using the component:
@@ -195,8 +195,8 @@ To compute something from an expression value or evaluate it, you can use the `m
 import { Expression, map, get } from "@mxjp/gluon";
 
 function Message(props: { message: Expression<string>; }) {
-  console.log("Initial message:", get(props.message));
-  return <h1>{map(props.message, m => m.toUpperCase())}</h1>;
+	console.log("Initial message:", get(props.message));
+	return <h1>{map(props.message, m => m.toUpperCase())}</h1>;
 }
 ```
 
@@ -205,13 +205,13 @@ To allow components to update a value, you can use the `Signal` type:
 import { mount, sig, Signal } from "@mxjp/gluon";
 
 function TextInput(props: { value: Signal<string>; }) {
-  return <input
-    type="text"
-    prop:value={props.value}
-    $input={event => {
-      props.value.value = (event.target as HTMLInputElement).value;
-    }}
-  />;
+	return <input
+		type="text"
+		prop:value={props.value}
+		$input={event => {
+			props.value.value = (event.target as HTMLInputElement).value;
+		}}
+	/>;
 }
 
 const text = sig("Hello World!");
@@ -221,7 +221,7 @@ const text = sig("Hello World!");
 Component children are passed via the `children` property:
 ```jsx
 function Message(props: { children?: unknown; }) {
-  return <h1>{props.children}</h1>;
+	return <h1>{props.children}</h1>;
 }
 
 <Message>Hello World!</Message>;

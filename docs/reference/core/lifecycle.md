@@ -9,7 +9,7 @@ import { teardown } from "@mxjp/gluon";
 const handle = setInterval(() => console.log("ping"), 1000);
 
 teardown(() => {
-  clearInterval(handle);
+	clearInterval(handle);
 });
 ```
 Calling `teardown` outside of any functions listed below has no effect and "leaks" the teardown hook. When running tests, this behavior can be [configured](../testing.md#leak-detection) to log leaks or to throw an error.
@@ -20,7 +20,7 @@ Capture teardown hooks during a function call:
 import { capture, teardown } from "@mxjp/gluon";
 
 const dispose = capture(() => {
-  teardown(() => { ... });
+	teardown(() => { ... });
 });
 
 dispose();
@@ -33,9 +33,9 @@ This is almost the same as `capture` and is meant for things that need to dispos
 import { captureSelf, teardown } from "@mxjp/gluon";
 
 captureSelf(dispose => {
-  teardown(() => { ... });
+	teardown(() => { ... });
 
-  dispose();
+	dispose();
 });
 ```
 Teardown hooks are called in registration order when the `dispose` function is called.
@@ -48,8 +48,8 @@ To explicitly leak teardown hooks, the `uncapture` function can be used. Code ru
 import { uncapture } from "@mxjp/gluon";
 
 uncapture(() => {
-  // This has no effect here:
-  teardown(() => { ... });
+	// This has no effect here:
+	teardown(() => { ... });
 });
 ```
 
@@ -59,8 +59,8 @@ There are some places where registering teardown hooks is very likely a mistake.
 import { nocapture } from "@mxjp/gluon";
 
 nocapture(() => {
-  // This will throw an error:
-  teardown(() => { ... });
+	// This will throw an error:
+	teardown(() => { ... });
 });
 ```
 
@@ -70,19 +70,19 @@ Calls to `capture`, `captureSelf`, `uncapture` and `nocapture` can be arbitraril
 import { capture, captureSelf, uncapture, nocapture } from "@mxjp/gluon";
 
 nocapture(() => {
-  const dispose = capture(() => {
-    // This works:
-    teardown(() => { ... });
-    uncapture(() => {
-      // This is ignored:
-      teardown(() => { ... });
-    });
-  });
+	const dispose = capture(() => {
+		// This works:
+		teardown(() => { ... });
+		uncapture(() => {
+			// This is ignored:
+			teardown(() => { ... });
+		});
+	});
 
-  dispose();
+	dispose();
 
-  // This will fail:
-  teardown({ ... });
+	// This will fail:
+	teardown({ ... });
 });
 ```
 
@@ -96,12 +96,12 @@ The lifecycle system has **no** special error handling.
 Capturing teardown hooks relies on the synchronous call stack and therefore only works partially with async code:
 ```jsx
 const dispose = capture(async () => {
-  // This will be captured:
-  teardown(() => { ... });
+	// This will be captured:
+	teardown(() => { ... });
 
-  await something;
+	await something;
 
-  // This will be leaked:
-  teardown(() => { ... });
+	// This will be leaked:
+	teardown(() => { ... });
 });
 ```

@@ -4,7 +4,7 @@ Render [content](../elements.md#content) for each unique value in an iterable [e
 import { For } from "@mxjp/gluon";
 
 <For each={someIterable}>
-  {value => <li>{value}</li>}
+	{value => <li>{value}</li>}
 </For>
 ```
 
@@ -12,6 +12,6 @@ import { For } from "@mxjp/gluon";
 A function to reactively access the current index is passed as the second argument:
 ```jsx
 <For each={someIterable}>
-  {(value, index) => <li>{() => index() + 1}: {value}</li>}
+	{(value, index) => <li>{() => index() + 1}: {value}</li>}
 </For>
 ```

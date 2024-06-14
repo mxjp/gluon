@@ -6,9 +6,9 @@ import { movable, Show } from "@mxjp/gluon";
 const marker = movable(<>Hello World!</>);
 
 <Show when={a}>
-  {() => marker.move()}
+	{() => marker.move()}
 </Show>
 <Show when={b}>
-  {() => marker.move()}
+	{() => marker.move()}
 </Show>
 ```

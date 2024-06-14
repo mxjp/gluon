@@ -10,8 +10,8 @@ Contexts automatically work with synchronous code & all gluon APIs.
 import { inject, extract } from "@mxjp/gluon";
 
 inject("message", "Hello World!", () => {
-  extract("message"); // "Hello World!"
-  extract("something else"); // undefined
+	extract("message"); // "Hello World!"
+	extract("something else"); // undefined
 });
 ```
 
@@ -20,10 +20,10 @@ To inject multiple keys or to delete keys from a context, use `deriveContext`:
 import { deriveContext, extract } from "@mxjp/gluon";
 
 deriveContext(ctx => {
-  ctx.set("message", "Hello World!");
-  ctx.delete("something else");
+	ctx.set("message", "Hello World!");
+	ctx.delete("something else");
 
-  extract("message"); // "Hello World!"
+	extract("message"); // "Hello World!"
 });
 ```
 
@@ -33,14 +33,14 @@ To use contexts while rendering, you can use the `<Inject>` and `<DeriveContext>
 import { Inject, DeriveContext, extract } from "@mxjp/gluon";
 
 <Inject key="value" value={42}>
-  {() => <>Value: {extract("value")}</>}
+	{() => <>Value: {extract("value")}</>}
 </Inject>
 
 <DeriveContext>
-  {ctx => {
-    ctx.set("value", 42);
-    return <>Value: {extract("value")}</>;
-  }}
+	{ctx => {
+		ctx.set("value", 42);
+		return <>Value: {extract("value")}</>;
+	}}
 </DeriveContext>
 ```
 
@@ -54,7 +54,7 @@ import { ContextKey, inject, extract } from "@mxjp/gluon";
 const MESSAGE = Symbol("message") as ContextKey<string>;
 
 inject(MESSAGE, "Hello World!", () => {
-  extract(MESSAGE); // Type: string | undefined
+	extract(MESSAGE); // Type: string | undefined
 });
 
 // This is now a compiler error:
@@ -67,9 +67,9 @@ Since contexts rely on the synchronous call stack, they only work partially with
 import { inject, extract } from "@mxjp/gluon";
 
 inject("message", "Hello World!", async () => {
-  extract("message"); // "Hello World!"
-  await something;
-  extract("message"); // undefined
+	extract("message"); // "Hello World!"
+	await something;
+	extract("message"); // undefined
 });
 ```
 
@@ -78,15 +78,15 @@ You can manually pass contexts to somewhere else to fix this:
 import { inject, extract, getContext, runInContext } from "@mxjp/gluon";
 
 inject("message", "Hello World!", async () => {
-  // Get a reference to the current context:
-  const context = getContext();
+	// Get a reference to the current context:
+	const context = getContext();
 
-  await something;
+	await something;
 
-  // Run a function within the context from above:
-  runInContext(context, () => {
-    extract("message"); // "Hello World!"
-  });
+	// Run a function within the context from above:
+	runInContext(context, () => {
+		extract("message"); // "Hello World!"
+	});
 });
 ```
 
@@ -96,8 +96,8 @@ inject("message", "Hello World!", async () => {
 Ensure that the `key` argument is the same everywhere.
 ```jsx
 inject("message", "Hello World!", () => {
-  // There is a typo here:
-  extract("nessage");
+	// There is a typo here:
+	extract("nessage");
 });
 ```
 
@@ -106,8 +106,8 @@ To avoid this, you can use [typed context keys](#typed-keys):
 const MESSAGE = Symbol.for("example-message") as ContextKey<string>;
 
 inject(MESSAGE, "Hello World!", () => {
-  // This typo is now a compiler error:
-  extract(NESSAGE);
+	// This typo is now a compiler error:
+	extract(NESSAGE);
 });
 ```
 
@@ -115,10 +115,10 @@ inject(MESSAGE, "Hello World!", () => {
 `extract` must be called synchronously while the callback passed to `inject` or `deriveContext` is running.
 ```jsx
 inject(MESSAGE, "Hello World!", () => {
-  queueMicrotask(() => {
-    // This runs after the inject call has already ended:
-    extract(MESSAGE); // undefined
-  });
+	queueMicrotask(() => {
+		// This runs after the inject call has already ended:
+		extract(MESSAGE); // undefined
+	});
 });
 ```
 
@@ -126,18 +126,18 @@ To solve this, you can [forward the context](#async-code) as follows:
 ```jsx
 inject(MESSAGE, "Hello World!", () => {
 
-  // Bind the current context to your callback:
-  queueMicrotask(wrapContext(() => {
-    extract(MESSAGE); // "Hello World!"
-  }));
+	// Bind the current context to your callback:
+	queueMicrotask(wrapContext(() => {
+		extract(MESSAGE); // "Hello World!"
+	}));
 
-  // Or manually pass the context to somewhere else:
-  const context = getContext();
-  queueMicrotask(() => {
-    runInContext(context, () => {
-      extract(MESSAGE); // "Hello World!"
-    });
-  });
+	// Or manually pass the context to somewhere else:
+	const context = getContext();
+	queueMicrotask(() => {
+		runInContext(context, () => {
+			extract(MESSAGE); // "Hello World!"
+		});
+	});
 
 });
 ```
@@ -146,12 +146,12 @@ inject(MESSAGE, "Hello World!", () => {
 When using `deriveContext`, the context must be modified before `extract` is called.
 ```jsx
 deriveContext(ctx => {
-  // This doesn't work:
-  extract(MESSAGE); // undefined
+	// This doesn't work:
+	extract(MESSAGE); // undefined
 
-  ctx.set(MESSAGE, "Hello World!");
+	ctx.set(MESSAGE, "Hello World!");
 
-  // This works:
-  extract(MESSAGE); // "Hello World!"
+	// This works:
+	extract(MESSAGE); // "Hello World!"
 });
 ```

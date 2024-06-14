@@ -26,9 +26,9 @@ In contrast, user input used in other attributes and as content is perfectly fin
 import { mount } from "@mxjp/gluon";
 
 mount(
-  document.body,
-  <div title="alert(location.origin)">
-    {"<script>alert(location.origin)</script>"}
-  </div>
+	document.body,
+	<div title="alert(location.origin)">
+		{"<script>alert(location.origin)</script>"}
+	</div>
 );
 ```

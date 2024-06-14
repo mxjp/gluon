@@ -11,13 +11,13 @@ const slot = new TaskSlot();
 
 // Queue a blocking task:
 const value = await slot.block(async () => {
-  // ...
-  return 42;
+	// ...
+	return 42;
 });
 
 // Queue a side effect:
 slot.sideEffect(async signal => {
-  // "signal" is an abort signal to abort this side effect if possible.
+	// "signal" is an abort signal to abort this side effect if possible.
 });
 ```
 

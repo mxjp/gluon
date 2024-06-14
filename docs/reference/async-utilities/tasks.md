@@ -5,18 +5,18 @@ import { Inject } from "@mxjp/gluon";
 import { TASKS, Tasks, isPending, waitFor } from "@mxjp/gluon/async";
 
 <Inject key={TASKS} value={new Tasks()}>
-  {() => <>
-    <button
-      // Disable this button when there are any pending tasks:
-      disabled={isPending}
-      $click={() => {
-        // Block user interactions while some operation is running:
-        waitFor(new Promise(resolve => {
-          setTimeout(resolve, 1000);
-        }));
-      }}
-    >Click me!</button>
-  </>}
+	{() => <>
+		<button
+			// Disable this button when there are any pending tasks:
+			disabled={isPending}
+			$click={() => {
+				// Block user interactions while some operation is running:
+				waitFor(new Promise(resolve => {
+					setTimeout(resolve, 1000);
+				}));
+			}}
+		>Click me!</button>
+	</>}
 </Inject>
 ```
 
@@ -24,9 +24,9 @@ import { TASKS, Tasks, isPending, waitFor } from "@mxjp/gluon/async";
 `Tasks` instances can have a parent which is meant for separating contexts like the content of dialogs and popovers:
 ```jsx
 function SomePopoverComponent(props: { children: () => unknown; }) {
-  return <Inject key={TASKS} value={Tasks.fork()}>
-    <props.children />
-  </Inject>;
+	return <Inject key={TASKS} value={Tasks.fork()}>
+		<props.children />
+	</Inject>;
 }
 ```
 

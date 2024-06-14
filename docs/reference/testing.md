@@ -14,13 +14,13 @@ Gluon provides a lightweight wrapper for running small synchronous tests that pr
 import { runTest, querySelector } from "@mxjp/gluon/test";
 
 runTest(ctx => {
-  const count = sig(0);
-  const view = mount(
-    document.body,
-    <button $click={() => { count.value++; }}>Click me!</button>,
-  );
-  querySelector(view, "button")?.click();
-  assert(count.value === 1);
+	const count = sig(0);
+	const view = mount(
+		document.body,
+		<button $click={() => { count.value++; }}>Click me!</button>,
+	);
+	querySelector(view, "button")?.click();
+	assert(count.value === 1);
 });
 ```
 
@@ -28,9 +28,9 @@ runTest(ctx => {
 Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context](core/context.md) will not work after awaiting something:
 ```jsx
 inject("foo", "bar", async () => {
-  extract("foo"); // => "bar"
-  await something();
-  extract("foo"); // => undefined
+	extract("foo"); // => "bar"
+	await something();
+	extract("foo"); // => undefined
 });
 ```
 
@@ -41,26 +41,26 @@ The example below shows a test that asserts that asynchronously loaded content i
 import { runAsyncTest, querySelector } from "@mxjp/gluon/test";
 
 await runAsyncTest(async ({ ctx, asyncCtx, use }) => {
-  const view = use(() => {
-    return mount(
-      document.body,
-      <Async source={async () => {
-        await something();
-        return "Hello World!";
-      }}>
-        {content => <div class="page">
-          {content}
-        </div>}
-      </Async>
-    );
-  });
+	const view = use(() => {
+		return mount(
+			document.body,
+			<Async source={async () => {
+				await something();
+				return "Hello World!";
+			}}>
+				{content => <div class="page">
+					{content}
+				</div>}
+			</Async>
+		);
+	});
 
-  // Wait for the "<Async>" component to resolve:
-  await asyncCtx.complete();
+	// Wait for the "<Async>" component to resolve:
+	await asyncCtx.complete();
 
-  const page = querySelector<HTMLElement>(view, ".page");
-  assert(page !== null);
-  assert(page.innerText === "Hello World!");
+	const page = querySelector<HTMLElement>(view, ".page");
+	assert(page !== null);
+	assert(page.innerText === "Hello World!");
 });
 ```
 
@@ -87,10 +87,10 @@ The [lifecycle API](core/lifecycle.md) silently discards teardown hooks outside 
 However, this can result in accidental memory leaks when registering teardown hooks in async code:
 ```jsx
 const stop = capture(async () => {
-  await something();
-  const interval = setInterval(() => console.log("ping!"), 1000);
-  // "clearInterval" will never be called:
-  teardown(() => clearInterval(interval));
+	await something();
+	const interval = setInterval(() => console.log("ping!"), 1000);
+	// "clearInterval" will never be called:
+	teardown(() => clearInterval(interval));
 });
 
 stop();
@@ -101,11 +101,11 @@ To catch these cases, you can use the `onTeardownLeak` function once before runn
 import { onTeardownLeak } from "@mxjp/gluon/test";
 
 onTeardownLeak(hook => {
-  // "hook" is the teardown hook that is being registered.
-  console.trace("Leaked teardown hook:", hook);
+	// "hook" is the teardown hook that is being registered.
+	console.trace("Leaked teardown hook:", hook);
 
-  // Or throw an error from within the **teardown** call:
-  throw new Error("Teardown hook was not captured.");
+	// Or throw an error from within the **teardown** call:
+	throw new Error("Teardown hook was not captured.");
 });
 
 // This will now call the code above:
@@ -123,9 +123,9 @@ import { runAsyncTest, exclusive } from "@mxjp/gluon/test";
 const FOCUS_ACTIONS = Symbol("focus actions");
 
 await exclusive(FOCUS_ACTIONS, async () => {
-  someInput.focus();
-  await somethingElse();
-  assert(document.activeElement === someInput);
+	someInput.focus();
+	await somethingElse();
+	assert(document.activeElement === someInput);
 });
 ```
 Using symbols as keys that are in some common place in your test setup is recommended as it prevents any typos in the key, but you can also use anything alse that can be a `Map` key.

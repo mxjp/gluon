@@ -4,7 +4,7 @@ Render [content](../elements.md#content) when an [expression](../signals.md#expr
 import { Show } from "@mxjp/gluon";
 
 <Show when={someCondition}>
-  {() => <>Hello World!</>}
+	{() => <>Hello World!</>}
 </Show>
 ```
 
@@ -14,7 +14,7 @@ Truthy condition results are passed to the child callback as the first argument.
 const message = sig("Hello World!");
 
 <Show when={message}>
-  {value => <h1>{value}</h1>}
+	{value => <h1>{value}</h1>}
 </Show>
 ```
 
@@ -22,6 +22,6 @@ const message = sig("Hello World!");
 A function to render fallback content can be specified as the `else` property.
 ```jsx
 <Show when={message} else={() => <>No message.</>}>
-  {value => <h1>{value}</h1>}
+	{value => <h1>{value}</h1>}
 </Show>
 ```

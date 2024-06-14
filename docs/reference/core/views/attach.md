@@ -4,6 +4,6 @@ Attach [content](../elements.md#content) when an [expression](../signals.md#expr
 import { Attach } from "@mxjp/gluon";
 
 <Attach when={someCondition}>
-  Hello World!
+	Hello World!
 </Attach>
 ```

@@ -21,7 +21,7 @@ To deeply change a value and then notify the signal dependants, use the `update`
 const items = sig(["a", "b"]);
 
 items.update(items => {
-  items.push("c");
+	items.push("c");
 });
 ```
 
@@ -69,7 +69,7 @@ Watch an expression and run a callback with it's result.
 import { watch } from "@mxjp/gluon";
 
 watch(count, value => {
-  console.log("Count:", value);
+	console.log("Count:", value);
 });
 ```
 
@@ -85,7 +85,7 @@ This is the same as [`watch`](#watch), but the initial value is returned instead
 import { watchUpdates } from "@mxjp/gluon";
 
 const initialCount = watchUpdates(count, value => {
-  console.log("Count:", value);
+	console.log("Count:", value);
 });
 ```
 
@@ -96,7 +96,7 @@ Run a function and re-run when any accessed signals are updated.
 import { effect } from "@mxjp/gluon";
 
 effect(() => {
-  console.log("Count:", count.value);
+	console.log("Count:", count.value);
 });
 ```
 
@@ -108,10 +108,10 @@ effect(() => {
 Prefer using [`watch`](#watch) or [`watchUpdates`](#watchupdates) if possible because it's easy to build infinite loops using `effect`:
 ```jsx
 effect(() => {
-  // This will cause a stack overflow because this
-  // both accesses and updates the value wich will
-  // re-run this callback during the update itself:
-  count.value++;
+	// This will cause a stack overflow because this
+	// both accesses and updates the value wich will
+	// re-run this callback during the update itself:
+	count.value++;
 });
 ```
 
@@ -121,7 +121,7 @@ Evaluate an expression and call a function once when any accessed signals are up
 import { trigger } from "@mxjp/gluon";
 
 const currentCount = trigger(count, () => {
-  console.log("Count has been changed.");
+	console.log("Count has been changed.");
 });
 ```
 
@@ -131,8 +131,8 @@ const currentCount = trigger(count, () => {
 When using `trigger` in a loop, e.g. in an expression the last `cycle` parameter is passed back into the callback and can be used to keep track of which iteration caused the update.
 ```jsx
 const currentCount = trigger(count, cycle => {
-  // cycle === 42
-  console.log("Count has been changed.");
+	// cycle === 42
+	console.log("Count has been changed.");
 }, 42);
 ```
 
@@ -145,8 +145,8 @@ const a = sig(1);
 const b = sig(2);
 
 batch(() => {
-  a.value++;
-  b.value++;
+	a.value++;
+	b.value++;
 });
 ```
 
@@ -159,8 +159,8 @@ const getValue = lazy(() => someExpensiveComputation(a.value, b.value));
 ```
 
 + This inherits the [context](context.md) and [lifecycle](lifecycle.md) behavior from where it's used. E.g:
-  + When used inside the expression of [`watch`](#watch), teardown hooks are not supported.
-  + When used inside the callback of [`effect`](#effect), teardown hooks are supported.
+	+ When used inside the expression of [`watch`](#watch), teardown hooks are not supported.
+	+ When used inside the callback of [`effect`](#effect), teardown hooks are supported.
 
 ## `memo`
 Watch an expression and get a function to reactively access it's latest result with the same [equality check](#equality) that is also used for signals.
@@ -230,7 +230,7 @@ When this isn't possible, you can use one of the following options:
 ```jsx
 // Use the update function:
 counter.update(value => {
-  value.count++;
+	value.count++;
 });
 
 // Replace the entire value:

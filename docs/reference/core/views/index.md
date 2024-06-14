@@ -41,7 +41,7 @@ console.log(view.first, view.last);
 A callback that is called for any boundary updates (known as the _boundary owner_) can be set until the current [lifecycle](../lifecycle.md) is disposed. Note, that there can be only one boundary owner at a time.
 ```jsx
 view.setBoundaryOwner((first, last) => {
-   // "first" and "last" are the new current boundary.
+	// "first" and "last" are the new current boundary.
 });
 ```
 
@@ -67,12 +67,12 @@ A view is created using the `View` constructor. The example below creates a view
 import { View } from "@mxjp/gluon";
 
 const view = new View((setBoundary, self) => {
-   // "self" is this view instance.
+	// "self" is this view instance.
 
-   const node = document.createTextNode("Hello World!");
+	const node = document.createTextNode("Hello World!");
 
-   // Set the initial first and last node:
-   // (This must be called at least once before this callback returns)
-   setBoundary(node, node);
+	// Set the initial first and last node:
+	// (This must be called at least once before this callback returns)
+	setBoundary(node, node);
 });
 ```

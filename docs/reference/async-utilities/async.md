@@ -5,23 +5,23 @@ import { Async } from "@mxjp/gluon/async";
 
 // main.tsx:
 <Async source={() => import("./page")}>
-  {page => <page.content />}
+	{page => <page.content />}
 </Async>
 
 // page.tsx:
 export function content() {
-  return <h1>Hello World!</h1>;
+	return <h1>Hello World!</h1>;
 }
 ```
 
 The `rejected` and `pending` properties can be used for rendering content when the promise is rejected or pending:
 ```jsx
 <Async
-  source={() => import("./page")}
-  pending={() => <>Loading...</>}
-  rejected={error => <>Error: {error}</>}
+	source={() => import("./page")}
+	pending={() => <>Loading...</>}
+	rejected={error => <>Error: {error}</>}
 >
-  {page => <page.content />}
+	{page => <page.content />}
 </Async>
 ```
 
@@ -33,7 +33,7 @@ import { ASYNC, AsyncContext } from "@mxjp/gluon/async";
 const ctx = new AsyncContext();
 
 <Inject key={ASYNC} value={ctx}>
-  {() => <Async>...</Async>}
+	{() => <Async>...</Async>}
 </Inject>
 
 // Wait for all "<Async>" parts to complete and re-throw unhandled errors:
@@ -47,7 +47,7 @@ ctx.track(fetch("something"));
 The `<Show>` or `<Nest>` components can be used to replace the `source` property over time:
 ```jsx
 <Show when={someSignal}>
-  {source => <Async source={source}>...</Async>}
+	{source => <Async source={source}>...</Async>}
 </Show>
 ```
 
@@ -56,11 +56,11 @@ The example below fetches a file and aborts pending requests when the file name 
 const name = sig("example.txt");
 
 <Nest>
-  {() => {
-    const value = name.value;
-    return () => <Async source={fetch(value, { signal: useAbortSignal() }).then(r => r.text())}>
-      {text => <pre>{text}</pre>}
-    </Async>;
-  }}
+	{() => {
+		const value = name.value;
+		return () => <Async source={fetch(value, { signal: useAbortSignal() }).then(r => r.text())}>
+			{text => <pre>{text}</pre>}
+		</Async>;
+	}}
 </Nest>
 ```

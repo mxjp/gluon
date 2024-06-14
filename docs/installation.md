@@ -11,10 +11,10 @@ Gluon provides a react 17 JSX runtime and a legacy runtime in case your build to
 To use JSX with typescript, add the following options to your tsconfig:
 ```js
 {
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "@mxjp/gluon"
-  }
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"jsxImportSource": "@mxjp/gluon"
+	}
 }
 ```
 
@@ -24,15 +24,15 @@ When using TypeScript, it is recommended to use the [compiler options](#typescri
 If you are using Babel with plain JavaScript, you can use the `@babel/plugin-transform-react-jsx` plugin with the following babel options:
 ```js
 {
-  "plugins": [
-    [
-      "@babel/plugin-transform-react-jsx",
-      {
-        "runtime": "automatic",
-        "importSource": "@mxjp/gluon"
-      }
-    ]
-  ]
+	"plugins": [
+		[
+			"@babel/plugin-transform-react-jsx",
+			{
+				"runtime": "automatic",
+				"importSource": "@mxjp/gluon"
+			}
+		]
+	]
 }
 ```
 
@@ -45,8 +45,8 @@ If you are using esbuild or vite with plain JavaScript, you can add the options 
 import * as esbuild from "esbuild";
 
 await esbuild.build({
-  jsx: "automatic",
-  jsxImportSource: "@mxjp/gluon",
+	jsx: "automatic",
+	jsxImportSource: "@mxjp/gluon",
 });
 ```
 ```js
@@ -54,10 +54,10 @@ await esbuild.build({
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  esbuild: {
-    jsx: "automatic",
-    jsxImportSource: "@mxjp/gluon",
-  },
+	esbuild: {
+		jsx: "automatic",
+		jsxImportSource: "@mxjp/gluon",
+	},
 });
 ```
 
@@ -93,9 +93,9 @@ node scripts/bundle.js -m core async -o ./custom
 ```
 
 + `--modules | -m <...modules>`
-  + Specify what modules to include.
-  + This can be any directory or filename that exists in the [src](https://github.com/mxjp/gluon/tree/main/src) directory without file extension.
-  + Default is `core`
+	+ Specify what modules to include.
+	+ This can be any directory or filename that exists in the [src](https://github.com/mxjp/gluon/tree/main/src) directory without file extension.
+	+ Default is `core`
 + `--output | -o <path>`
-  + Specify the output path of the bundle without extension.
-  + Default is `./dist/gluon.custom`
+	+ Specify the output path of the bundle without extension.
+	+ Default is `./dist/gluon.custom`

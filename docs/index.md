@@ -13,10 +13,10 @@ import { mount, sig } from "@mxjp/gluon";
 const count = sig(0);
 
 mount(
-  document.body,
-  <button $click={() => { count.value++ }}>
-    Clicked {count} times
-  </button>
+	document.body,
+	<button $click={() => { count.value++ }}>
+		Clicked {count} times
+	</button>
 );
 ```
 
@@ -59,13 +59,13 @@ Gluon supports all the client side features you would expect from a modern frame
 + Update batching
 + Using and authoring web components
 + Global state management with deep reactive wrappers for
-  + Arrays
-  + Objects & class instances
-  + Sets
-  + Maps
+	+ Arrays
+	+ Objects & class instances
+	+ Sets
+	+ Maps
 + History API & hash based routing
-  + Custom & manual route matching
-  + Nested routing
+	+ Custom & manual route matching
+	+ Nested routing
 
 ### SSR & Hydration
 Gluon does not directly support server side rendering (SSR) or hydration. Instead, you can use libraries like [JSDOM](https://www.npmjs.com/package/jsdom) to render gluon applications on the server or during the build process.

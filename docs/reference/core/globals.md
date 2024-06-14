@@ -27,9 +27,9 @@ Ensure that instances of the target class are also recognized as instances of th
 import { shareInstancesOf } from "@mxjp/gluon";
 
 class Example {
-  static {
-    shareInstancesOf(this, "example");
-  }
+	static {
+		shareInstancesOf(this, "example");
+	}
 }
 ```
 This attaches a marker to all instances of the class and overwrites the `hasInstance` function of the target class to check if that marker exists. The marker is stored in the prototype using a symbol obtained with `Symbol.for` and the specified key.

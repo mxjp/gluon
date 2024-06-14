@@ -81,12 +81,12 @@ The `class` attribute can be any combination of strings, arrays and objects with
 ```jsx
 <div class="example" />
 <div class={[
-  "foo",
-  () => "bar",
-  {
-    baz: true,
-    boo: () => false,
-  },
+	"foo",
+	() => "bar",
+	{
+		baz: true,
+		boo: () => false,
+	},
 ]} />
 ```
 
@@ -104,15 +104,15 @@ Properties use the same casing as in css.
 ```jsx
 <div style={{ color: "red" }} />
 <div style={() => [
-  {
-    color: "red",
-    "font-size": "1rem",
-  },
-  { color: () => "blue" },
-  { color: someSignal },
-  [
-    { width: "42px" },
-  ],
+	{
+		color: "red",
+		"font-size": "1rem",
+	},
+	{ color: () => "blue" },
+	{ color: someSignal },
+	[
+		{ width: "42px" },
+	],
 ]} />
 ```
 
@@ -130,10 +130,10 @@ Everything listed below can be used as element content or can be returned from [
 Expressions (static values, signals and functions) are rendered as escaped text content. `null` and `undefined` are rendered as an empty string:
 ```jsx
 <div>
-  Static text
-  {"Static text"}
-  {someSignal}
-  {() => someSignal.value}
+	Static text
+	{"Static text"}
+	{someSignal}
+	{() => someSignal.value}
 </div>
 ```
 
@@ -141,8 +141,8 @@ Expressions (static values, signals and functions) are rendered as escaped text 
 Any DOM nodes are moved into the parent element.
 ```jsx
 <div>
-  <input />
-  {document.createElement("div")}
+	<input />
+	{document.createElement("div")}
 </div>
 ```
 
@@ -154,9 +154,9 @@ When [views](views/index.md) are used as content, they are owned by the element 
 import { Show } from "@mxjp/gluon";
 
 <div>
-  <Show when={someSignal}>
-    {() => <>Hello World!</>}
-  </Show>
+	<Show when={someSignal}>
+		{() => <>Hello World!</>}
+	</Show>
 </div>
 ```
 
@@ -164,12 +164,12 @@ import { Show } from "@mxjp/gluon";
 Content can be wrapped in arbitrarily nested arrays and JSX fragments.
 ```jsx
 <div>
-  <>
-    {[
-      "Hello World!",
-      <div />,
-    ]}
-  </>
+	<>
+		{[
+			"Hello World!",
+			<div />,
+		]}
+	</>
 </div>
 ```
 Note, that JSX fragments in gluon return their children as is. The return type of single-child or empty fragments may depend on your JSX transpiler.
@@ -187,6 +187,6 @@ The namespace URI for new elements can be [injected](context.md).
 import { Inject, XMLNS, SVG } from "@mxjp/gluon";
 
 <Inject key={XMLNS} value={SVG}>
-  {() => <svg viewBox="0 0 100 100">...</svg>}
+	{() => <svg viewBox="0 0 100 100">...</svg>}
 </Inject>
 ```

@@ -1,7 +1,7 @@
 {
 	"name": "@mxjp/gluon",
 	"description": "A signal based rendering library",
-	"homepage": "https://github.com/mxjp/gluon",
+	"homepage": "https://mxjp.github.io/gluon",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/mxjp/gluon"

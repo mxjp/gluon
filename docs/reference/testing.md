@@ -1,0 +1,131 @@
+# Testing
+Testing gluon based applications is usually very simple because all of it's signal based rendering is synchronous. E.g. when updating a signal, all resulting changes are reflected in the DOM immediately:
+```jsx
+const count = sig(7);
+const element = <div>Current count: {count}</div> as HTMLDivElement;
+assert(element.innerText === "Current count: 7");
+count.value = 42;
+assert(element.innerText === "Current count: 42");
+```
+
+## Synchronous Tests
+Gluon provides a lightweight wrapper for running small synchronous tests that provides a [context](core/context.md) and takes care of calling [teardown hooks](core/lifecycle.md) after the test.
+```jsx
+import { runTest, querySelector } from "@mxjp/gluon/test";
+
+runTest(ctx => {
+  const count = sig(0);
+  const view = mount(
+    document.body,
+    <button $click={() => { count.value++; }}>Click me!</button>,
+  );
+  querySelector(view, "button")?.click();
+  assert(count.value === 1);
+});
+```
+
+## Asynchronous Tests
+Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context](core/context.md) will not work after awaiting something:
+```jsx
+inject("foo", "bar", async () => {
+  extract("foo"); // => "bar"
+  await something();
+  extract("foo"); // => undefined
+});
+```
+
+There is a wrapper for async tests that allows you to run small synchronous parts of your test with a shared [context](core/context.md), an [async context](async-utilities/async.md#tracking-completion). After the test, this will run [teardown hooks](core/lifecycle.md) registered during **"use(..)"** calls and wait for any pending tasks tracked in the async context.
+
+The example below shows a test that asserts that asynchronously loaded content is displayed correctly:
+```jsx
+import { runAsyncTest, querySelector } from "@mxjp/gluon/test";
+
+await runAsyncTest(async ({ ctx, asyncCtx, use }) => {
+  const view = use(() => {
+    return mount(
+      document.body,
+      <Async source={async () => {
+        await something();
+        return "Hello World!";
+      }}>
+        {content => <div class="page">
+          {content}
+        </div>}
+      </Async>
+    );
+  });
+
+  // Wait for the "<Async>" component to resolve:
+  await asyncCtx.complete();
+
+  const page = querySelector<HTMLElement>(view, ".page");
+  assert(page !== null);
+  assert(page.innerText === "Hello World!");
+});
+```
+
+## Waiting For Expressions
+You can watch arbitrary [expressions](core/signals.md#expressions) using the `watchFor` function.
+```jsx
+import { sig, watchFor, isPending } from "@mxjp/gluon";
+
+// Wait for a specific signal value:
+const count = sig(0);
+doSomethingAsyncWithCount();
+await watchFor(() => count.value > 7);
+
+// Wait with a timeout:
+await watchFor(() => count.value > 7, 500);
+
+// Wait for pending user tasks:
+await watchFor(() => !isPending());
+```
+
+## Leak Detection
+The [lifecycle API](core/lifecycle.md) silently discards teardown hooks outside of `capture` calls. This can be a valid use case, for instance when rendering your application until the browser closes or when intentionally leaking teardown hooks using `uncapture`.
+
+However, this can result in accidental memory leaks when registering teardown hooks in async code:
+```jsx
+const stop = capture(async () => {
+  await something();
+  const interval = setInterval(() => console.log("ping!"), 1000);
+  // "clearInterval" will never be called:
+  teardown(() => clearInterval(interval));
+});
+
+stop();
+```
+
+To catch these cases, you can use the `onTeardownLeak` function once before running all of your tests:
+```jsx
+import { onTeardownLeak } from "@mxjp/gluon/test";
+
+onTeardownLeak(hook => {
+  // "hook" is the teardown hook that is being registered.
+  console.trace("Leaked teardown hook:", hook);
+
+  // Or throw an error from within the **teardown** call:
+  throw new Error("Teardown hook was not captured.");
+});
+
+// This will now call the code above:
+teardown(() => {});
+
+// This will NOT call the code above, as using **uncapture** is very likely intentional:
+uncapture(() => teardown(() => {}));
+```
+
+## Concurrency
+It is generally possible to run tests for gluon based applications concurrently. However, using APIs that may interfere with each other such as `Element.focus` can result in flaky tests. To solve this you can use the `exclusive` function to run code in a globally shared queue for a specific purpose:
+```jsx
+import { runAsyncTest, exclusive } from "@mxjp/gluon/test";
+
+const FOCUS_ACTIONS = Symbol("focus actions");
+
+await exclusive(FOCUS_ACTIONS, async () => {
+  someInput.focus();
+  await somethingElse();
+  assert(document.activeElement === someInput);
+});
+```
+Using symbols as keys that are in some common place in your test setup is recommended as it prevents any typos in the key, but you can also use anything alse that can be a `Map` key.

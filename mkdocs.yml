@@ -1,0 +1,27 @@
+site_name: gluon docs!
+site_url: https://mxjp.github.io/gluon
+theme:
+  name: material
+  logo: assets/logo.svg
+  features:
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - toc.integrate
+  palette:
+    scheme: slate
+    primary: black
+    accent: green
+
+extra:
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.superfences
+
+repo_url: https://github.com/mxjp/gluon

@@ -1,0 +1,14 @@
+
+:root {
+	font-size: 1.25rem;
+	text-wrap: balance;
+	text-wrap: pretty;
+}
+
+pre {
+	white-space: pre-wrap;
+}
+
+.md-grid {
+	max-width: 60rem;
+}

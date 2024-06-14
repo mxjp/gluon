@@ -25,5 +25,7 @@ The following describes the order in which new instances are created, updated or
 	+ If the existing instance at the current index has a different value, the instance is disposed and a new one is created.
 + Remaining instances are disposed in iteration order.
 
+When the view itself is disposed, instances are disposed in the latest iteration order.
+
 ### Performance
 The current implementation has a performance of `O(n)` with `n` being the new number of items. When items are frequently moved, consider using [`<For>`](./for.md) instead.

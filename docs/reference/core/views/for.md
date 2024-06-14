@@ -26,5 +26,7 @@ The following describes the order in which new instances are created, updated or
 	+ A new instance is created if there is none.
 + Remaining non-reused instances are disposed in creation order.
 
+When the view itself is disposed, instances are disposed in the latest iteration order.
+
 ### Performance
 The current implementation has a best case performance of `O(n)` and a practical worst case performance of `O(n * log(n))` with `n` being the new number of items. In practice, this is mostly irrelevant because the majority of time is spend updating the DOM.

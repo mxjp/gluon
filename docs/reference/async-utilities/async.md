@@ -28,7 +28,8 @@ The `rejected` and `pending` properties can be used for rendering content when t
 ## Tracking Completion
 To wait for async parts in a specific context to complete, you can use `AsyncContexts`:
 ```jsx
-import { ASYNC, AsyncContext } from "@mxjp/gluon/async";
+import { Inject } from "@mxjp/gluon";
+import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
 
 const ctx = new AsyncContext();
 
@@ -41,6 +42,28 @@ await ctx.complete();
 
 // Or manually track an async task:
 ctx.track(fetch("something"));
+```
+
+### Revealing Content At Once
+When there are multiple async parts in the same place, tracking can be used to hide an entire area and show it once all of the inner async parts have completed.
+```jsx
+import { Inject, sig, movable } from "@mxjp/gluon";
+import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
+
+const innerCtx = new AsyncContext();
+const inner = movable(
+	<Inject key={ASYNC} value={innerCtx}>
+		{() => <>
+			<Async>...</Async>
+			<Async>...</Async>
+			<Async>...</Async>
+		</>}
+	</Inject>
+);
+
+<Async source={innerCtx.complete()}>
+	{() => inner.move()}
+</Async>
 ```
 
 ## Dynamic Sources

@@ -374,11 +374,14 @@ await test("view", async ctx => {
 			}
 		});
 
-		await ctx.test("lifecycle & update order", () => {
+		function lifecycleTest(options: {
+			sequence: [values: unknown[], ...expectedEvents: unknown[]][];
+			disposeEvents: unknown[];
+		}): void {
 			const events: unknown[] = [];
-			const signal = sig(["a", "b"]);
+			const signal = sig<unknown[]>([]);
 
-			uncapture(() => {
+			const dispose = capture(() => {
 				<For each={signal}>
 					{(value, index) => {
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -393,34 +396,80 @@ await test("view", async ctx => {
 					}}
 				</For>;
 			});
-			assertEvents(events, [
-				["create", "a", 0],
-				["create", "b", 1],
-			]);
 
-			signal.update(values => {
-				values.splice(1, 0, "c");
-			});
-			assertEvents(events, [
-				["create", "c", 1],
-				["index", "b", 2],
-			]);
+			assertEvents(events, []);
+			for (const [values, ...expectedEvents] of options.sequence) {
+				signal.value = values;
+				assertEvents(events, expectedEvents);
+			}
 
-			signal.update(values => {
-				values[1] = "d";
-			});
-			assertEvents(events, [
-				["create", "d", 1],
-				["dispose", "c", 1],
-			]);
+			dispose();
+			assertEvents(events, options.disposeEvents);
+		}
 
-			signal.update(values => {
-				values.splice(1, 1);
+		await ctx.test("lifecycle & update order", () => {
+			lifecycleTest({
+				sequence: [
+					[
+						["a", "b"],
+						["create", "a", 0],
+						["create", "b", 1],
+					],
+					[
+						["a", "c", "b"],
+						["create", "c", 1],
+						["index", "b", 2],
+					],
+					[
+						["a", "d", "b"],
+						["create", "d", 1],
+						["dispose", "c", 1],
+					],
+					[
+						["a", "b"],
+						["index", "b", 1],
+						["dispose", "d", 1],
+					],
+					[
+						["a", "b"],
+					],
+					[
+						["b", "a"],
+						["index", "b", 0],
+						["index", "a", 1],
+					],
+				],
+				disposeEvents: [
+					["dispose", "b", 0],
+					["dispose", "a", 1],
+				],
 			});
-			assertEvents(events, [
-				["index", "b", 1],
-				["dispose", "d", 1],
-			]);
+		});
+
+		await ctx.test("lifecycle & update order (NaN)", () => {
+			lifecycleTest({
+				sequence: [
+					[
+						[NaN, NaN, "a"],
+						["create", NaN, 0],
+						["create", "a", 1],
+					],
+					[
+						["b", NaN, "a"],
+						["create", "b", 0],
+						["index", NaN, 1],
+						["index", "a", 2],
+					],
+					[
+						["b", NaN, "a"],
+					],
+				],
+				disposeEvents: [
+					["dispose", "b", 0],
+					["dispose", NaN, 1],
+					["dispose", "a", 2],
+				],
+			});
 		});
 
 		await ctx.test("iterator internal updates", async () => {
@@ -513,50 +562,103 @@ await test("view", async ctx => {
 			}
 		});
 
-		await ctx.test("lifecycle & update order", () => {
+		function lifecycleTest(options: {
+			sequence: [values: unknown[], ...expectedEvents: unknown[]][];
+			disposeEvents: unknown[];
+		}): void {
 			const events: unknown[] = [];
-			const signal = sig(["a", "b"]);
+			const signal = sig<unknown[]>([]);
 
-			uncapture(() => {
+			const dispose = capture(() => {
 				<IndexFor each={signal}>
 					{(value, index) => {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 						events.push(["create", value, index]);
+						watchUpdates(index, index => {
+							events.push(["index", value, index]);
+						});
 						teardown(() => {
+							// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 							events.push(["dispose", value, index]);
 						});
 					}}
 				</IndexFor>;
 			});
-			assertEvents(events, [
-				["create", "a", 0],
-				["create", "b", 1],
-			]);
 
-			signal.update(values => {
-				values.splice(1, 0, "c");
-			});
-			assertEvents(events, [
-				["dispose", "b", 1],
-				["create", "c", 1],
-				["create", "b", 2],
-			]);
+			assertEvents(events, []);
+			for (const [values, ...expectedEvents] of options.sequence) {
+				signal.value = values;
+				assertEvents(events, expectedEvents);
+			}
 
-			signal.update(values => {
-				values[1] = "d";
-			});
-			assertEvents(events, [
-				["dispose", "c", 1],
-				["create", "d", 1],
-			]);
+			dispose();
+			// assertEvents(events, options.disposeEvents);
+		}
 
-			signal.update(values => {
-				values.splice(1, 1);
+		await ctx.test("lifecycle & update order", () => {
+			lifecycleTest({
+				sequence: [
+					[
+						["a", "b"],
+						["create", "a", 0],
+						["create", "b", 1],
+					],
+					[
+						["a", "c", "b"],
+						["dispose", "b", 1],
+						["create", "c", 1],
+						["create", "b", 2],
+					],
+					[
+						["a", "d", "b"],
+						["dispose", "c", 1],
+						["create", "d", 1],
+					],
+					[
+						["a", "b"],
+						["dispose", "d", 1],
+						["create", "b", 1],
+						["dispose", "b", 2],
+					],
+					[
+						["b", "a"],
+						["dispose", "a", 0],
+						["create", "b", 0],
+						["dispose", "b", 1],
+						["create", "a", 1],
+					],
+				],
+				disposeEvents: [
+					["dispose", "b", 0],
+					["dispose", "a", 1],
+				],
 			});
-			assertEvents(events, [
-				["dispose", "d", 1],
-				["create", "b", 1],
-				["dispose", "b", 2],
-			]);
+		});
+
+		await ctx.test("lifecycle & update order (NaN)", () => {
+			lifecycleTest({
+				sequence: [
+					[
+						[NaN, NaN, "a"],
+						["create", NaN, 0],
+						["create", NaN, 1],
+						["create", "a", 2],
+					],
+					[
+						["b", NaN, "a"],
+						["dispose", NaN, 0],
+						["create", "b", 0],
+					],
+					[
+						["b", NaN, "a"],
+					],
+				],
+				disposeEvents: [
+					["dispose", "b", 0],
+					["dispose", NaN, 1],
+					["dispose", "a", 2],
+				],
+			});
 		});
 
 		await ctx.test("iterator internal updates", async () => {

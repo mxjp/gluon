@@ -340,7 +340,7 @@ export function For<T>(props: {
 			let last = first;
 			for (const value of nocapture(() => get(props.each))) {
 				let instance: Instance | undefined = instances[index];
-				if (instance && instance.value === value) {
+				if (instance && Object.is(instance.value, value)) {
 					instance.cycle = cycle;
 					instance.index.value = index;
 					last = instance.view.last;
@@ -478,7 +478,7 @@ export function IndexFor<T>(props: {
 			for (const value of nocapture(() => get(props.each))) {
 				if (index < instances.length) {
 					const current = instances[index];
-					if (current.value === value) {
+					if (Object.is(current.value, value)) {
 						last = current.view.last;
 						index++;
 						continue;

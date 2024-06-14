@@ -15,3 +15,15 @@ The index is passed as the second argument:
 	{(value, index) => <li>{() => index + 1}: {value}</li>}
 </IndexFor>
 ```
+
+## Update Order
+For every update, this view runs a simple diffing algorithm between existing instances and new values at the same index.
+
+The following describes the order in which new instances are created, updated or disposed. Any changes to the update order are considered breaking changes.
+
++ For each new value, index:
+	+ If the existing instance at the current index has a different value, the instance is disposed and a new one is created.
++ Remaining instances are disposed in iteration order.
+
+### Performance
+The current implementation has a performance of `O(n)` with `n` being the new number of items. When items are frequently moved, consider using [`<For>`](./for.md) instead.

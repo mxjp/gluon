@@ -22,10 +22,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v5
-      - run: python -m pip install -r docs/requirements.txt
-      # TODO: Build & publish:
-      # - uses: actions/upload-pages-artifact@v2
-      #   with:
-      #     path: './docs/dist'
-      # - uses: actions/deploy-pages@v2
-      #   id: deployment
+      - run: pip install mkdocs-material
+      - run: mkdocs build --site-dir docs_out
+      - uses: actions/upload-pages-artifact@v2
+        with:
+          path: './docs_out'
+      - uses: actions/deploy-pages@v2
+        id: deployment

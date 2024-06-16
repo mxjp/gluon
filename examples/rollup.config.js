@@ -76,7 +76,7 @@ export default defineConfig({
 							const original = code.slice(mdComment.index + mdComment[0].length).trim();
 							md += `\`\`\`jsx\n${original}\n\`\`\`\n\n`;
 						}
-						md += `<script async src="/gluon/examples/bundle.js"></script>\n`;
+						md += `<script type="module" src="/gluon/examples/bundle.js"></script>\n`;
 						md += `<gluon-example name="${name}"></gluon-example>\n`;
 						await writeFile(join(outDir, `${name}.md`), md);
 					}

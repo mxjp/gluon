@@ -47,12 +47,15 @@ function RotateOrder(props: {
 	return new View((setBoundary, self) => {
 		// Create a child view for each child using the "render" function:
 		const views = children.map(render);
+		// Create an initial parent node:
+		const parent = document.createDocumentFragment();
 
 		// Views need to keep track of their first and last nodes.
 		for (const view of views) {
-			// The boundary owner callback is called every time, the
-			// child view has updated it's boundary nodes until the current
-			// lifecycle is disposed:
+			parent.appendChild(view.take());
+
+			// Keep track of child view boundary updates to
+			// update this view's boundary:
 			view.setBoundaryOwner((first, last) => {
 				// Update the first node of the current view if
 				// this child view is currently the first one:
@@ -67,13 +70,7 @@ function RotateOrder(props: {
 			});
 		}
 
-		// Initially we can just append all views to a new document
-		// fragment and notify the custom view that the fragment's
-		// first and last node are the current boundary:
-		const parent = document.createDocumentFragment();
-		for (const view of views) {
-			parent.appendChild(view.take());
-		}
+		// Set the initial boundary:
 		setBoundary(parent.firstChild!, parent.lastChild!);
 
 		// Handle rotation events:

@@ -1,7 +1,7 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "rollup";
@@ -10,6 +10,8 @@ const context = join(fileURLToPath(import.meta.url), "..");
 const root = join(context, "..");
 const src = join(context, "src");
 const outDir = join(root, "docs/examples");
+
+await mkdir(outDir, { recursive: true });
 
 export default defineConfig({
 	context,

@@ -1,0 +1,15 @@
+{
+	"type": "module",
+	"scripts": {
+		"start": "rollup --config rollup.config.js --watch",
+		"build": "rollup --config rollup.config.js"
+	},
+	"dependencies": {
+		"@mxjp/gluon": "file:.."
+	},
+	"devDependencies": {
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@rollup/plugin-typescript": "^11.1.6"
+	}
+}

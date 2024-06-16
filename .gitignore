@@ -3,3 +3,5 @@
 /node_modules
 /tests_out
 /docs_out
+/docs/examples
+/examples/node_modules

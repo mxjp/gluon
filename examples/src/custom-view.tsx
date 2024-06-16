@@ -13,8 +13,8 @@ export function Example() {
 	const rotate = new Emitter<[]>();
 	const visible = sig(true);
 
-	return <>
-		<div>
+	return <div class="column">
+		<div class="row">
 			<button $click={() => { rotate.emit() }}>Rotate Order</button>
 			<button $click={() => visible.value = !visible.value}>Toggle Visibility</button>
 		</div>
@@ -25,7 +25,7 @@ export function Example() {
 				<input type="text" value="CCC" />
 			</RotateOrder>
 		</Attach>
-	</>;
+	</div>;
 }
 
 function RotateOrder(props: {
@@ -67,11 +67,17 @@ function RotateOrder(props: {
 			});
 		}
 
-		function update() {
-			// Sice every view has at least one node at all time
-			// and this custom view contains at least two views,
-			// we can assume that this is a consecutive signal update
-			// if the parent already exists:
+		// Initially we can just append all views to a new document
+		// fragment and notify the custom view that the fragment's
+		// first and last node are the current boundary:
+		const parent = document.createDocumentFragment();
+		for (const view of views) {
+			parent.appendChild(view.take());
+		}
+		setBoundary(parent.firstChild!, parent.lastChild!);
+
+		// Handle rotation events:
+		props.on(() => {
 			const parent = self.parent;
 			if (parent) {
 				// Rotate the order in the view array and DOM nodes:
@@ -81,19 +87,11 @@ function RotateOrder(props: {
 
 				// Notify the custom view that our boundary has changed:
 				setBoundary(view.first, views[views.length - 1].last);
-			} else {
-				// Initially we can just append all views to a new document
-				// fragment and notify the custom view that the fragment's
-				// first and last node are the current boundary:
-				const parent = document.createDocumentFragment();
-				for (const view of views) {
-					parent.appendChild(view.take());
-				}
-				setBoundary(parent.firstChild!, parent.lastChild!);
 			}
-		}
 
-		update();
-		props.on(update);
+			// If the parent doesn't exist, we can assume that there
+			// is at most one node. Rotating the child nodes can be
+			// skipped in this case.
+		});
 	});
 }

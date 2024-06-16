@@ -44,7 +44,7 @@ export default defineConfig({
 					}
 
 					return `
-						import { teardown } from "@mxjp/gluon";
+						import { teardown, e } from "@mxjp/gluon";
 						import { GluonElement } from "@mxjp/gluon/element";
 
 						${imports.join("\n")}
@@ -54,8 +54,15 @@ export default defineConfig({
 						};
 
 						class ExampleElement extends GluonElement {
+							connectedCallback() {
+								super.connectedCallback();
+							}
+
 							render() {
-								return examples[this.getAttribute("name")]();
+								return [
+									e("link", { rel: "stylesheet", href: "/gluon/stylesheets/examples.css" }),
+									examples[this.getAttribute("name")](),
+								];
 							}
 						}
 
@@ -67,17 +74,20 @@ export default defineConfig({
 				if (id.startsWith(src)) {
 					const file = relative(src, id);
 					if (file.endsWith(".tsx")) {
-						const code = await readFile(id, "utf-8");
+						let code = await readFile(id, "utf-8");
 						const name = file.slice(0, -4);
 						let md = "";
+
 						const mdComment = /^\s*?\/\*([^]*?)\*\/\s*?/.exec(code);
 						if (mdComment) {
 							md += mdComment[1].trim() + "\n\n";
-							const original = code.slice(mdComment.index + mdComment[0].length).trim();
-							md += `\`\`\`jsx\n${original}\n\`\`\`\n\n`;
+							code = code.slice(mdComment.index + mdComment[0].length).trim();
 						}
+
 						md += `<script type="module" src="/gluon/examples/bundle.js"></script>\n`;
 						md += `<gluon-example name="${name}"></gluon-example>\n`;
+						md += `\`\`\`jsx\n${code}\n\`\`\`\n\n`;
+
 						await writeFile(join(outDir, `${name}.md`), md);
 					}
 				}

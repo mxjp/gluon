@@ -10,8 +10,10 @@ This example also demonstrates how state and logic can be separated from it's re
 import { Expression, IndexFor, Show, get, lazy, sig, teardown } from "@mxjp/gluon";
 
 export function Example() {
+	// Create a reactive timer instance:
 	const timer = createTimer();
 
+	// Render the timer UI:
 	return <div class="column">
 		<div style={{ "font-size": "2rem" }}>
 			<Time value={timer.elapsed} />
@@ -37,6 +39,7 @@ export function Example() {
 	</div>;
 }
 
+// A small component for displaying a time in milliseconds:
 function Time(props: {
 	value: Expression<number>;
 }) {
@@ -68,7 +71,15 @@ function createTimer() {
 		lastLap: number,
 	};
 
+	// Create a signal that is updated with the current time every frame:
 	const now = sig(performance.now());
+	let nextFrame = requestAnimationFrame(function update() {
+		nextFrame = requestAnimationFrame(update);
+		now.value = performance.now();
+	});
+	// Stop updating the timer when this lifecycle is disposed:
+	teardown(() => cancelAnimationFrame(nextFrame));
+
 	const laps = sig<Lap[]>([]);
 	const state = sig<State>({
 		type: "paused",
@@ -76,12 +87,8 @@ function createTimer() {
 		lastLap: 0,
 	});
 
-	let nextFrame = requestAnimationFrame(function update() {
-		nextFrame = requestAnimationFrame(update);
-		now.value = performance.now();
-	});
-	teardown(() => cancelAnimationFrame(nextFrame));
-
+	// Compute the elapsed time on demand from
+	// the current time and state signals:
 	const elapsed = lazy(() => {
 		switch (state.value.type) {
 			case "paused": return state.value.elapsed;
@@ -89,6 +96,8 @@ function createTimer() {
 		}
 	});
 
+	// Return an object with reactive accessors for the
+	// current state and some functions to control this timer:
 	return {
 		running: () => state.value.type === "running",
 		laps: () => laps.value,

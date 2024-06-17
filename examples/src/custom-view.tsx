@@ -1,9 +1,9 @@
 /*
 
 # Custom View
-This example shows a custom view that rotates the order of it's children when a signal is updated.
+This example shows a custom view that rotates the order of it's logical children when a signal is updated.
 
-To demonstrate boundary tracking, you can also hide the custom view, rotate the order and then show it again.
+You can toggle the visibility of the entire view or one of it's children to demonstrate boundary tracking.
 
 */
 
@@ -11,18 +11,25 @@ import { Attach, Emitter, Event, View, render, sig } from "@mxjp/gluon";
 
 export function Example() {
 	const rotate = new Emitter<[]>();
-	const visible = sig(true);
+	const allVisible = sig(true);
+	const innerVisible = sig(true);
 
 	return <div class="column">
 		<div class="row">
 			<button $click={() => { rotate.emit() }}>Rotate Order</button>
-			<button $click={() => visible.value = !visible.value}>Toggle Visibility</button>
+			<button $click={() => allVisible.value = !allVisible.value}>Toggle Outer Visibility</button>
+			<button $click={() => innerVisible.value = !innerVisible.value}>Toggle Inner Visibility</button>
 		</div>
-		<Attach when={visible}>
+		<Attach when={allVisible}>
 			<RotateOrder on={rotate.event}>
 				<input type="text" value="A" />
 				<input type="text" value="BB" />
-				<input type="text" value="CCC" />
+
+				{/* This "Attach" view is treated as a single child: */}
+				<Attach when={innerVisible}>
+					<input type="text" value="CC1" />
+					<input type="text" value="CC2" />
+				</Attach>
 			</RotateOrder>
 		</Attach>
 	</div>;

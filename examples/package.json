@@ -5,7 +5,8 @@
 		"build": "rollup --config rollup.config.js"
 	},
 	"dependencies": {
-		"@mxjp/gluon": "file:.."
+		"@mxjp/gluon": "file:..",
+		"i18next": "^23.11.5"
 	},
 	"devDependencies": {
 		"@rollup/plugin-node-resolve": "^15.2.3",

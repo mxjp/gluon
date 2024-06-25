@@ -210,6 +210,25 @@ await test("view", async ctx => {
 			strictEqual(text(view.take()), "");
 			assertEvents(events, [""]);
 		});
+
+		await ctx.test("render side effects", () => {
+			const signal = sig(0);
+			let view!: View;
+			uncapture(() => {
+				view = <Nest>
+					{() => {
+						const value = signal.value;
+						return () => {
+							if (value < 3) {
+								signal.value++;
+							}
+							return value;
+						};
+					}}
+				</Nest> as View;
+			});
+			strictEqual(text(view.take()), "3");
+		});
 	});
 
 	await ctx.test("Show", () => {

@@ -207,8 +207,14 @@ export function Nest(props: {
 	children: Expression<(() => unknown) | null | undefined>;
 }): View {
 	return new View((setBoundary, self) => {
+		let cycle = 0;
 		watch(props.children, value => {
+			cycle++;
+			const accessedCycle = cycle;
 			const view = render(value?.());
+			if (accessedCycle !== cycle) {
+				return;
+			}
 			const parent = self.parent;
 			if (parent) {
 				parent.insertBefore(view.take(), self.first);

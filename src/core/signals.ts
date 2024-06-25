@@ -1,7 +1,7 @@
 import { getContext, runInContext, wrapContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
 import { INTERNAL_GLOBALS } from "./internals.js";
-import { capture, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
+import { capture, captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 import type { Dependant, DependantFn } from "./signal-types.js";
 
 const { BATCH_STACK, TRACKING_STACK, TRIGGERS_STACK, DEPENDANTS_STACK } = INTERNAL_GLOBALS;
@@ -297,7 +297,10 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 			});
 		}
 
-		const runFn = () => fn(value);
+		const runFn = (disposeSelf: TeardownHook) => {
+			disposeFn = disposeSelf;
+			fn(value);
+		};
 
 		(function dependant(accessedCycle: number): void {
 			if (disposed || cycle !== accessedCycle) {
@@ -314,7 +317,7 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 					DEPENDANTS_STACK.pop();
 				}
 				disposeFn?.();
-				disposeFn = capture(runFn);
+				captureSelf(runFn);
 			});
 		})(cycle);
 	} else {

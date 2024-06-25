@@ -6,7 +6,7 @@ import test from "node:test";
 import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
 import { wrap } from "@mxjp/gluon/store";
 
-import { assertEvents, assertSharedInstance, boundaryEvents, TestView, testView, text } from "../common.js";
+import { assertEvents, assertSharedInstance, boundaryEvents, lifecycleEvent, TestView, testView, text } from "../common.js";
 
 await test("view", async ctx => {
 	await ctx.test("shared instances", () => {
@@ -212,6 +212,7 @@ await test("view", async ctx => {
 		});
 
 		await ctx.test("render side effects", () => {
+			const events: unknown[] = [];
 			const signal = sig(0);
 			let view!: View;
 			uncapture(() => {
@@ -219,6 +220,7 @@ await test("view", async ctx => {
 					{() => {
 						const value = signal.value;
 						return () => {
+							lifecycleEvent(events, `${value}`);
 							if (value < 3) {
 								signal.value++;
 							}
@@ -228,6 +230,7 @@ await test("view", async ctx => {
 				</Nest> as View;
 			});
 			strictEqual(text(view.take()), "3");
+			assertEvents(events, ["s:0", "s:1", "s:2", "s:3", "e:2", "e:1", "e:0"]);
 		});
 	});
 

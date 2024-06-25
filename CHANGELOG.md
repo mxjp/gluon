@@ -1,5 +1,9 @@
 # Changelog
 
+## 10.2
++ Support immediate side effects in `watch` callbacks.
++ Support immediate render side effects in `<Nest>` and `<Show>`.
+
 ## 10.1
 + Add `GluonElement` as a base for web components.
 + Fix signal equality check of `NaN` values.

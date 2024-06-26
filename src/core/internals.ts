@@ -7,7 +7,7 @@ export interface InternalGlobals {
 	/**
 	 * The next suffix for generating unique ids in the current thread.
 	 */
-	NEXT_ID: { value: number };
+	NEXT_ID: { value: number | bigint };
 
 	/**
 	 * A stack where the last item is the current context.

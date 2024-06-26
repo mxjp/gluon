@@ -209,7 +209,7 @@ export function Nest(props: {
 	return new View((setBoundary, self) => {
 		let cycle = 0;
 		watch(props.children, value => {
-			cycle++;
+			cycle = (cycle + 1) | 0;
 			const accessedCycle = cycle;
 			const view = render(value?.());
 			if (accessedCycle !== cycle) {
@@ -416,7 +416,7 @@ export function For<T>(props: {
 					instance.dispose();
 				}
 			}
-			cycle++;
+			cycle = (cycle + 1) | 0;
 			if (last !== self.last) {
 				setBoundary(undefined, last);
 			}

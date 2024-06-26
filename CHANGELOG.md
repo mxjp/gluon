@@ -2,6 +2,8 @@
 
 ## 10.3
 + Support practically infinite unique ids.
++ Support infinitely chained immediate signal updates.
++ Support immediate side effects in `effect` callbacks.
 
 ## 10.2
 + Support immediate side effects in `watch` callbacks.

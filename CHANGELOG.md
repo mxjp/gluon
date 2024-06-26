@@ -1,5 +1,8 @@
 # Changelog
 
+## 10.3
++ Support practically infinite unique ids.
+
 ## 10.2
 + Support immediate side effects in `watch` callbacks.
 + Support immediate render side effects in `<Nest>` and `<Show>`.

@@ -42,6 +42,9 @@ function callDependant(cycle: number, fn: DependantFn) {
 	fn(cycle);
 }
 
+const SIGNAL_EQUALS_DEFAULT: SignalEqualsFn<unknown> = Object.is;
+const SIGNAL_EQUALS_DISABLED: SignalEqualsFn<unknown> = () => false;
+
 /**
  * Represents a value that changes over time.
  */
@@ -80,7 +83,7 @@ export class Signal<T> {
 		this.#value = value;
 		this.#equals = typeof equals === "function"
 			? equals
-			: (equals ? (a, b) => Object.is(a, b) : () => false);
+			: (equals ? SIGNAL_EQUALS_DEFAULT : SIGNAL_EQUALS_DISABLED);
 	}
 
 	/**

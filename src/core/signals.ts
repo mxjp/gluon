@@ -1,7 +1,7 @@
 import { getContext, runInContext, wrapContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
 import { INTERNAL_GLOBALS } from "./internals.js";
-import { capture, captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
+import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 import type { Dependant, DependantFn } from "./signal-types.js";
 
 const { BATCH_STACK, TRACKING_STACK, TRIGGERS_STACK, DEPENDANTS_STACK } = INTERNAL_GLOBALS;
@@ -305,24 +305,28 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 			fn(value);
 		};
 
-		(function dependant(accessedCycle: number): void {
+		const cycleFn = () => {
+			TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
+			DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
+			try {
+				nocapture(runExpr);
+			} finally {
+				TRIGGERS_STACK.pop();
+				DEPENDANTS_STACK.pop();
+			}
+			disposeFn?.();
+			captureSelf(runFn);
+		};
+
+		const dependant = (accessedCycle: number): void => {
 			if (disposed || cycle !== accessedCycle) {
 				return;
 			}
-			cycle++;
-			runInContext(context, () => {
-				TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
-				DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
-				try {
-					nocapture(runExpr);
-				} finally {
-					TRIGGERS_STACK.pop();
-					DEPENDANTS_STACK.pop();
-				}
-				disposeFn?.();
-				captureSelf(runFn);
-			});
-		})(cycle);
+			cycle = (cycle + 1) | 0;
+			runInContext(context, cycleFn);
+		};
+
+		dependant(cycle);
 	} else {
 		fn(expr);
 	}
@@ -360,7 +364,6 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, tri
  */
 export function effect(fn: () => void, trigger = false): void {
 	const context = getContext();
-
 	let disposed = false;
 	let disposeFn: TeardownHook | undefined;
 	let cycle = 0;
@@ -370,23 +373,32 @@ export function effect(fn: () => void, trigger = false): void {
 		disposeFn?.();
 	});
 
-	(function dependant(accessedCycle: number): void {
+	const runFn = (disposeSelf: TeardownHook) => {
+		disposeFn = disposeSelf;
+		fn();
+	};
+
+	const cycleFn = () => {
+		disposeFn?.();
+		TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
+		DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
+		try {
+			captureSelf(runFn);
+		} finally {
+			TRIGGERS_STACK.pop();
+			DEPENDANTS_STACK.pop();
+		}
+	};
+
+	const dependant = (accessedCycle: number): void => {
 		if (disposed || cycle !== accessedCycle) {
 			return;
 		}
-		cycle++;
-		runInContext(context, () => {
-			disposeFn?.();
-			TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
-			DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
-			try {
-				disposeFn = capture(fn);
-			} finally {
-				TRIGGERS_STACK.pop();
-				DEPENDANTS_STACK.pop();
-			}
-		});
-	})(cycle);
+		cycle = (cycle + 1) | 0;
+		runInContext(context, cycleFn);
+	};
+
+	dependant(cycle);
 }
 
 /**
@@ -532,12 +544,19 @@ export function lazy<T>(expr: Expression<T>): () => T {
 	let proxyMap = new Map<DependantFn, number>();
 	const proxy: Dependant = [accessedCycle => {
 		if (proxy[1] === accessedCycle) {
-			proxy[1]++;
+			proxy[1] = (proxy[1] + 1) | 0;
 			const map = proxyMap;
 			proxyMap = new Map();
 			map.forEach(callDependant);
 		}
 	}, 0];
+
+	const triggerFn = (accessedCycle: number) => {
+		if (cycle === accessedCycle) {
+			cycle = (cycle + 1) | 0;
+			current = false;
+		}
+	};
 
 	let cycle = 0;
 	return () => {
@@ -546,12 +565,7 @@ export function lazy<T>(expr: Expression<T>): () => T {
 			current = true;
 			DEPENDANTS_STACK.push([proxy]);
 			try {
-				value = trigger(expr, accessedCycle => {
-					if (cycle === accessedCycle) {
-						cycle++;
-						current = false;
-					}
-				}, cycle);
+				value = trigger(expr, triggerFn, cycle);
 			} finally {
 				DEPENDANTS_STACK.pop();
 			}

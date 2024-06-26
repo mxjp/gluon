@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { batch, capture, effect, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, Signal, string, teardown, TeardownHook, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
 
-import { assertEvents, assertSharedInstance } from "../common.js";
+import { assertEvents, assertSharedInstance, lifecycleEvent } from "../common.js";
 
 await test("signals", async ctx => {
 	await ctx.test("shared instances", () => {
@@ -407,6 +407,40 @@ await test("signals", async ctx => {
 			});
 		});
 	}
+
+	await ctx.test("immediate side effects", async ctx => {
+		await ctx.test("watch", () => {
+			const events: unknown[] = [];
+			const signal = sig(0);
+			const dispose = capture(() => {
+				watch(signal, value => {
+					lifecycleEvent(events, `${value}`);
+					if (signal.value < 3) {
+						signal.value++;
+					}
+				});
+			});
+			assertEvents(events, ["s:0", "s:1", "s:2", "s:3", "e:2", "e:1", "e:0"]);
+			dispose();
+			assertEvents(events, ["e:3"]);
+		});
+
+		await ctx.test("effect", () => {
+			const events: unknown[] = [];
+			const signal = sig(0);
+			const dispose = capture(() => {
+				effect(() => {
+					lifecycleEvent(events, `${signal.value}`);
+					if (signal.value < 3) {
+						signal.value++;
+					}
+				});
+			});
+			assertEvents(events, ["s:0", "s:1", "s:2", "s:3", "e:2", "e:1", "e:0"]);
+			dispose();
+			assertEvents(events, ["e:3"]);
+		});
+	});
 
 	await ctx.test("watchUpdates", () => {
 		const events: unknown[] = [];

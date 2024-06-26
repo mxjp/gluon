@@ -8,7 +8,13 @@ const { NEXT_ID } = INTERNAL_GLOBALS;
  * @returns The unique id in the form `gluon_123`.
  */
 export function uniqueId(): string {
-	return "gluon_" + String(NEXT_ID.value++);
+	const next = NEXT_ID.value;
+	if (typeof next === "number" && next >= Number.MAX_SAFE_INTEGER) {
+		NEXT_ID.value = BigInt(NEXT_ID.value) + 1n;
+	} else {
+		NEXT_ID.value++;
+	}
+	return "gluon_" + String(next);
 }
 
 /**

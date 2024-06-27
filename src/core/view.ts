@@ -420,7 +420,7 @@ export function For<T>(props: {
 			if (last !== self.last) {
 				setBoundary(undefined, last);
 			}
-		});
+		}, false, true);
 	});
 }
 
@@ -532,7 +532,7 @@ export function IndexFor<T>(props: {
 			if (self.last !== last) {
 				setBoundary(undefined, last);
 			}
-		});
+		}, false, true);
 	});
 }
 

@@ -396,6 +396,8 @@ await test("view", async ctx => {
 			}
 		});
 
+		// TODO: Item render side effects.
+
 		function lifecycleTest(options: {
 			sequence: [values: unknown[], ...expectedEvents: unknown[]][];
 			disposeEvents: unknown[];
@@ -583,6 +585,8 @@ await test("view", async ctx => {
 				throw error;
 			}
 		});
+
+		// TODO: Item render side effects.
 
 		function lifecycleTest(options: {
 			sequence: [values: unknown[], ...expectedEvents: unknown[]][];

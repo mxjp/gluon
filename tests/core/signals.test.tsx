@@ -409,7 +409,7 @@ await test("signals", async ctx => {
 	}
 
 	await ctx.test("immediate side effects", async ctx => {
-		await ctx.test("watch", () => {
+		await ctx.test("watch (recursive)", () => {
 			const events: unknown[] = [];
 			const signal = sig(0);
 			const dispose = capture(() => {
@@ -425,7 +425,27 @@ await test("signals", async ctx => {
 			assertEvents(events, ["e:3"]);
 		});
 
-		await ctx.test("effect", () => {
+		await test("watch (sequential)", () => {
+			const events: unknown[] = [];
+			const signal = sig(0);
+			const dispose = capture(() => {
+				watch(signal, value => {
+					lifecycleEvent(events, `${value}`);
+					if (signal.value < 3) {
+						signal.value++;
+					}
+				}, false, true);
+			});
+			assertEvents(events, ["s:0", "e:0", "s:1", "e:1", "s:2", "e:2", "s:3"]);
+			dispose();
+			assertEvents(events, ["e:3"]);
+		});
+
+		await test("watch (sequential, access cycles)", () => {
+			// TODO: Assert, that sequence cycle offset never interferes with access cycles.
+		});
+
+		await ctx.test("effect (recursive)", () => {
 			const events: unknown[] = [];
 			const signal = sig(0);
 			const dispose = capture(() => {
@@ -439,6 +459,26 @@ await test("signals", async ctx => {
 			assertEvents(events, ["s:0", "s:1", "s:2", "s:3", "e:2", "e:1", "e:0"]);
 			dispose();
 			assertEvents(events, ["e:3"]);
+		});
+
+		await ctx.test("effect (sequential)", () => {
+			const events: unknown[] = [];
+			const signal = sig(0);
+			const dispose = capture(() => {
+				effect(() => {
+					lifecycleEvent(events, `${signal.value}`);
+					if (signal.value < 3) {
+						signal.value++;
+					}
+				}, false, true);
+			});
+			assertEvents(events, ["s:0", "e:0", "s:1", "e:1", "s:2", "e:2", "s:3"]);
+			dispose();
+			assertEvents(events, ["e:3"]);
+		});
+
+		await test("effect (sequential, access cycles)", () => {
+			// TODO: Assert, that sequence cycle offset never interferes with access cycles.
 		});
 	});
 

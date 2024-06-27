@@ -1,4 +1,4 @@
-import { getContext, runInContext, wrapContext } from "./context.js";
+import { getContext, runInContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
 import { INTERNAL_GLOBALS } from "./internals.js";
 import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
@@ -248,11 +248,35 @@ export type Expression<T> = T | Signal<T> | (() => T);
 export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
 
 /**
+ * Wrap a dependant function so that recursive side effects run in sequence instead of immediately.
+ */
+function sequentialize(dependant: DependantFn): DependantFn {
+	let queue = 0;
+	let cycleOffset = 0;
+	return accessedCycle => {
+		queue++;
+		if (queue === 1) {
+			try {
+				while (queue > 0) {
+					dependant(accessedCycle + cycleOffset);
+					cycleOffset++;
+					queue--;
+				}
+			} finally {
+				queue = 0;
+				cycleOffset = 0;
+			}
+		}
+	};
+}
+
+/**
  * Watch an expression until the current lifecycle is disposed.
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately. Lifecycle hooks are called before the next function call or when the current lifecycle is disposed.
  * @param trigger If true, batches are ignored and the expression and function run before all non-triggers. Default is false.
+ * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  *
  * @example
  * ```tsx
@@ -276,7 +300,7 @@ export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
  * count.value = 2;
  * ```
  */
-export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false): void {
+export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = false, sequential = false): void {
 	if (expr instanceof Signal || typeof expr === "function") {
 		const context = getContext();
 		let disposed = false;
@@ -295,9 +319,9 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 				value = expr.value;
 			};
 		} else {
-			runExpr = wrapContext(() => {
-				value = (expr as () => T)();
-			});
+			runExpr = () => {
+				value = nocapture(expr as () => T);
+			};
 		}
 
 		const runFn = (disposeSelf: TeardownHook) => {
@@ -309,7 +333,7 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 			TRIGGERS_STACK.push(trigger ? [[dependant, cycle]] : []);
 			DEPENDANTS_STACK.push(trigger ? [] : [[dependant, cycle]]);
 			try {
-				nocapture(runExpr);
+				runExpr();
 			} finally {
 				TRIGGERS_STACK.pop();
 				DEPENDANTS_STACK.pop();
@@ -318,14 +342,16 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
 			captureSelf(runFn);
 		};
 
-		const dependant = (accessedCycle: number): void => {
+		let dependant = (accessedCycle: number): void => {
 			if (disposed || cycle !== accessedCycle) {
 				return;
 			}
 			cycle = (cycle + 1) | 0;
 			runInContext(context, cycleFn);
 		};
-
+		if (sequential) {
+			dependant = sequentialize(dependant);
+		}
 		dependant(cycle);
 	} else {
 		fn(expr);
@@ -338,9 +364,10 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, trigger = 
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result when any updates occur.
  * @param trigger If true, batches are ignored and the expression and function run before all non-triggers. Default is false.
+ * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  * @returns The first expression result.
  */
-export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, trigger?: boolean): T {
+export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, trigger?: boolean, sequential?: boolean): T {
 	let first: T;
 	let update = false;
 	watch(expr, value => {
@@ -350,7 +377,7 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, tri
 			first = value;
 			update = true;
 		}
-	}, trigger);
+	}, trigger, sequential);
 	return first!;
 }
 
@@ -361,8 +388,9 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, tri
  *
  * @param fn The function to run. Lifecycle hooks  are called before the next function call or when the current lifecycle is disposed.
  * @param trigger If true, batches are ignored and the expression and function run before all non-triggers. Default is false.
+ * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  */
-export function effect(fn: () => void, trigger = false): void {
+export function effect(fn: () => void, trigger = false, sequential = false): void {
 	const context = getContext();
 	let disposed = false;
 	let disposeFn: TeardownHook | undefined;
@@ -390,14 +418,16 @@ export function effect(fn: () => void, trigger = false): void {
 		}
 	};
 
-	const dependant = (accessedCycle: number): void => {
+	let dependant = (accessedCycle: number): void => {
 		if (disposed || cycle !== accessedCycle) {
 			return;
 		}
 		cycle = (cycle + 1) | 0;
 		runInContext(context, cycleFn);
 	};
-
+	if (sequential) {
+		dependant = sequentialize(dependant);
+	}
 	dependant(cycle);
 }
 

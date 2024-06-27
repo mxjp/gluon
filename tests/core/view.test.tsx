@@ -230,7 +230,7 @@ await test("view", async ctx => {
 				</Nest> as View;
 			});
 			strictEqual(text(view.take()), "3");
-			assertEvents(events, ["s:0", "s:1", "s:2", "s:3", "e:2", "e:1", "e:0"]);
+			assertEvents(events, ["s:0", "e:0", "s:1", "e:1", "s:2", "e:2", "s:3"]);
 		});
 	});
 

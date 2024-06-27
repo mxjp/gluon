@@ -3,7 +3,9 @@
 ## 10.3
 + Support practically infinite unique ids.
 + Support infinitely chained immediate signal updates.
-+ Support immediate side effects in `effect` callbacks.
++ Support immediate side effects in `watch` & `effect` callbacks.
++ Add `sequential` parameter to `watch` & `effect`.
++ Immediate render side effects in `<Nest>`, `<Show>`, `<For>` and `<IndexFor>` are now sequential.
 
 ## 10.2
 + Support immediate side effects in `watch` callbacks.

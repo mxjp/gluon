@@ -6,10 +6,10 @@
 		"build": "vite build"
 	},
 	"devDependencies": {
-		"typescript": "^5.4.2",
-		"vite": "^5.1.6"
+		"typescript": "^5.5.2",
+		"vite": "^5.3.2"
 	},
 	"dependencies": {
-		"@mxjp/gluon": "^10.1.0"
+		"@mxjp/gluon": "^11.0.0"
 	}
 }

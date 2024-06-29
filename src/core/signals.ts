@@ -254,7 +254,9 @@ function sequentialize(dependant: DependantFn): DependantFn {
 	let queue = 0;
 	let cycleOffset = 0;
 	return accessedCycle => {
-		queue++;
+		if (queue < 2) {
+			queue++;
+		}
 		if (queue === 1) {
 			try {
 				while (queue > 0) {

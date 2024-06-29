@@ -76,8 +76,8 @@ You can also use gluon without any build system by directly using one of the es 
 
 | Modules | Human Readable | Minified | Types |
 |-|-|-|-|
-| Core | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
-| Core, Async, Router | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
+| Core Only | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
+| All | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
 
 ### Custom Bundles
 If the bundles above don't fit your needs, you can build a custom bundle that only includes the modules you need:

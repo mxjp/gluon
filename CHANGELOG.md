@@ -1,11 +1,11 @@
 # Changelog
 
-## 10.3
+## 11.0
++ **Breaking:** `trigger` argument has been removed from `watch`, `watchUpdates` and `effect`.
++ **Breaking:** Immediate render side effects in `<Nest>`, `<Show>`, `<For>` and `<IndexFor>` are now sequential.
 + Support practically infinite unique ids.
 + Support infinitely chained immediate signal updates.
-+ Support immediate side effects in `watch` & `effect` callbacks.
 + Add `sequential` parameter to `watch` & `effect`.
-+ Immediate render side effects in `<Nest>`, `<Show>`, `<For>` and `<IndexFor>` are now sequential.
 
 ## 10.2
 + Support immediate side effects in `watch` callbacks.

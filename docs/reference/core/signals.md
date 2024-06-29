@@ -203,6 +203,61 @@ map(6, value => value * 7);
 map(sig(6), value => value * 7);
 ```
 
+## Immediate Side Effects
+All signal updates are immediately processed by default. This includes nested updates:
+```jsx
+import { sig, watch } from "@mxjp/gluon";
+
+const count = sig(0);
+
+watch(count, value => {
+	console.group("Count:", value);
+	if (value < 2) {
+		count.value++;
+		console.log("New count:", count.value);
+	}
+	console.groupEnd();
+});
+
+console.log("Final count:", count.value);
+```
+```
+Count: 0
+	Count: 1
+		Count: 2
+		New count: 2
+	New count: 2
+Final count: 2
+```
+
+If needed, nested updates can also be processed in sequence by setting the last parameter in `watch`, `watchUpdates` or `effect` to true:
+```jsx
+import { sig, watch } from "@mxjp/gluon";
+
+const count = sig(0);
+
+watch(count, value => {
+	console.group("Count:", value);
+	if (value < 2) {
+		count.value++;
+		console.log("New count:", count.value);
+	}
+	console.groupEnd();
+}, true);
+
+console.log("Final count:", count.value);
+```
+```
+Count: 0
+	New count: 1
+Count: 1
+	New count: 2
+Count: 2
+Final count: 2
+```
+
+
+
 ## Troubleshooting
 For signal based reactivity to work, the following is required:
 

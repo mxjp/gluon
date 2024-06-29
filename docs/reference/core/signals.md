@@ -77,7 +77,6 @@ watch(count, value => {
 + Evaluation is stopped when the current [lifecycle](lifecycle.md) is disposed.
 + Teardown hooks from the callback are called when the current [lifecycle](lifecycle.md) is disposed or before the next call.
 + Teardown hooks are not supported in the expression.
-+ Setting the second parameter to `true` guarantees that the callback runs before other non-trigger callbacks and during [batches](#batch).
 
 ## `watchUpdates`
 This is the same as [`watch`](#watch), but the initial value is returned instead of being passed to the callback.
@@ -103,7 +102,6 @@ effect(() => {
 + The current [context](context.md) is available in the callback.
 + Execution is stopped when the current [lifecycle](lifecycle.md) is disposed.
 + Teardown hooks from the callback are called when the current [lifecycle](lifecycle.md) is disposed or before the next call.
-+  Setting the second parameter to `true` guarantees that the callback runs before other non-trigger callbacks and during [batches](#batch).
 
 Prefer using [`watch`](#watch) or [`watchUpdates`](#watchupdates) if possible because it's easy to build infinite loops using `effect`:
 ```jsx
@@ -125,7 +123,7 @@ const currentCount = trigger(count, () => {
 });
 ```
 
-+ It is guaranteed that trigger callbacks run before all other non-trigger callbacks.
++ It is guaranteed that trigger callbacks run before all other [watch](#watch), [watchUpdates](#watchupdates) or [effect](#effect) callbacks.
 + Trigger callbacks run during [batches](#batch).
 
 When using `trigger` in a loop, e.g. in an expression the last `cycle` parameter is passed back into the callback and can be used to keep track of which iteration caused the update.

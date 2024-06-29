@@ -439,8 +439,39 @@ await test("signals", async ctx => {
 			assertEvents(events, ["e:3"]);
 		});
 
-		await test("watch (sequential, access cycles)", () => {
-			// TODO: Assert, that sequence cycle offset never interferes with access cycles.
+		await test("watch (sequential, duplicate updates)", () => {
+			const events: unknown[] = [];
+			const signal = sig(0);
+			const dispose = capture(() => {
+				watch(signal, value => {
+					lifecycleEvent(events, `${value}`);
+					if (signal.value < 5) {
+						signal.value++;
+						signal.value++;
+					}
+				}, true);
+			});
+			assertEvents(events, ["s:0", "e:0", "s:2", "e:2", "s:4", "e:4", "s:6"]);
+			dispose();
+			assertEvents(events, ["e:6"]);
+		});
+
+		await test("watch (sequential, multiple signals)", () => {
+			const events: unknown[] = [];
+			const a = sig(0);
+			const b = sig(0);
+			const dispose = capture(() => {
+				watch(() => a.value + b.value, value => {
+					lifecycleEvent(events, `${value}`);
+					if (value < 5) {
+						a.value++;
+						b.value++;
+					}
+				}, true);
+			});
+			assertEvents(events, ["s:0", "e:0", "s:2", "e:2", "s:4", "e:4", "s:6"]);
+			dispose();
+			assertEvents(events, ["e:6"]);
 		});
 
 		await ctx.test("effect (recursive)", () => {
@@ -475,8 +506,40 @@ await test("signals", async ctx => {
 			assertEvents(events, ["e:3"]);
 		});
 
-		await test("effect (sequential, access cycles)", () => {
-			// TODO: Assert, that sequence cycle offset never interferes with access cycles.
+		await test("effect (sequential, duplicate updates)", () => {
+			const events: unknown[] = [];
+			const signal = sig(0);
+			const dispose = capture(() => {
+				effect(() => {
+					lifecycleEvent(events, `${signal.value}`);
+					if (signal.value < 5) {
+						signal.value++;
+						signal.value++;
+					}
+				}, true);
+			});
+			assertEvents(events, ["s:0", "e:0", "s:2", "e:2", "s:4", "e:4", "s:6"]);
+			dispose();
+			assertEvents(events, ["e:6"]);
+		});
+
+		await test("effect (sequential, multiple signals)", () => {
+			const events: unknown[] = [];
+			const a = sig(0);
+			const b = sig(0);
+			const dispose = capture(() => {
+				effect(() => {
+					const value = a.value + b.value;
+					lifecycleEvent(events, `${value}`);
+					if (value < 5) {
+						a.value++;
+						b.value++;
+					}
+				}, true);
+			});
+			assertEvents(events, ["s:0", "e:0", "s:2", "e:2", "s:4", "e:4", "s:6"]);
+			dispose();
+			assertEvents(events, ["e:6"]);
 		});
 	});
 

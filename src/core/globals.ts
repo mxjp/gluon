@@ -38,8 +38,6 @@ export function shareInstancesOf(targetClass: { prototype: object }, symbolKey: 
 	const native = (targetClass as any)[Symbol.hasInstance] as (target: any) => boolean;
 	Object.defineProperty(targetClass, Symbol.hasInstance, {
 		configurable: true,
-		enumerable: false,
-		writable: false,
 		value: function hasInstance(target: any): boolean {
 			return target?.[marker] ?? native.call(this, target);
 		},

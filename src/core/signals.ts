@@ -344,11 +344,10 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, sequential
 		};
 
 		let dependant = (accessedCycle: number): void => {
-			if (disposed || cycle !== accessedCycle) {
-				return;
+			if (!disposed && cycle === accessedCycle) {
+				cycle = (cycle + 1) | 0;
+				runInContext(context, cycleFn);
 			}
-			cycle = (cycle + 1) | 0;
-			runInContext(context, cycleFn);
 		};
 		if (sequential) {
 			dependant = sequentialize(dependant);
@@ -418,11 +417,10 @@ export function effect(fn: () => void, sequential = false): void {
 	};
 
 	let dependant = (accessedCycle: number): void => {
-		if (disposed || cycle !== accessedCycle) {
-			return;
+		if (!disposed && cycle === accessedCycle) {
+			cycle = (cycle + 1) | 0;
+			runInContext(context, cycleFn);
 		}
-		cycle = (cycle + 1) | 0;
-		runInContext(context, cycleFn);
 	};
 	if (sequential) {
 		dependant = sequentialize(dependant);
@@ -455,10 +453,7 @@ export function effect(fn: () => void, sequential = false): void {
 export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cycle = 0): T {
 	if (expr instanceof Signal || typeof expr === "function") {
 		const triggers = TRIGGERS_STACK[TRIGGERS_STACK.length - 1];
-		triggers.push([
-			cycle => uncapture(() => fn(cycle)),
-			cycle,
-		]);
+		triggers.push([cycle => uncapture(() => fn(cycle)), cycle]);
 		try {
 			if (expr instanceof Signal) {
 				return expr.value;

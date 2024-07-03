@@ -1,6 +1,6 @@
 import "../env.js";
 
-import { notStrictEqual, strictEqual, throws } from "node:assert";
+import { deepStrictEqual, notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
 import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
@@ -396,7 +396,27 @@ await test("view", async ctx => {
 			}
 		});
 
-		// TODO: Item render side effects.
+		await ctx.test("sequential item render side effects", () => {
+			const events: unknown[] = [];
+			const signal = sig([1]);
+			const view = uncapture(() => {
+				return <For each={signal}>
+					{value => {
+						if (value === 3) {
+							signal.value = [5];
+						}
+						lifecycleEvent(events, String(value));
+						return value;
+					}}
+				</For> as View;
+			});
+			assertEvents(events, ["s:1"]);
+			strictEqual(text(view.take()), "1");
+			signal.value = [2, 3, 4];
+			deepStrictEqual(signal.value, [5]);
+			assertEvents(events, ["s:2", "s:3", "s:4", "e:1", "s:5", "e:2", "e:3", "e:4"]);
+			strictEqual(text(view.take()), "5");
+		});
 
 		function lifecycleTest(options: {
 			sequence: [values: unknown[], ...expectedEvents: unknown[]][];
@@ -586,7 +606,27 @@ await test("view", async ctx => {
 			}
 		});
 
-		// TODO: Item render side effects.
+		await ctx.test("sequential item render side effects", () => {
+			const events: unknown[] = [];
+			const signal = sig([1]);
+			const view = uncapture(() => {
+				return <IndexFor each={signal}>
+					{value => {
+						if (value === 3) {
+							signal.value = [5];
+						}
+						lifecycleEvent(events, String(value));
+						return value;
+					}}
+				</IndexFor> as View;
+			});
+			assertEvents(events, ["s:1"]);
+			strictEqual(text(view.take()), "1");
+			signal.value = [2, 3, 4];
+			deepStrictEqual(signal.value, [5]);
+			assertEvents(events, ["e:1", "s:2", "s:3", "s:4", "e:2", "s:5", "e:3", "e:4"]);
+			strictEqual(text(view.take()), "5");
+		});
 
 		function lifecycleTest(options: {
 			sequence: [values: unknown[], ...expectedEvents: unknown[]][];

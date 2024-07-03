@@ -1,5 +1,8 @@
 # Changelog
 
+## 11.1
++ Add `MemoryRouter`.
+
 ## 11.0
 + **Breaking:** `trigger` argument has been removed from `watch`, `watchUpdates` and `effect`.
 + **Breaking:** Immediate render side effects in `<Nest>`, `<Show>`, `<For>` and `<IndexFor>` are now sequential.

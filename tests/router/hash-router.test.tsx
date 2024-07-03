@@ -35,16 +35,16 @@ await test("router/history router", () => {
 
 	assertEvents(events, [["", undefined]]);
 
-	router.push("/a", undefined);
+	router.push("/a");
 	assertEvents(events, [["/a", undefined]]);
 
 	router.push("/b", "test=1");
 	assertEvents(events, [["/b", "test=1"]]);
 
-	router.replace("/c", undefined);
+	router.replace("/c");
 	assertEvents(events, [["/c", undefined]]);
 
-	router.push("/d", "test=2");
+	router.push("/d", { test: "2" });
 	assertEvents(events, [["/d", "test=2"]]);
 
 	location.hash = "#";

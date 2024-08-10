@@ -82,7 +82,7 @@ export function render(content: unknown): View {
 	if (content instanceof View) {
 		return content;
 	}
-	return new View((setBoundary, self) => {
+	return new View(setBoundary => {
 		if (Array.isArray(content)) {
 			const flat = content.flat(Infinity) as unknown[];
 			if (flat.length > 1) {
@@ -94,17 +94,9 @@ export function render(content: unknown): View {
 					} else if (part instanceof View) {
 						parent.appendChild(part.take());
 						if (i === 0) {
-							part.setBoundaryOwner((first, _) => {
-								if (first !== self.first) {
-									setBoundary(first, undefined);
-								}
-							});
+							part.setBoundaryOwner((first, _) => setBoundary(first, undefined));
 						} else if (i === flat.length - 1) {
-							part.setBoundaryOwner((_, last) => {
-								if (last !== self.last) {
-									setBoundary(undefined, last);
-								}
-							});
+							part.setBoundaryOwner((_, last) => setBoundary(undefined, last));
 						}
 					} else if (part !== null && part !== undefined) {
 						parent.appendChild(createText(part));

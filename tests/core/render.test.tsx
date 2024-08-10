@@ -178,18 +178,23 @@ await test("render", async ctx => {
 				strictEqual(text(nodes[4]), "42");
 				strictEqual(text(nodes[5]), "f");
 				strictEqual(text(nodes[6]), "l");
-			}
-
-			{
-				first.nextLast();
-				const nodes = Array.from(viewNodes(view));
-				strictEqual(nodes.length, 7);
-				strictEqual(text(nodes[1]), "l0");
 				assertEvents(events, []);
 			}
 
 			{
+				first.nextLast();
+				strictEqual(view.first, first.view.first);
+				strictEqual(view.last, last.view.last);
+				const nodes = Array.from(viewNodes(view));
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[1]), "l0");
+				assertEvents(events, ["fl"]);
+			}
+
+			{
 				first.nextFirst();
+				strictEqual(view.first, first.view.first);
+				strictEqual(view.last, last.view.last);
 				const nodes = Array.from(viewNodes(view));
 				strictEqual(nodes.length, 7);
 				strictEqual(text(nodes[0]), "f1");
@@ -199,14 +204,18 @@ await test("render", async ctx => {
 
 			{
 				last.nextFirst();
+				strictEqual(view.first, first.view.first);
+				strictEqual(view.last, last.view.last);
 				const nodes = Array.from(viewNodes(view));
 				strictEqual(nodes.length, 7);
 				strictEqual(text(nodes[5]), "f0");
-				assertEvents(events, []);
+				assertEvents(events, ["f1l"]);
 			}
 
 			{
 				last.nextLast();
+				strictEqual(view.first, first.view.first);
+				strictEqual(view.last, last.view.last);
 				const nodes = Array.from(viewNodes(view));
 				strictEqual(nodes.length, 7);
 				strictEqual(text(nodes[0]), "f1");

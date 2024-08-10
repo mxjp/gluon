@@ -8,6 +8,8 @@ const { TEARDOWN_STACK } = INTERNAL_GLOBALS;
  */
 export type TeardownHook = () => void;
 
+const NOOP = () => {};
+
 /**
  * Run a function while capturing teardown hooks.
  *
@@ -22,17 +24,13 @@ export function capture(fn: () => void): TeardownHook {
 	} finally {
 		TEARDOWN_STACK.pop();
 	}
-	if (hooks.length === 0) {
-		return () => {};
-	}
-	if (hooks.length === 1) {
-		return hooks[0];
-	}
-	return () => {
-		for (let i = 0; i < hooks.length; i++) {
-			hooks[i]();
+	return hooks.length > 1
+		? () => {
+			for (let i = 0; i < hooks.length; i++) {
+				hooks[i]();
+			}
 		}
-	};
+		: hooks[0] ?? NOOP;
 }
 
 /**

@@ -19,7 +19,7 @@ export function Example() {
 	// deep reactive wrapper for the items array:
 	let items: Item[];
 	try {
-		items = wrap(JSON.parse(localStorage.getItem(STORAGE_KEY)!));
+		items = wrap(JSON.parse(localStorage.getItem(STORAGE_KEY)!) ?? []);
 	} catch (error) {
 		items = wrap([]);
 		console.error(error);

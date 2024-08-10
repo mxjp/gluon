@@ -273,6 +273,57 @@ function sequentialize(dependant: DependantFn): DependantFn {
 }
 
 /**
+ * Internal utility for starting a watch cycle.
+ *
+ * @param sequential True to wrap the internal dependant using {@link sequentialize}.
+ * @param createCycleFn A function to create the cycle function that is called immediately and by the dependant.
+ * @param innerFn The inner function that can be called by the cycle function while capturing teardown hooks.
+ */
+function startCycle(
+	sequential: boolean,
+	createCycleFn: (
+		dependant: Dependant,
+		innerFn: (disposeSelf: TeardownHook) => void,
+		dispose: () => void,
+	) => (() => void),
+	innerFn: () => void,
+) {
+	const context = getContext();
+	let disposed = false;
+	let disposeFn: TeardownHook | undefined;
+
+	teardown(() => {
+		disposed = true;
+		disposeFn?.();
+	});
+
+	let dependantFn = (accessedCycle: number): void => {
+		if (!disposed && dependant[1] === accessedCycle) {
+			dependant[1] = (dependant[1] + 1) | 0;
+			runInContext(context, cycleFn);
+		}
+	};
+	if (sequential) {
+		dependantFn = sequentialize(dependantFn);
+	}
+
+	const dependant: Dependant = [dependantFn, 0];
+
+	const captureInnerFn = (disposeSelf: TeardownHook) => {
+		disposeFn = disposeSelf;
+		innerFn();
+	};
+
+	const cycleFn = createCycleFn(
+		dependant,
+		captureInnerFn,
+		() => disposeFn?.(),
+	);
+
+	dependantFn(0);
+}
+
+/**
  * Watch an expression until the current lifecycle is disposed.
  *
  * @param expr The expression to watch.
@@ -303,56 +354,26 @@ function sequentialize(dependant: DependantFn): DependantFn {
  */
 export function watch<T>(expr: Expression<T>, fn: (value: T) => void, sequential = false): void {
 	if (expr instanceof Signal || typeof expr === "function") {
-		const context = getContext();
-		let disposed = false;
-		let disposeFn: TeardownHook | undefined;
-		let cycle = 0;
-
-		teardown(() => {
-			disposed = true;
-			disposeFn?.();
-		});
-
 		let value: T;
-		let runExpr: () => void;
-		if (expr instanceof Signal) {
-			runExpr = () => {
-				value = expr.value;
-			};
-		} else {
-			runExpr = () => {
-				value = nocapture(expr as () => T);
-			};
-		}
-
-		const runFn = (disposeSelf: TeardownHook) => {
-			disposeFn = disposeSelf;
-			fn(value);
-		};
-
-		const cycleFn = () => {
-			TRIGGERS_STACK.push([]);
-			DEPENDANTS_STACK.push([[dependant, cycle]]);
-			try {
-				runExpr();
-			} finally {
-				TRIGGERS_STACK.pop();
-				DEPENDANTS_STACK.pop();
-			}
-			disposeFn?.();
-			captureSelf(runFn);
-		};
-
-		let dependant = (accessedCycle: number): void => {
-			if (!disposed && cycle === accessedCycle) {
-				cycle = (cycle + 1) | 0;
-				runInContext(context, cycleFn);
-			}
-		};
-		if (sequential) {
-			dependant = sequentialize(dependant);
-		}
-		dependant(cycle);
+		const runExpr = expr instanceof Signal
+			? () => value = expr.value
+			: () => value = nocapture(expr as () => T);
+		startCycle(
+			sequential,
+			(dependant, innerFn, dispose) => () => {
+				TRIGGERS_STACK.push([]);
+				DEPENDANTS_STACK.push([dependant]);
+				try {
+					runExpr();
+				} finally {
+					TRIGGERS_STACK.pop();
+					DEPENDANTS_STACK.pop();
+				}
+				dispose();
+				captureSelf(innerFn);
+			},
+			() => fn(value),
+		);
 	} else {
 		fn(expr);
 	}
@@ -389,43 +410,21 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, seq
  * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  */
 export function effect(fn: () => void, sequential = false): void {
-	const context = getContext();
-	let disposed = false;
-	let disposeFn: TeardownHook | undefined;
-	let cycle = 0;
-
-	teardown(() => {
-		disposed = true;
-		disposeFn?.();
-	});
-
-	const runFn = (disposeSelf: TeardownHook) => {
-		disposeFn = disposeSelf;
-		fn();
-	};
-
-	const cycleFn = () => {
-		disposeFn?.();
-		TRIGGERS_STACK.push([]);
-		DEPENDANTS_STACK.push([[dependant, cycle]]);
-		try {
-			captureSelf(runFn);
-		} finally {
-			TRIGGERS_STACK.pop();
-			DEPENDANTS_STACK.pop();
-		}
-	};
-
-	let dependant = (accessedCycle: number): void => {
-		if (!disposed && cycle === accessedCycle) {
-			cycle = (cycle + 1) | 0;
-			runInContext(context, cycleFn);
-		}
-	};
-	if (sequential) {
-		dependant = sequentialize(dependant);
-	}
-	dependant(cycle);
+	startCycle(
+		sequential,
+		(dependant, innerFn, dispose) => () => {
+			dispose();
+			TRIGGERS_STACK.push([]);
+			DEPENDANTS_STACK.push([dependant]);
+			try {
+				captureSelf(innerFn);
+			} finally {
+				TRIGGERS_STACK.pop();
+				DEPENDANTS_STACK.pop();
+			}
+		},
+		fn,
+	);
 }
 
 /**

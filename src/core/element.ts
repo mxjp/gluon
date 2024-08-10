@@ -157,8 +157,8 @@ export function setAttributes(elem: Element, attrs: Attributes): void {
 		if (value === undefined) {
 			continue attrs;
 		}
-		if (name.startsWith("$")) {
-			const capture = name.startsWith("$$");
+		if (name[0] === "$") {
+			const capture = name[1] === "$";
 			const event = name.slice(capture ? 2 : 1);
 			elem.addEventListener(event, wrapContext(value as (event: Event) => void), { capture });
 		} else if (name.startsWith("prop:")) {

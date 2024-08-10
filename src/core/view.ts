@@ -276,6 +276,15 @@ export interface ForContentFn<T> {
 	(value: T, index: () => number): unknown;
 }
 
+function insertView(parent: Node, prev: Node, view: View): void {
+	const next = prev.nextSibling;
+	if (next) {
+		parent.insertBefore(view.take(), next);
+	} else {
+		parent.appendChild(view.take());
+	}
+}
+
 /**
  * A component that renders content for each unique value in an iterable.
  *
@@ -365,13 +374,7 @@ export function For<T>(props: {
 							});
 						});
 
-						const next = last.nextSibling;
-						if (next) {
-							parent.insertBefore(instance.view.take(), next);
-						} else {
-							parent.appendChild(instance.view.take());
-						}
-
+						insertView(parent, last, instance.view);
 						instances.splice(index, 0, instance);
 						instanceMap.set(value, instance);
 						last = instance.view.last;
@@ -383,12 +386,7 @@ export function For<T>(props: {
 						const currentIndex = instances.indexOf(instance, index);
 						if (currentIndex < 0) {
 							detach(instances.splice(index, instances.length - index, instance));
-							const next = last.nextSibling;
-							if (next) {
-								parent.insertBefore(instance.view.take(), next);
-							} else {
-								parent.appendChild(instance.view.take());
-							}
+							insertView(parent, last, instance.view);
 						} else {
 							detach(instances.splice(index, currentIndex - index));
 						}
@@ -502,13 +500,7 @@ export function IndexFor<T>(props: {
 					});
 				});
 
-				const next = last.nextSibling;
-				if (next) {
-					parent.insertBefore(instance.view.take(), next);
-				} else {
-					parent.appendChild(instance.view.take());
-				}
-
+				insertView(parent, last, instance.view);
 				instances[index] = instance;
 				last = instance.view.last;
 				index++;

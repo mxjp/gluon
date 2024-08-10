@@ -312,16 +312,21 @@ export function For<T>(props: {
 }): View {
 	return new View((setBoundary, self) => {
 		interface Instance {
-			value: T;
-			cycle: number;
-			index: Signal<number>;
-			dispose: TeardownHook;
-			view: View;
+			/** value */
+			u: T;
+			/** cycle */
+			c: number;
+			/** index */
+			i: Signal<number>;
+			/** dispose */
+			d: TeardownHook;
+			/** view */
+			v: View;
 		}
 
 		function detach(instances: Instance[]) {
 			for (let i = 0; i < instances.length; i++) {
-				instances[i].view.detach();
+				instances[i].v.detach();
 			}
 		}
 
@@ -335,7 +340,7 @@ export function For<T>(props: {
 
 		teardown(() => {
 			for (let i = 0; i < instances.length; i++) {
-				instances[i].dispose();
+				instances[i].d();
 			}
 		});
 
@@ -349,49 +354,49 @@ export function For<T>(props: {
 			let last = first;
 			for (const value of nocapture(() => get(props.each))) {
 				let instance: Instance | undefined = instances[index];
-				if (instance && Object.is(instance.value, value)) {
-					instance.cycle = cycle;
-					instance.index.value = index;
-					last = instance.view.last;
+				if (instance && Object.is(instance.u, value)) {
+					instance.c = cycle;
+					instance.i.value = index;
+					last = instance.v.last;
 					index++;
 				} else {
 					instance = instanceMap.get(value);
 					if (instance === undefined) {
 						const instance: Instance = {
-							value,
-							cycle,
-							index: sig(index),
-							dispose: undefined!,
-							view: undefined!,
+							u: value,
+							c: cycle,
+							i: sig(index),
+							d: undefined!,
+							v: undefined!,
 						};
 
-						instance.dispose = capture(() => {
-							instance.view = render(props.children(value, () => instance.index.value));
-							instance.view.setBoundaryOwner((_, last) => {
-								if (instances[instances.length - 1] === instance && instance.cycle === cycle) {
+						instance.d = capture(() => {
+							instance.v = render(props.children(value, () => instance.i.value));
+							instance.v.setBoundaryOwner((_, last) => {
+								if (instances[instances.length - 1] === instance && instance.c === cycle) {
 									setBoundary(undefined, last);
 								}
 							});
 						});
 
-						insertView(parent, last, instance.view);
+						insertView(parent, last, instance.v);
 						instances.splice(index, 0, instance);
 						instanceMap.set(value, instance);
-						last = instance.view.last;
+						last = instance.v.last;
 						index++;
-					} else if (instance.cycle !== cycle) {
-						instance.index.value = index;
-						instance.cycle = cycle;
+					} else if (instance.c !== cycle) {
+						instance.i.value = index;
+						instance.c = cycle;
 
 						const currentIndex = instances.indexOf(instance, index);
 						if (currentIndex < 0) {
 							detach(instances.splice(index, instances.length - index, instance));
-							insertView(parent, last, instance.view);
+							insertView(parent, last, instance.v);
 						} else {
 							detach(instances.splice(index, currentIndex - index));
 						}
 
-						last = instance.view.last;
+						last = instance.v.last;
 						index++;
 					}
 				}
@@ -402,10 +407,10 @@ export function For<T>(props: {
 			}
 
 			for (const [value, instance] of instanceMap) {
-				if (instance.cycle !== cycle) {
+				if (instance.c !== cycle) {
 					instanceMap.delete(value);
-					instance.view.detach();
-					instance.dispose();
+					instance.v.detach();
+					instance.d();
 				}
 			}
 			cycle = (cycle + 1) | 0;
@@ -455,9 +460,12 @@ export function IndexFor<T>(props: {
 }): View {
 	return new View((setBoundary, self) => {
 		interface Instance {
-			value: T;
-			dispose: TeardownHook;
-			view: View;
+			/** value */
+			u: T;
+			/** dispose */
+			d: TeardownHook;
+			/** view */
+			v: View;
 		}
 
 		const first: Node = document.createComment("g");
@@ -476,41 +484,41 @@ export function IndexFor<T>(props: {
 			for (const value of nocapture(() => get(props.each))) {
 				if (index < instances.length) {
 					const current = instances[index];
-					if (Object.is(current.value, value)) {
-						last = current.view.last;
+					if (Object.is(current.u, value)) {
+						last = current.v.last;
 						index++;
 						continue;
 					}
-					current.view.detach();
-					current.dispose();
+					current.v.detach();
+					current.d();
 				}
 
 				const instance: Instance = {
-					value,
-					dispose: undefined!,
-					view: undefined!,
+					u: value,
+					d: undefined!,
+					v: undefined!,
 				};
 
-				instance.dispose = capture(() => {
-					instance.view = render(props.children(value, index));
-					instance.view.setBoundaryOwner((_, last) => {
+				instance.d = capture(() => {
+					instance.v = render(props.children(value, index));
+					instance.v.setBoundaryOwner((_, last) => {
 						if (instances[instances.length - 1] === instance) {
 							setBoundary(undefined, last);
 						}
 					});
 				});
 
-				insertView(parent, last, instance.view);
+				insertView(parent, last, instance.v);
 				instances[index] = instance;
-				last = instance.view.last;
+				last = instance.v.last;
 				index++;
 			}
 
 			if (instances.length > index) {
 				for (let i = index; i < instances.length; i++) {
 					const instance = instances[i];
-					instance.view.detach();
-					instance.dispose();
+					instance.v.detach();
+					instance.d();
 				}
 				instances.length = index;
 			}

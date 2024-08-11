@@ -1,4 +1,5 @@
 import { shareInstancesOf } from "./globals.js";
+import { createParent, createPlaceholder, extractRange } from "./internals.js";
 import { capture, nocapture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
 import { effect, Expression, get, memo, sig, Signal, watch } from "./signals.js";
@@ -130,10 +131,7 @@ export class View {
 		if (this.#first === this.#last) {
 			return this.#first;
 		}
-		const range = new Range();
-		range.setStartBefore(this.#first);
-		range.setEndAfter(this.#last);
-		return range.extractContents();
+		return extractRange(this.#first, this.#last);
 	}
 
 	/**
@@ -145,10 +143,7 @@ export class View {
 		if (this.#first === this.#last) {
 			this.#first.parentNode?.removeChild(this.#first);
 		} else {
-			const range = new Range();
-			range.setStartBefore(this.#first);
-			range.setEndAfter(this.#last);
-			range.extractContents();
+			extractRange(this.#first, this.#last);
 		}
 	}
 }
@@ -335,7 +330,7 @@ export function For<T>(props: {
 		const instances: Instance[] = [];
 		const instanceMap = new Map<T, Instance>();
 
-		const first: Node = document.createComment("g");
+		const first: Node = createPlaceholder();
 		setBoundary(first, first);
 
 		teardown(() => {
@@ -347,7 +342,7 @@ export function For<T>(props: {
 		effect(() => {
 			let parent = self.parent;
 			if (!parent) {
-				parent = document.createDocumentFragment();
+				parent = createParent();
 				parent.appendChild(first);
 			}
 			let index = 0;
@@ -468,7 +463,7 @@ export function IndexFor<T>(props: {
 			v: View;
 		}
 
-		const first: Node = document.createComment("g");
+		const first: Node = createPlaceholder();
 		setBoundary(first, first);
 
 		const instances: Instance[] = [];
@@ -476,7 +471,7 @@ export function IndexFor<T>(props: {
 		effect(() => {
 			let parent = self.parent;
 			if (!parent) {
-				parent = document.createDocumentFragment();
+				parent = createParent();
 				parent.appendChild(first);
 			}
 			let index = 0;
@@ -551,7 +546,7 @@ export class MovableView {
 				setBoundary(this.#view.first, this.#view.last);
 				this.#view.setBoundaryOwner(setBoundary);
 				teardown(() => {
-					const anchor = document.createComment("g");
+					const anchor = createPlaceholder();
 					const parent = self.parent;
 					if (parent) {
 						parent.insertBefore(anchor, self.first);

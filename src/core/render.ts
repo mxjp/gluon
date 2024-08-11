@@ -1,3 +1,4 @@
+import { createParent, createPlaceholder } from "./internals.js";
 import { teardown } from "./lifecycle.js";
 import { Expression, watch } from "./signals.js";
 import { View, ViewSetBoundaryFn } from "./view.js";
@@ -19,7 +20,7 @@ export function createText(expr: Expression<unknown>): Text {
  * Internal shorthand for creating the boundary comment of an empty view.
  */
 function empty(setBoundary: ViewSetBoundaryFn): void {
-	const node = document.createComment("g");
+	const node = createPlaceholder();
 	setBoundary(node, node);
 }
 
@@ -86,7 +87,7 @@ export function render(content: unknown): View {
 		if (Array.isArray(content)) {
 			const flat = content.flat(Infinity) as unknown[];
 			if (flat.length > 1) {
-				const parent = document.createDocumentFragment();
+				const parent = createParent();
 				for (let i = 0; i < flat.length; i++) {
 					const part = flat[i];
 					if (part instanceof Node) {

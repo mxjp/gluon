@@ -49,3 +49,27 @@ INTERNAL_GLOBALS.BATCH_STACK ??= [];
 INTERNAL_GLOBALS.TRACKING_STACK ??= [true];
 INTERNAL_GLOBALS.TRIGGERS_STACK ??= [[]];
 INTERNAL_GLOBALS.DEPENDANTS_STACK ??= [[]];
+
+/**
+ * Internal utility to create placeholder comments.
+ */
+export function createPlaceholder(): Node {
+	return document.createComment("g");
+}
+
+/**
+ * Internal utility to create an arbitrary parent node.
+ */
+export function createParent(): Node {
+	return document.createDocumentFragment();
+}
+
+/**
+ * Internal utility to extract an inclusive range of nodes.
+ */
+export function extractRange(first: Node, last: Node): DocumentFragment {
+	const r = new Range();
+	r.setStartBefore(first);
+	r.setEndAfter(last);
+	return r.extractContents();
+}

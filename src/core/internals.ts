@@ -73,3 +73,15 @@ export function extractRange(first: Node, last: Node): DocumentFragment {
 	r.setEndAfter(last);
 	return r.extractContents();
 }
+
+/**
+ * Internal utility to call a function with a specific stack frame.
+ */
+export function useStack<T, R>(stack: T[], frame: T, fn: () => R): R {
+	try {
+		stack.push(frame);
+		return fn();
+	} finally {
+		stack.pop();
+	}
+}

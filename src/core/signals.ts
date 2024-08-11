@@ -1,6 +1,6 @@
 import { getContext, runInContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
-import { INTERNAL_GLOBALS } from "./internals.js";
+import { INTERNAL_GLOBALS, useStack } from "./internals.js";
 import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 import type { Dependant, DependantFn } from "./signal-types.js";
 
@@ -491,13 +491,7 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  */
 export function batch<T>(fn: () => T): T {
 	const deps: Dependant[] = [];
-	BATCH_STACK.push(deps);
-	let value: T;
-	try {
-		value = fn();
-	} finally {
-		BATCH_STACK.pop();
-	}
+	const value = useStack(BATCH_STACK, deps, fn);
 	if (BATCH_STACK.length > 0) {
 		BATCH_STACK[BATCH_STACK.length - 1].push(...deps);
 	} else {
@@ -621,12 +615,7 @@ export function lazy<T>(expr: Expression<T>): () => T {
  * ```
  */
 export function untrack<T>(fn: () => T): T {
-	TRACKING_STACK.push(false);
-	try {
-		return fn();
-	} finally {
-		TRACKING_STACK.pop();
-	}
+	return useStack(TRACKING_STACK, false, fn);
 }
 
 /**
@@ -638,12 +627,7 @@ export function untrack<T>(fn: () => T): T {
  * @returns The function's return value.
  */
 export function track<T>(fn: () => T): T {
-	TRACKING_STACK.push(true);
-	try {
-		return fn();
-	} finally {
-		TRACKING_STACK.pop();
-	}
+	return useStack(TRACKING_STACK, true, fn);
 }
 
 /**

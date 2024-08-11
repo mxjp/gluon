@@ -1,4 +1,4 @@
-import { INTERNAL_GLOBALS } from "./internals.js";
+import { INTERNAL_GLOBALS, useStack } from "./internals.js";
 import type { TeardownFrame } from "./lifecycle-types.js";
 
 const { TEARDOWN_STACK } = INTERNAL_GLOBALS;
@@ -18,12 +18,7 @@ const NOOP = () => {};
  */
 export function capture(fn: () => void): TeardownHook {
 	const hooks: TeardownHook[] = [];
-	TEARDOWN_STACK.push(hooks);
-	try {
-		fn();
-	} finally {
-		TEARDOWN_STACK.pop();
-	}
+	useStack(TEARDOWN_STACK, hooks, fn);
 	return hooks.length > 1
 		? () => {
 			for (let i = 0; i < hooks.length; i++) {
@@ -64,12 +59,7 @@ export function captureSelf<T>(fn: (dispose: TeardownHook) => T): T {
  * @returns The function's return value.
  */
 export function uncapture<T>(fn: () => T): T {
-	TEARDOWN_STACK.push(undefined);
-	try {
-		return fn();
-	} finally {
-		TEARDOWN_STACK.pop();
-	}
+	return useStack(TEARDOWN_STACK, undefined, fn);
 }
 
 const NOCAPTURE: TeardownFrame = {

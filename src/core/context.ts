@@ -1,4 +1,4 @@
-import { INTERNAL_GLOBALS } from "./internals.js";
+import { INTERNAL_GLOBALS, useStack } from "./internals.js";
 
 const { CONTEXT_STACK } = INTERNAL_GLOBALS;
 
@@ -150,12 +150,7 @@ export function DeriveContext(props: {
  * @returns The function's return value.
  */
 export function runInContext<R>(context: ReadonlyContext | undefined, fn: () => R): R {
-	CONTEXT_STACK.push(context);
-	try {
-		return fn();
-	} finally {
-		CONTEXT_STACK.pop();
-	}
+	return useStack(CONTEXT_STACK, context, fn);
 }
 
 /**

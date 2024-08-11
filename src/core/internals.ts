@@ -1,7 +1,31 @@
 import type { ReadonlyContext } from "./context.js";
 import { sharedGlobal } from "./globals.js";
-import type { TeardownFrame } from "./lifecycle-types.js";
-import type { Dependant } from "./signal-types.js";
+import type { TeardownHook } from "./lifecycle.js";
+
+export type Falsy = null | undefined | false | 0 | 0n | "";
+
+export type TagNameMap = HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementEventMap;
+
+/**
+ * A function that is stored inside any accessed signals alongside a cycle.
+ */
+export interface DependantFn {
+	(cycle: number): void;
+}
+
+/**
+ * A pair of dependant function and the cycle it was captured at.
+ */
+export type Dependant = [fn: DependantFn, cycle: number];
+
+/**
+ * Represents a stack frame that teardown hooks can be pushed into.
+ *
+ * Note that this may be an array.
+ */
+export interface TeardownFrame {
+	push(hook: TeardownHook): void;
+}
 
 export interface InternalGlobals {
 	/**

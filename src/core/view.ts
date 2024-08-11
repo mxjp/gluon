@@ -1,9 +1,8 @@
 import { shareInstancesOf } from "./globals.js";
-import { createParent, createPlaceholder, extractRange } from "./internals.js";
+import { createParent, createPlaceholder, extractRange, Falsy } from "./internals.js";
 import { capture, nocapture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
 import { effect, Expression, get, memo, sig, Signal, watch } from "./signals.js";
-import { Falsy } from "./types.js";
 
 /**
  * A function that is called when the view boundary may have been changed.

@@ -1,7 +1,7 @@
 import { ContextKey, extract, wrapContext } from "./context.js";
+import { TagNameMap } from "./internals.js";
 import { createText } from "./render.js";
 import { Expression, get, watch } from "./signals.js";
-import { TagNameMap } from "./types.js";
 import { View } from "./view.js";
 
 /**

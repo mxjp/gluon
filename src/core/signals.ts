@@ -1,8 +1,7 @@
 import { getContext, runInContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
-import { INTERNAL_GLOBALS, useStack } from "./internals.js";
+import { Dependant, DependantFn, INTERNAL_GLOBALS, useStack } from "./internals.js";
 import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
-import type { Dependant, DependantFn } from "./signal-types.js";
 
 const { BATCH_STACK, TRACKING_STACK, TRIGGERS_STACK, DEPENDANTS_STACK } = INTERNAL_GLOBALS;
 

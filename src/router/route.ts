@@ -100,10 +100,8 @@ export function matchRoute<T extends Route>(path: string, routes: Iterable<T>): 
 				}
 				return { route, path: matched, params: match, rest };
 			}
-		} else if (route.match === undefined) {
-			return { route, path: "", rest: path };
 		} else {
-			throw new Error("unsupported match type");
+			return { route, path: "", rest: path };
 		}
 	}
 }
@@ -165,7 +163,8 @@ export function Routes(props: {
 }): unknown {
 	const router = extract(ROUTER);
 	if (!router) {
-		throw new Error("router not available");
+		// Router is not available in the current context:
+		throw new Error("G3");
 	}
 	const watched = watchRoutes(() => router.path, props.routes);
 	return Nest({

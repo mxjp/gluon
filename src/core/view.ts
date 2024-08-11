@@ -76,7 +76,8 @@ export class View {
 			this.#owner?.(this.#first, this.#last);
 		}, this);
 		if (!this.#first || !this.#last) {
-			throw new Error("incomplete boundary");
+			// View boundary was not completely initialized.
+			throw new Error("G1");
 		}
 	}
 
@@ -114,7 +115,7 @@ export class View {
 	 */
 	setBoundaryOwner(owner: ViewBoundaryOwner): void {
 		if (this.#owner !== undefined) {
-			throw new Error("boundary owner is already set");
+			throw new Error("G2");
 		}
 		this.#owner = owner;
 		teardown(() => this.#owner = undefined);

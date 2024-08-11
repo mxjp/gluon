@@ -64,7 +64,8 @@ export function uncapture<T>(fn: () => T): T {
 
 const NOCAPTURE: TeardownFrame = {
 	push() {
-		throw new Error("teardown hooks are not supported in this context.");
+		// Teardown hooks are explicitly not supported in this context:
+		throw new Error("G0");
 	},
 };
 

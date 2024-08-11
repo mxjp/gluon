@@ -404,9 +404,7 @@ export function For<T>(props: {
 				}
 			}
 			cycle = (cycle + 1) | 0;
-			if (last !== self.last) {
-				setBoundary(undefined, last);
-			}
+			setBoundary(undefined, last);
 		}, true);
 	});
 }
@@ -513,9 +511,7 @@ export function IndexFor<T>(props: {
 				instances.length = index;
 			}
 
-			if (self.last !== last) {
-				setBoundary(undefined, last);
-			}
+			setBoundary(undefined, last);
 		}, true);
 	});
 }

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 11.1
++ **Deprecated:** Public exports will be removed: `appendContent`, `setAttributes`, `createText`.
 + Add `MemoryRouter`.
 
 ## 11.0

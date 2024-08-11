@@ -152,39 +152,31 @@ function watchStyle(value: StyleValue, handler: StyleHandler) {
  * @param attrs The attributes to set.
  */
 export function setAttributes(elem: Element, attrs: Attributes): void {
-	attrs: for (const name in attrs) {
+	for (const name in attrs) {
 		const value = attrs[name as keyof Attributes];
-		if (value === undefined) {
-			continue attrs;
-		}
-		if (name[0] === "$") {
-			const capture = name[1] === "$";
-			const event = name.slice(capture ? 2 : 1);
-			elem.addEventListener(event, wrapContext(value as (event: Event) => void), { capture });
-		} else if (name.startsWith("prop:")) {
-			const prop = name.slice(5);
-			watch(value, value => (elem as any)[prop] = value);
-		} else if (name.startsWith("attr:")) {
-			const attr = name.slice(5);
-			watch(value, value => setAttr(elem, attr, value));
-		} else {
-			switch (name) {
-				case "style": {
-					const style = (elem as HTMLElement).style;
-					watchStyle(value as StyleValue, (name, value) => {
-						style.setProperty(name, value ? String(value) : null);
-					});
-					continue attrs;
-				}
-
-				case "class": {
-					watch(() => getClassTokens(value as ClassValue), tokens => {
-						elem.setAttribute("class", tokens);
-					});
-					continue attrs;
-				}
+		if (value !== undefined) {
+			if (name[0] === "$") {
+				const capture = name[1] === "$";
+				const event = name.slice(capture ? 2 : 1);
+				elem.addEventListener(event, wrapContext(value as (event: Event) => void), { capture });
+			} else if (name.startsWith("prop:")) {
+				const prop = name.slice(5);
+				watch(value, value => (elem as any)[prop] = value);
+			} else if (name.startsWith("attr:")) {
+				const attr = name.slice(5);
+				watch(value, value => setAttr(elem, attr, value));
+			} else if (name === "style") {
+				const style = (elem as HTMLElement).style;
+				watchStyle(value as StyleValue, (name, value) => {
+					style.setProperty(name, value ? String(value) : null);
+				});
+			} else if (name === "class") {
+				watch(() => getClassTokens(value as ClassValue), tokens => {
+					elem.setAttribute("class", tokens);
+				});
+			} else {
+				watch(value, value => setAttr(elem, name, value));
 			}
-			watch(value, value => setAttr(elem, name, value));
 		}
 	}
 }
@@ -200,11 +192,7 @@ export function setAttributes(elem: Element, attrs: Attributes): void {
 export function createElement<K extends keyof TagNameMap>(tagName: K, attrs: Attributes, content: unknown): TagNameMap[K];
 export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown): E;
 export function createElement(tagName: string, attrs: Attributes, content: unknown): Element {
-	const ns = extract(XMLNS);
-	const elem = ns === undefined
-		? document.createElement(tagName)
-		: document.createElementNS(ns, tagName) as HTMLElement | SVGElement | MathMLElement;
-
+	const elem = document.createElementNS(extract(XMLNS) ?? HTML, tagName);
 	setAttributes(elem, attrs);
 	appendContent(elem, content);
 	return elem;

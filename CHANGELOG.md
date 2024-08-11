@@ -1,7 +1,7 @@
 # Changelog
 
 ## 12.0
-+ **Breaking:** Publix exports have been removed: `appendContent`, `setAttributes`, `createText`.
++ **Breaking:** Public exports have been removed: `appendContent`, `setAttributes`, `createText`.
 
 ## 11.1
 + **Deprecated:** Public exports will be removed: `appendContent`, `setAttributes`, `createText`.

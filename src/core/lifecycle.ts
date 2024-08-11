@@ -1,4 +1,5 @@
-import { INTERNAL_GLOBALS, TeardownFrame, useStack } from "./internals.js";
+import { INTERNAL_GLOBALS } from "./internal-globals.js";
+import { TeardownFrame, useStack } from "./internals.js";
 
 const { TEARDOWN_STACK } = INTERNAL_GLOBALS;
 

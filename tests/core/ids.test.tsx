@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { uniqueId } from "@mxjp/gluon";
 
-import { INTERNAL_GLOBALS } from "../../dist/es/core/internals.js";
+import { INTERNAL_GLOBALS } from "../../dist/es/core/internal-globals.js";
 
 const { NEXT_ID } = INTERNAL_GLOBALS;
 

@@ -3,8 +3,9 @@ import "../env.js";
 import { deepStrictEqual, notStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { createText, render, sig, uncapture, View, viewNodes } from "@mxjp/gluon";
+import { render, sig, uncapture, View, viewNodes } from "@mxjp/gluon";
 
+import { createText } from "../../dist/es/core/internals.js";
 import { assertEvents, boundaryEvents, testView, text } from "../common.js";
 
 await test("render", async ctx => {
@@ -12,7 +13,7 @@ await test("render", async ctx => {
 		return Array.from(viewNodes(render(content)));
 	}
 
-	await ctx.test("createText", () => {
+	await ctx.test("createText (internal)", () => {
 		const signal = sig<unknown>(undefined);
 		const text = uncapture(() => createText(signal));
 		strictEqual(text.textContent, "");

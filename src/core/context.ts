@@ -1,4 +1,5 @@
-import { INTERNAL_GLOBALS, useStack } from "./internals.js";
+import { INTERNAL_GLOBALS } from "./internal-globals.js";
+import { useStack } from "./internals.js";
 
 const { CONTEXT_STACK } = INTERNAL_GLOBALS;
 

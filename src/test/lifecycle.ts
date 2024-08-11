@@ -1,4 +1,4 @@
-import { INTERNAL_GLOBALS } from "../core/internals.js";
+import { INTERNAL_GLOBALS } from "../core/internal-globals.js";
 import { TeardownHook } from "../core/lifecycle.js";
 
 const { TEARDOWN_STACK } = INTERNAL_GLOBALS;

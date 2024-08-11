@@ -1,4 +1,4 @@
-import { INTERNAL_GLOBALS } from "./internals.js";
+import { INTERNAL_GLOBALS } from "./internal-globals.js";
 
 const { NEXT_ID } = INTERNAL_GLOBALS;
 

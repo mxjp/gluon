@@ -1,20 +1,6 @@
-import { createParent, createPlaceholder } from "./internals.js";
+import { createParent, createPlaceholder, createText } from "./internals.js";
 import { teardown } from "./lifecycle.js";
-import { Expression, watch } from "./signals.js";
 import { View, ViewSetBoundaryFn } from "./view.js";
-
-/**
- * Create a text node that displays the result of an expression.
- *
- * Null and undefined are displayed as an empty string.
- */
-function createText(expr: Expression<unknown>): Text {
-	const text = document.createTextNode("");
-	watch(expr, value => {
-		text.textContent = String(value ?? "");
-	});
-	return text;
-}
 
 /**
  * Internal shorthand for creating the boundary comment of an empty view.

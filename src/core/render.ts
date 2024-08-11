@@ -7,10 +7,8 @@ import { View, ViewSetBoundaryFn } from "./view.js";
  * Create a text node that displays the result of an expression.
  *
  * Null and undefined are displayed as an empty string.
- *
- * @deprecated Public export of this API will be removed in gluon 12.
  */
-export function createText(expr: Expression<unknown>): Text {
+function createText(expr: Expression<unknown>): Text {
 	const text = document.createTextNode("");
 	watch(expr, value => {
 		text.textContent = String(value ?? "");

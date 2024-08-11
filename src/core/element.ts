@@ -38,6 +38,8 @@ export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<typeof HTML | t
  *
  * @param node The node.
  * @param content The content to append.
+ *
+ * @deprecated Public export of this API will be removed in gluon 12.
  */
 export function appendContent(node: Node, content: unknown): void {
 	if (content === null || content === undefined) {
@@ -150,6 +152,8 @@ function watchStyle(value: StyleValue, handler: StyleHandler) {
  *
  * @param elem The element.
  * @param attrs The attributes to set.
+ *
+ * @deprecated Public export of this API will be removed in gluon 12.
  */
 export function setAttributes(elem: Element, attrs: Attributes): void {
 	for (const name in attrs) {

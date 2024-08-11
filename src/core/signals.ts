@@ -1,10 +1,8 @@
 import { getContext, runInContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
-import { INTERNAL_GLOBALS } from "./internal-globals.js";
+import { BATCH_STACK, DEPENDANTS_STACK, TRACKING_STACK, TRIGGERS_STACK } from "./internal-globals.js";
 import { Dependant, DependantFn, useStack } from "./internals.js";
 import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
-
-const { BATCH_STACK, TRACKING_STACK, TRIGGERS_STACK, DEPENDANTS_STACK } = INTERNAL_GLOBALS;
 
 /**
  * A function used in signals to determine if the signal should update during a value assignment.

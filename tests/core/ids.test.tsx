@@ -5,9 +5,7 @@ import test from "node:test";
 
 import { uniqueId } from "@mxjp/gluon";
 
-import { INTERNAL_GLOBALS } from "../../dist/es/core/internal-globals.js";
-
-const { NEXT_ID } = INTERNAL_GLOBALS;
+import { NEXT_ID } from "../../dist/es/core/internal-globals.js";
 
 await test("uniqueId", async ctx => {
 	await ctx.test("initial usage", () => {

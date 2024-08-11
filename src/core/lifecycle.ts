@@ -1,7 +1,5 @@
-import { INTERNAL_GLOBALS } from "./internal-globals.js";
+import { TEARDOWN_STACK } from "./internal-globals.js";
 import { TeardownFrame, useStack } from "./internals.js";
-
-const { TEARDOWN_STACK } = INTERNAL_GLOBALS;
 
 /**
  * A function that can be called to dispose something.

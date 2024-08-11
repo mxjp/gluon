@@ -2,7 +2,7 @@ import type { ReadonlyContext } from "./context.js";
 import { sharedGlobal } from "./globals.js";
 import type { Dependant, TeardownFrame } from "./internals.js";
 
-export interface InternalGlobals {
+interface Globals {
 	/**
 	 * The next suffix for generating unique ids in the current thread.
 	 */
@@ -39,12 +39,25 @@ export interface InternalGlobals {
 	DEPENDANTS_STACK: Dependant[][];
 }
 
-export const INTERNAL_GLOBALS = sharedGlobal("gluon:globals", () => ({} as InternalGlobals));
+const GLOBALS = sharedGlobal("gluon:globals", () => ({} as Globals));
 
-INTERNAL_GLOBALS.NEXT_ID ??= { value: 0 };
-INTERNAL_GLOBALS.CONTEXT_STACK ??= [];
-INTERNAL_GLOBALS.TEARDOWN_STACK ??= [];
-INTERNAL_GLOBALS.BATCH_STACK ??= [];
-INTERNAL_GLOBALS.TRACKING_STACK ??= [true];
-INTERNAL_GLOBALS.TRIGGERS_STACK ??= [[]];
-INTERNAL_GLOBALS.DEPENDANTS_STACK ??= [[]];
+const NEXT_ID_KEY = "NEXT_ID" as const;
+export const NEXT_ID = GLOBALS[NEXT_ID_KEY] ??= { value: 0 };
+
+const CONTEXT_STACK_KEY = "CONTEXT_STACK" as const;
+export const CONTEXT_STACK = GLOBALS[CONTEXT_STACK_KEY] ??= [];
+
+const TEARDOWN_STACK_KEY = "TEARDOWN_STACK" as const;
+export const TEARDOWN_STACK = GLOBALS[TEARDOWN_STACK_KEY] ??= [];
+
+const BATCH_STACK_KEY = "BATCH_STACK" as const;
+export const BATCH_STACK = GLOBALS[BATCH_STACK_KEY] ??= [];
+
+const TRACKING_STACK_KEY = "TRACKING_STACK" as const;
+export const TRACKING_STACK = GLOBALS[TRACKING_STACK_KEY] ??= [true];
+
+const TRIGGERS_STACK_KEY = "TRIGGERS_STACK" as const;
+export const TRIGGERS_STACK = GLOBALS[TRIGGERS_STACK_KEY] ??= [[]];
+
+const DEPENDANTS_STACK_KEY = "DEPENDANTS_STACK" as const;
+export const DEPENDANTS_STACK = GLOBALS[DEPENDANTS_STACK_KEY] ??= [[]];

@@ -35,9 +35,7 @@ export class Emitter<T extends unknown[]> {
 	 */
 	event: Event<T> = listener => {
 		this.#listeners.add(listener);
-		teardown(() => {
-			this.#listeners.delete(listener);
-		});
+		teardown(() => this.#listeners.delete(listener));
 	};
 
 	/**

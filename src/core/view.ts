@@ -117,9 +117,7 @@ export class View {
 			throw new Error("boundary owner is already set");
 		}
 		this.#owner = owner;
-		teardown(() => {
-			this.#owner = undefined;
-		});
+		teardown(() => this.#owner = undefined);
 	}
 
 	/**
@@ -204,11 +202,8 @@ export function Nest(props: {
 	return new View((setBoundary, self) => {
 		watch(props.children, value => {
 			const view = render(value?.());
-			const parent = self.parent;
-			if (parent) {
-				parent.insertBefore(view.take(), self.first);
-				self.detach();
-			}
+			self.parent?.insertBefore(view.take(), self.first);
+			self.detach();
 			setBoundary(view.first, view.last);
 			view.setBoundaryOwner(setBoundary);
 		}, true);
@@ -547,11 +542,8 @@ export class MovableView {
 				this.#view.setBoundaryOwner(setBoundary);
 				teardown(() => {
 					const anchor = createPlaceholder();
-					const parent = self.parent;
-					if (parent) {
-						parent.insertBefore(anchor, self.first);
-						self.detach();
-					}
+					self.parent?.insertBefore(anchor, self.first);
+					self.detach();
 					setBoundary(anchor, anchor);
 				});
 			});

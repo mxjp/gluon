@@ -174,8 +174,6 @@ export function render(content: unknown): View {
 export function mount(parent: Node, content: unknown): View {
 	const view = render(content);
 	parent.appendChild(view.take());
-	teardown(() => {
-		view.detach();
-	});
+	teardown(() => view.detach());
 	return view;
 }

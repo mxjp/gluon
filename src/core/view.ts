@@ -141,7 +141,7 @@ export class View {
 	 */
 	detach(): void {
 		if (this.#first === this.#last) {
-			this.#first.parentNode?.removeChild(this.#first);
+			this.#first?.parentNode?.removeChild(this.#first);
 		} else {
 			extractRange(this.#first, this.#last);
 		}

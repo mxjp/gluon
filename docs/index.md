@@ -23,7 +23,7 @@ mount(
 ## Concept
 
 ### Low Level
-JSX expressions in gluon directly create real DOM elements which is relatively fast and has a low memory footprint compared to virtual DOMs. For rendering conditional or repeated nodes, gluon uses so called Views which are just sequences of nodes that notify their owner of any boundary updates.
+JSX expressions in gluon directly create real DOM elements which is relatively fast and has a low memory footprint compared to virtual DOMs. For rendering conditional or repeated nodes, gluon uses so called Views which are just sequences of nodes that can change themselves over time.
 
 ### Composability
 Everything in gluon is composable without any restrictions. You can define reactive state anywhere you like and use it anywhere else, dynamically define and pass around components, etc.

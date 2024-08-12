@@ -28,12 +28,10 @@ export async function runAsyncTest<T>(fn: AsyncTestFn<T>): Promise<T> {
 		const result = await fn({
 			ctx,
 			asyncCtx,
-			use: fn => {
-				return captureSelf(dispose => {
-					teardown.push(dispose);
-					return runInContext(ctx, fn);
-				});
-			},
+			use: fn => captureSelf(dispose => {
+				teardown.push(dispose);
+				return runInContext(ctx, fn);
+			}),
 		});
 		await cleanup();
 		return result;

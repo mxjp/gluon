@@ -51,9 +51,7 @@ export class ProbeMap<K, V> {
 		if (isTracking()) {
 			let probe = this.#probes.get(key);
 			if (probe === undefined) {
-				probe = new ProbeSignal(() => {
-					this.#probes.delete(key);
-				}, this.#get(key));
+				probe = new ProbeSignal(() => this.#probes.delete(key), this.#get(key));
 				this.#probes.set(key, probe);
 			}
 			probe.access();

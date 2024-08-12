@@ -525,9 +525,7 @@ export function batch<T>(fn: () => T): T {
  */
 export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolean): () => T {
 	const signal = sig<T>(undefined!, equals);
-	watch(expr, value => {
-		signal.value = value;
-	});
+	watch(expr, value => signal.value = value);
 	return () => signal.value;
 }
 

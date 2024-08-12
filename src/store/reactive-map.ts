@@ -100,9 +100,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
 	forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
 		this.#iterators.access();
-		return this.#target.forEach((value, key) => {
-			callback.call(thisArg, this.#barrier.wrap(value), key, this);
-		});
+		return this.#target.forEach((value, key) => callback.call(thisArg, this.#barrier.wrap(value), key, this));
 	}
 
 	* [Symbol.iterator](): IterableIterator<[K, V]> {

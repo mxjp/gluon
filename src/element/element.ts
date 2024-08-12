@@ -94,9 +94,7 @@ export abstract class GluonElement extends HTMLElement {
 	 */
 	start(): void {
 		if (this.#dispose === undefined) {
-			this.#dispose = capture(() => {
-				(this.#shadow ?? this).replaceChildren(render(this.render()).take());
-			});
+			this.#dispose = capture(() => (this.#shadow ?? this).replaceChildren(render(this.render()).take()));
 		}
 	}
 

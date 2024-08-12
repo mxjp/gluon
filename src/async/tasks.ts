@@ -124,11 +124,7 @@ export class Tasks {
 			})();
 		} else if (source instanceof Promise) {
 			this.#setPending();
-			void source.then(() => {
-				this.#unsetPending();
-			}, () => {
-				this.#unsetPending();
-			});
+			void source.then(() => this.#unsetPending(), () => this.#unsetPending());
 		}
 	}
 

@@ -171,13 +171,9 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 				watch(value, value => setAttr(elem, attr, value));
 			} else if (name === "style") {
 				const style = (elem as HTMLElement).style;
-				watchStyle(value as StyleValue, (name, value) => {
-					style.setProperty(name, value ? String(value) : null);
-				});
+				watchStyle(value as StyleValue, (name, value) => style.setProperty(name, value ? String(value) : null));
 			} else if (name === "class") {
-				watch(() => getClassTokens(value as ClassValue), tokens => {
-					elem.setAttribute("class", tokens);
-				});
+				watch(() => getClassTokens(value as ClassValue), tokens => elem.setAttribute("class", tokens));
 			} else {
 				watch(value, value => setAttr(elem, name, value));
 			}

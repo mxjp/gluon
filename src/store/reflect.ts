@@ -8,11 +8,7 @@ import { sig, Signal, watchUpdates } from "../core/signals.js";
  * @returns The signal.
  */
 export function reflect<T, K extends keyof T>(target: T, key: K): Signal<T[K]> {
-	const prop = sig(watchUpdates(() => target[key], value => {
-		prop.value = value;
-	}));
-	watchUpdates(prop, value => {
-		target[key] = value;
-	});
+	const prop = sig(watchUpdates(() => target[key], value => prop.value = value));
+	watchUpdates(prop, value => target[key] = value);
 	return prop;
 }

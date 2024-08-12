@@ -69,8 +69,6 @@ export function useStack<T, R>(stack: T[], frame: T, fn: () => R): R {
  */
 export function createText(expr: Expression<unknown>): Text {
 	const text = document.createTextNode("");
-	watch(expr, value => {
-		text.textContent = String(value ?? "");
-	});
+	watch(expr, value => text.textContent = (value ?? "") as string);
 	return text;
 }

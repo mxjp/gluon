@@ -145,12 +145,17 @@ function watchStyle(value: StyleValue, handler: StyleHandler) {
 }
 
 /**
- * Set attributes on an element.
+ * Create an element.
  *
- * @param elem The element.
+ * @param tagName The tag name.
  * @param attrs The attributes to set.
+ * @param content The content to append.
+ * @returns The element.
  */
-function setAttributes(elem: Element, attrs: Attributes): void {
+export function createElement<K extends keyof TagNameMap>(tagName: K, attrs: Attributes, content: unknown): TagNameMap[K];
+export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown): E;
+export function createElement(tagName: string, attrs: Attributes, content: unknown): Element {
+	const elem = document.createElementNS(extract(XMLNS) ?? HTML, tagName);
 	for (const name in attrs) {
 		const value = attrs[name as keyof Attributes];
 		if (value !== undefined) {
@@ -178,21 +183,6 @@ function setAttributes(elem: Element, attrs: Attributes): void {
 			}
 		}
 	}
-}
-
-/**
- * Create an element.
- *
- * @param tagName The tag name.
- * @param attrs The attributes to set.
- * @param content The content to append.
- * @returns The element.
- */
-export function createElement<K extends keyof TagNameMap>(tagName: K, attrs: Attributes, content: unknown): TagNameMap[K];
-export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown): E;
-export function createElement(tagName: string, attrs: Attributes, content: unknown): Element {
-	const elem = document.createElementNS(extract(XMLNS) ?? HTML, tagName);
-	setAttributes(elem, attrs);
 	appendContent(elem, content);
 	return elem;
 }

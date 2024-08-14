@@ -1,39 +1,65 @@
 import "../env.js";
 
+import { throws } from "node:assert";
 import test from "node:test";
 
-import { capture, Emitter } from "@mxjp/gluon";
+import { capture, Emitter, uncapture } from "@mxjp/gluon";
 
 import { assertEvents } from "../common.js";
 
-await test("events", () => {
-	const events: unknown[] = [];
-	const emitter = new Emitter<[foo: string, bar: number]>();
+await test("events", async ctx => {
+	await ctx.test("usage", () => {
+		const events: unknown[] = [];
+		const emitter = new Emitter<[foo: string, bar: number]>();
 
-	events.push(0);
-	const removeA = capture(() => {
-		emitter.event((foo, _bar) => {
-			events.push(["a", foo]);
+		events.push(0);
+		const removeA = capture(() => {
+			emitter.event((foo, _bar) => {
+				events.push(["a", foo]);
+			});
 		});
-	});
-	events.push(1);
-	emitter.emit("a", 1);
-	assertEvents(events, [0, 1, ["a", "a"]]);
+		events.push(1);
+		emitter.emit("a", 1);
+		assertEvents(events, [0, 1, ["a", "a"]]);
 
-	const removeB = capture(() => {
-		emitter.event((_foo, bar) => {
-			events.push(["b", bar]);
+		const removeB = capture(() => {
+			emitter.event((_foo, bar) => {
+				events.push(["b", bar]);
+			});
 		});
+		events.push(2);
+		emitter.emit("b", 2);
+		assertEvents(events, [2, ["a", "b"], ["b", 2]]);
+
+		removeA();
+		emitter.emit("c", 3);
+		assertEvents(events, [["b", 3]]);
+
+		removeB();
+		emitter.emit("d", 4);
+		assertEvents(events, []);
 	});
-	events.push(2);
-	emitter.emit("b", 2);
-	assertEvents(events, [2, ["a", "b"], ["b", 2]]);
 
-	removeA();
-	emitter.emit("c", 3);
-	assertEvents(events, [["b", 3]]);
+	await ctx.test("error handling", () => {
+		const events: unknown[] = [];
+		const emitter = new Emitter<[]>();
 
-	removeB();
-	emitter.emit("d", 4);
-	assertEvents(events, []);
+		uncapture(() => {
+			emitter.event(() => events.push(0));
+			emitter.event(() => {
+				events.push(1);
+				throw new Error("test");
+			});
+			emitter.event(() => events.push(2));
+			emitter.event(() => events.push(3));
+		});
+
+		throws(() => {
+			emitter.emit();
+		}, error => {
+			return (error instanceof Error) && error.message === "test";
+		});
+
+		assertEvents(events, [0, 1]);
+	});
 });

@@ -1,6 +1,6 @@
 import "../env.js";
 
-import { strictEqual } from "node:assert";
+import { strictEqual, throws } from "node:assert";
 import test from "node:test";
 
 import { ContextKey, deriveContext, extract, inject } from "@mxjp/gluon";
@@ -37,6 +37,46 @@ await test("context", async ctx => {
 
 			const b: string | undefined = extract(KEY_B);
 			strictEqual(b, "test");
+		});
+	});
+
+	await ctx.test("error handling", async ctx => {
+		await ctx.test("inject", () => {
+			strictEqual(extract("foo"), undefined);
+			inject("foo", "bar", () => {
+				strictEqual(extract("foo"), "bar");
+				throws(() => {
+					inject("foo", "baz", () => {
+						strictEqual(extract("foo"), "baz");
+						throw new Error("test");
+					});
+				}, error => {
+					return (error instanceof Error) && error.message === "test";
+				});
+				strictEqual(extract("foo"), "bar");
+			});
+			strictEqual(extract("foo"), undefined);
+		});
+
+		await ctx.test("deriveContext", () => {
+			strictEqual(extract("foo"), undefined);
+			deriveContext(outer => {
+				outer.set("foo", "bar");
+				strictEqual(extract("foo"), "bar");
+				throws(() => {
+					deriveContext(inner => {
+						inner.set("foo", "baz");
+						outer.set("bar", "boo");
+						strictEqual(extract("foo"), "baz");
+						throw new Error("test");
+					});
+				}, error => {
+					return (error instanceof Error) && error.message === "test";
+				});
+				strictEqual(extract("foo"), "bar");
+				strictEqual(extract("bar"), "boo");
+			});
+			strictEqual(extract("foo"), undefined);
 		});
 	});
 });

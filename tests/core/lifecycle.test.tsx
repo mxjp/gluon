@@ -1,6 +1,6 @@
 import "../env.js";
 
-import { strictEqual } from "node:assert";
+import { strictEqual, throws } from "node:assert";
 import test from "node:test";
 
 import { capture, captureSelf, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
@@ -86,5 +86,93 @@ await test("lifecycle", async ctx => {
 			events.push(5);
 			assertEvents(events, [0, 1, 3, 4, 2, 5]);
 		});
+	});
+
+	await ctx.test("error handling", async ctx => {
+		await ctx.test("capture", () => {
+			const events: unknown[] = [];
+			const outer = capture(() => {
+				teardown(() => {
+					events.push(0);
+				});
+				throws(() => {
+					capture(() => {
+						teardown(() => {
+							throw new Error("this should never be called");
+						});
+						throw new Error("test");
+					});
+				}, error => {
+					return (error instanceof Error) && error.message === "test";
+				});
+				teardown(() => {
+					events.push(1);
+				});
+			});
+			outer();
+			assertEvents(events, [0, 1]);
+		});
+
+		for (const disposeInner of [false, true]) {
+			await ctx.test(`captureSelf (immediate${disposeInner ? ", dispose inner" : ""})`, () => {
+				const events: unknown[] = [];
+				captureSelf(outer => {
+					outer();
+					teardown(() => {
+						events.push(0);
+					});
+					throws(() => {
+						captureSelf(inner => {
+							if (disposeInner) {
+								inner();
+							}
+							teardown(() => {
+								throw new Error("this should never be called");
+							});
+							throw new Error("test");
+						});
+					}, error => {
+						return (error instanceof Error) && error.message === "test";
+					});
+					teardown(() => {
+						events.push(1);
+					});
+					assertEvents(events, []);
+				});
+				assertEvents(events, [0, 1]);
+			});
+
+			await ctx.test(`captureSelf (delayed${disposeInner ? ", dispose inner" : ""})`, () => {
+				const events: unknown[] = [];
+				let outerDispose!: TeardownHook;
+				captureSelf(outer => {
+					outerDispose = outer;
+					teardown(() => {
+						events.push(0);
+					});
+					let innerDispose!: TeardownHook;
+					throws(() => {
+						captureSelf(inner => {
+							innerDispose = inner;
+							teardown(() => {
+								throw new Error("this should never be called");
+							});
+							throw new Error("test");
+						});
+					}, error => {
+						return (error instanceof Error) && error.message === "test";
+					});
+					if (disposeInner) {
+						innerDispose();
+					}
+					teardown(() => {
+						events.push(1);
+					});
+				});
+				assertEvents(events, []);
+				outerDispose();
+				assertEvents(events, [0, 1]);
+			});
+		}
 	});
 });

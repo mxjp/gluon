@@ -467,6 +467,8 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
 /**
  * Defer signal updates while calling a function and call them immediately after all current batches have finished.
  *
+ * Batches also run if an error is thrown by the specified function.
+ *
  * @param fn The function to run.
  * @returns The function's return value.
  *
@@ -489,16 +491,20 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  */
 export function batch<T>(fn: () => T): T {
 	const deps: Dependant[] = [];
-	const value = useStack(BATCH_STACK, deps, fn);
-	if (BATCH_STACK.length > 0) {
-		BATCH_STACK[BATCH_STACK.length - 1].push(...deps);
-	} else {
-		for (let i = 0; i < deps.length; i++) {
-			const [fn, cycle] = deps[i];
-			fn(cycle);
+	try {
+		BATCH_STACK.push(deps);
+		return fn();
+	} finally {
+		BATCH_STACK.pop();
+		if (BATCH_STACK.length > 0) {
+			BATCH_STACK[BATCH_STACK.length - 1].push(...deps);
+		} else {
+			for (let i = 0; i < deps.length; i++) {
+				const [fn, cycle] = deps[i];
+				fn(cycle);
+			}
 		}
 	}
-	return value;
 }
 
 /**

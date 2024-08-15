@@ -1,5 +1,8 @@
 # Changelog
 
+## 13.0
++ **Breaking:** Batches now run even if an error is thrown to prevent breaking unrelated signal cycles.
+
 ## 12.0
 + **Breaking:** Public exports have been removed: `appendContent`, `setAttributes`, `createText`.
 

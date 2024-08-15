@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { batch, capture, effect, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, Signal, string, teardown, TeardownHook, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
 
-import { assertEvents, assertSharedInstance, lifecycleEvent } from "../common.js";
+import { assertEvents, assertSharedInstance, lifecycleEvent, withMsg } from "../common.js";
 
 await test("signals", async ctx => {
 	await ctx.test("shared instances", () => {
@@ -335,7 +335,7 @@ await test("signals", async ctx => {
 					uncapture(() => watch(() => {
 						throws(() => {
 							teardown(() => {});
-						});
+						}, withMsg("G0"));
 						uncapture(() => {
 							teardown(() => {});
 						});
@@ -389,16 +389,16 @@ await test("signals", async ctx => {
 
 						throws(() => {
 							teardown(() => {});
-						});
+						}, withMsg("G0"));
 						throws(() => {
 							watch(() => {}, () => {});
-						});
+						}, withMsg("G0"));
 						throws(() => {
 							watchUpdates(() => {}, () => {});
-						});
+						}, withMsg("G0"));
 						throws(() => {
 							effect(() => {});
-						});
+						}, withMsg("G0"));
 
 						return signal.value;
 					}, value => {
@@ -460,6 +460,99 @@ await test("signals", async ctx => {
 					});
 					assertEvents(events, ["e42", "c42"]);
 				});
+
+				for (const inExpr of [false, true]) {
+					await ctx.test(`${inExpr ? "expression" : "callback"} error handling`, async ctx => {
+						await ctx.test("immediate, no access", () => {
+							uncapture(() => {
+								throws(() => {
+									watch(() => {
+										if (inExpr) {
+											throw new Error("e");
+										}
+									}, () => {
+										throw new Error("c");
+									}, sequential);
+								}, withMsg(inExpr ? "e" : "c"));
+							});
+						});
+
+						await ctx.test("immediate, access", () => {
+							const events: unknown[] = [];
+							const signal = sig(42);
+							const dispose = capture(() => {
+								watch(signal, value => {
+									events.push(`a${value}`);
+								});
+
+								throws(() => {
+									watch(() => {
+										signal.access();
+										if (inExpr) {
+											throw new Error("e");
+										}
+									}, () => {
+										throw new Error("c");
+									}, sequential);
+								}, withMsg(inExpr ? "e" : "c"));
+
+								watch(signal, value => {
+									events.push(`b${value}`);
+								});
+
+								assertEvents(events, ["a42", "b42"]);
+							});
+
+							throws(() => {
+								signal.value = 77;
+							}, withMsg(inExpr ? "e" : "c"));
+							assertEvents(events, ["a77"]);
+
+							throws(() => {
+								signal.value = 11;
+							}, withMsg(inExpr ? "e" : "c"));
+							assertEvents(events, ["a11"]);
+
+							dispose();
+							signal.value = 123;
+							assertEvents(events, []);
+						});
+
+						await ctx.test("deferred, access", () => {
+							const events: unknown[] = [];
+							const signal = sig(42);
+
+							const dispose = capture(() => {
+								watch(() => {
+									if (signal.value === 77 && inExpr) {
+										throw new Error("e");
+									}
+									return signal.value;
+								}, value => {
+									if (value === 77) {
+										throw new Error("c");
+									}
+									events.push(`v${value}`);
+								}, sequential);
+
+								assertEvents(events, ["v42"]);
+							});
+
+							throws(() => {
+								signal.value = 77;
+							}, withMsg(inExpr ? "e" : "c"));
+
+							assertEvents(events, []);
+
+							signal.value = 123;
+							assertEvents(events, ["v123"]);
+
+							dispose();
+							signal.value = 1234;
+							assertEvents(events, []);
+						});
+					});
+				}
 			});
 
 			await ctx.test("effect", async ctx => {
@@ -542,6 +635,55 @@ await test("signals", async ctx => {
 						}, sequential);
 					});
 					strictEqual(count, 5);
+				});
+
+				await ctx.test("error handling", async ctx => {
+					await ctx.test("immediate, no access", () => {
+						uncapture(() => {
+							throws(() => {
+								effect(() => {
+									throw new Error("test");
+								}, sequential);
+							}, withMsg("test"));
+						});
+					});
+
+					await ctx.test("immediate, access", () => {
+						const events: unknown[] = [];
+						const signal = sig(42);
+						const dispose = capture(() => {
+							effect(() => {
+								events.push(`a${signal.value}`);
+							});
+
+							throws(() => {
+								effect(() => {
+									signal.access();
+									throw new Error("test");
+								});
+							}, withMsg("test"));
+
+							effect(() => {
+								events.push(`b${signal.value}`);
+							});
+
+							assertEvents(events, ["a42", "b42"]);
+						});
+
+						throws(() => {
+							signal.value = 77;
+						}, withMsg("test"));
+						assertEvents(events, ["a77"]);
+
+						throws(() => {
+							signal.value = 11;
+						}, withMsg("test"));
+						assertEvents(events, ["a11"]);
+
+						dispose();
+						signal.value = 123;
+						assertEvents(events, []);
+					});
 				});
 			});
 
@@ -755,57 +897,129 @@ await test("signals", async ctx => {
 					});
 					assertEvents(events, ["i", "o", 9]);
 				});
+
+				await ctx.test("error handling", () => {
+					const events: unknown[] = [];
+					const signal = sig(42);
+
+					const computed = uncapture(() => memo(() => {
+						if (signal.value === 77) {
+							throw new Error("test");
+						}
+						return signal.value + 1;
+					}));
+
+					uncapture(() => {
+						watch(computed, value => {
+							events.push(value);
+						});
+					});
+					assertEvents(events, [43]);
+					strictEqual(computed(), 43);
+
+					throws(() => {
+						signal.value = 77;
+					}, withMsg("test"));
+					assertEvents(events, []);
+					strictEqual(computed(), 43);
+
+					signal.value = 123;
+					assertEvents(events, [124]);
+					strictEqual(computed(), 124);
+				});
 			});
 
-			await ctx.test("batch", () => {
-				const events: unknown[] = [];
-				const a = sig(0);
-				const b = sig(1);
-				uncapture(() => watch(() => {
-					strictEqual(isTracking(), true);
-					return a.value + b.value;
-				}, value => {
-					events.push(value);
-				}, sequential));
-				assertEvents(events, [1]);
+			await ctx.test("batch", async ctx => {
+				await ctx.test("usage", () => {
+					const events: unknown[] = [];
+					const a = sig(0);
+					const b = sig(1);
+					uncapture(() => watch(() => {
+						strictEqual(isTracking(), true);
+						return a.value + b.value;
+					}, value => {
+						events.push(value);
+					}, sequential));
+					assertEvents(events, [1]);
 
-				batch(() => {
-					a.value++;
-					b.value++;
-					assertEvents(events, []);
-				});
-				assertEvents(events, [3]);
-
-				batch(() => {
-					a.value++;
-					assertEvents(events, []);
-					batch(() => {
-						b.value++;
-						assertEvents(events, []);
-					});
-					assertEvents(events, []);
-				});
-				assertEvents(events, [5]);
-
-				batch(() => batch(() => {
-					a.value++;
-					b.value++;
-					assertEvents(events, []);
 					batch(() => {
 						a.value++;
 						b.value++;
 						assertEvents(events, []);
 					});
-					assertEvents(events, []);
-				}));
-				assertEvents(events, [9]);
+					assertEvents(events, [3]);
 
-				batch(() => {
-					a.value++;
-					a.value++;
-					assertEvents(events, []);
+					batch(() => {
+						a.value++;
+						assertEvents(events, []);
+						batch(() => {
+							b.value++;
+							assertEvents(events, []);
+						});
+						assertEvents(events, []);
+					});
+					assertEvents(events, [5]);
+
+					batch(() => batch(() => {
+						a.value++;
+						b.value++;
+						assertEvents(events, []);
+						batch(() => {
+							a.value++;
+							b.value++;
+							assertEvents(events, []);
+						});
+						assertEvents(events, []);
+					}));
+					assertEvents(events, [9]);
+
+					batch(() => {
+						a.value++;
+						a.value++;
+						assertEvents(events, []);
+					});
+					assertEvents(events, [11]);
 				});
-				assertEvents(events, [11]);
+
+				await ctx.test("error handling", () => {
+					const events: unknown[] = [];
+					const signal = sig(42);
+					uncapture(() => watch(signal, value => {
+						events.push(value);
+					}));
+					assertEvents(events, [42]);
+
+					throws(() => {
+						batch(() => {
+							signal.value = 77;
+							throw new Error("test");
+						});
+					}, withMsg("test"));
+
+					strictEqual(signal.value, 77);
+					assertEvents(events, [77]);
+
+					signal.value = 2;
+					strictEqual(signal.value, 2);
+					assertEvents(events, [2]);
+
+					batch(() => {
+						throws(() => {
+							batch(() => {
+								signal.value = 11;
+								throw new Error("test");
+							});
+						}, withMsg("test"));
+
+						strictEqual(signal.value, 11);
+						assertEvents(events, []);
+					});
+					assertEvents(events, [11]);
+
+					signal.value = 3;
+					strictEqual(signal.value, 3);
+					assertEvents(events, [3]);
+				});
 			});
 
 			await ctx.test("lazy", async ctx => {

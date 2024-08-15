@@ -179,6 +179,9 @@ export function * viewNodes(view: View): IterableIterator<Node> {
 /**
  * A component that renders content depending on an expression.
  *
+ * + If an error is thrown by the expression or component during initialization, the error is re-thrown.
+ * + If an error is thrown by the expression or component during a signal update, the previously rendered content is kept and the error is re-thrown.
+ *
  * @example
  * ```tsx
  * import { Nest, sig } from "@mxjp/gluon";
@@ -213,7 +216,9 @@ export function Nest(props: {
 /**
  * A component that renders conditional content.
  *
- * Content is only re-rendered if the expression result is not strictly equal to the previous one. If this behavior is undesired, use {@link Nest} instead.
+ * + Content is only re-rendered if the expression result is not strictly equal to the previous one. If this behavior is undesired, use {@link Nest} instead.
+ * + If an error is thrown by the expression or component during initialization, the error is re-thrown.
+ * + If an error is thrown by the expression or component during a signal update, the previously rendered content is kept and the error is re-thrown.
  *
  * @example
  * ```tsx

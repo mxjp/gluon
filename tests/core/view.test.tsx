@@ -232,6 +232,100 @@ await test("view", async ctx => {
 			strictEqual(text(view.take()), "3");
 			assertEvents(events, ["s:0", "e:0", "s:1", "e:1", "s:2", "e:2", "s:3"]);
 		});
+
+		await ctx.test("error handling", async ctx => {
+			await ctx.test("expression, initialization", () => {
+				const signal = sig(42);
+				throws(() => {
+					capture(() => {
+						<Nest>
+							{() => {
+								signal.access();
+								throw new Error("test");
+							}}
+						</Nest> as View;
+					});
+				}, withMsg("test"));
+				signal.value = 77;
+			});
+
+			await ctx.test("expression, signal update", () => {
+				const signal = sig(42);
+				let view!: View;
+				const dispose = capture(() => {
+					view = <Nest>
+						{() => {
+							const value = signal.value;
+							if (value === 77) {
+								throw new Error("test");
+							}
+							return () => value;
+						}}
+					</Nest> as View;
+				});
+				strictEqual(text(view.take()), "42");
+
+				throws(() => {
+					signal.value = 77;
+				}, withMsg("test"));
+				strictEqual(text(view.take()), "42");
+
+				signal.value = 123;
+				strictEqual(text(view.take()), "123");
+
+				dispose();
+				signal.value = 11;
+				strictEqual(text(view.take()), "123");
+			});
+
+			await ctx.test("component, initialization", () => {
+				const signal = sig(42);
+				throws(() => {
+					capture(() => {
+						<Nest>
+							{() => {
+								signal.access();
+								return () => {
+									throw new Error("test");
+								};
+							}}
+						</Nest> as View;
+					});
+				}, withMsg("test"));
+				signal.value = 77;
+			});
+
+			await ctx.test("component, signal update", () => {
+				const signal = sig(42);
+				let view!: View;
+				const dispose = capture(() => {
+					view = <Nest>
+						{() => {
+							const value = signal.value;
+							return () => {
+								if (value === 77) {
+									throw new Error("test");
+								}
+								return value;
+							};
+						}}
+					</Nest> as View;
+				});
+				strictEqual(text(view.take()), "42");
+
+				throws(() => {
+					signal.value = 77;
+				}, withMsg("test"));
+				strictEqual(text(view.take()), "42");
+
+				signal.value = 123;
+				strictEqual(text(view.take()), "123");
+
+				dispose();
+				signal.value = 11;
+				strictEqual(text(view.take()), "123");
+			});
+		});
 	});
 
 	await ctx.test("Show", () => {

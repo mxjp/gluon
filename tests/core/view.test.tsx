@@ -6,7 +6,7 @@ import test from "node:test";
 import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
 import { wrap } from "@mxjp/gluon/store";
 
-import { assertEvents, assertSharedInstance, boundaryEvents, lifecycleEvent, TestView, testView, text } from "../common.js";
+import { assertEvents, assertSharedInstance, boundaryEvents, lifecycleEvent, TestView, testView, text, withMsg } from "../common.js";
 
 await test("view", async ctx => {
 	await ctx.test("shared instances", () => {
@@ -17,13 +17,13 @@ await test("view", async ctx => {
 	});
 
 	await ctx.test("init incomplete", () => {
-		throws(() => new View(() => {}));
+		throws(() => new View(() => {}), withMsg("G1"));
 		throws(() => new View(setBoundary => {
 			setBoundary(document.createTextNode("test"), undefined);
-		}));
+		}), withMsg("G1"));
 		throws(() => new View(setBoundary => {
 			setBoundary(undefined, document.createTextNode("test"));
-		}));
+		}), withMsg("G1"));
 	});
 
 	await ctx.test("init single node", () => {
@@ -61,7 +61,7 @@ await test("view", async ctx => {
 		strictEqual(view.view.last, b);
 		assertEvents(events, ["f0l1"]);
 
-		throws(() => view.view.setBoundaryOwner(() => {}));
+		throws(() => view.view.setBoundaryOwner(() => {}), withMsg("G2"));
 		unset();
 		uncapture(() => view.view.setBoundaryOwner(() => {}));
 

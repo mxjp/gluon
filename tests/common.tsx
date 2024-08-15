@@ -94,3 +94,9 @@ export function assertSharedInstance<T extends new(...args: any) => unknown>(tar
 	strictEqual(new Dummy() instanceof targetClass, true);
 	strictEqual(sampleInstance instanceof Dummy, true);
 }
+
+export function withMsg(message: string): (error: unknown) => boolean {
+	return error => {
+		return (error instanceof Error) && error.message === message;
+	};
+}

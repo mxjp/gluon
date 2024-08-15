@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { capture, captureSelf, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, withMsg } from "../common.js";
 
 await test("lifecycle", async ctx => {
 	await ctx.test("inert use", () => {
@@ -102,9 +102,7 @@ await test("lifecycle", async ctx => {
 						});
 						throw new Error("test");
 					});
-				}, error => {
-					return (error instanceof Error) && error.message === "test";
-				});
+				}, withMsg("test"));
 				teardown(() => {
 					events.push(1);
 				});
@@ -131,9 +129,7 @@ await test("lifecycle", async ctx => {
 							});
 							throw new Error("test");
 						});
-					}, error => {
-						return (error instanceof Error) && error.message === "test";
-					});
+					}, withMsg("test"));
 					teardown(() => {
 						events.push(1);
 					});
@@ -159,9 +155,7 @@ await test("lifecycle", async ctx => {
 							});
 							throw new Error("test");
 						});
-					}, error => {
-						return (error instanceof Error) && error.message === "test";
-					});
+					}, withMsg("test"));
 					if (disposeInner) {
 						innerDispose();
 					}

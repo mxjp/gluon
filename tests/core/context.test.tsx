@@ -5,6 +5,8 @@ import test from "node:test";
 
 import { ContextKey, deriveContext, extract, inject } from "@mxjp/gluon";
 
+import { withMsg } from "../common.js";
+
 await test("context", async ctx => {
 	await ctx.test("nesting", () => {
 		strictEqual(extract("foo"), undefined);
@@ -50,9 +52,7 @@ await test("context", async ctx => {
 						strictEqual(extract("foo"), "baz");
 						throw new Error("test");
 					});
-				}, error => {
-					return (error instanceof Error) && error.message === "test";
-				});
+				}, withMsg("test"));
 				strictEqual(extract("foo"), "bar");
 			});
 			strictEqual(extract("foo"), undefined);
@@ -70,9 +70,7 @@ await test("context", async ctx => {
 						strictEqual(extract("foo"), "baz");
 						throw new Error("test");
 					});
-				}, error => {
-					return (error instanceof Error) && error.message === "test";
-				});
+				}, withMsg("test"));
 				strictEqual(extract("foo"), "bar");
 				strictEqual(extract("bar"), "boo");
 			});

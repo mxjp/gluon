@@ -5,7 +5,7 @@ import test from "node:test";
 
 import { capture, Emitter, uncapture } from "@mxjp/gluon";
 
-import { assertEvents } from "../common.js";
+import { assertEvents, withMsg } from "../common.js";
 
 await test("events", async ctx => {
 	await ctx.test("usage", () => {
@@ -56,9 +56,7 @@ await test("events", async ctx => {
 
 		throws(() => {
 			emitter.emit();
-		}, error => {
-			return (error instanceof Error) && error.message === "test";
-		});
+		}, withMsg("test"));
 
 		assertEvents(events, [0, 1]);
 	});

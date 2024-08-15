@@ -98,17 +98,18 @@ await test("lifecycle", async ctx => {
 				throws(() => {
 					capture(() => {
 						teardown(() => {
-							throw new Error("this should never be called");
+							events.push(2);
 						});
 						throw new Error("test");
 					});
 				}, withMsg("test"));
+				assertEvents(events, [2]);
 				teardown(() => {
 					events.push(1);
 				});
 			});
 			outer();
-			assertEvents(events, [0, 1]);
+			assertEvents(events, [1, 0]);
 		});
 
 		for (const disposeInner of [false, true]) {
@@ -125,17 +126,18 @@ await test("lifecycle", async ctx => {
 								inner();
 							}
 							teardown(() => {
-								throw new Error("this should never be called");
+								events.push(2);
 							});
 							throw new Error("test");
 						});
 					}, withMsg("test"));
+					assertEvents(events, [2]);
 					teardown(() => {
 						events.push(1);
 					});
 					assertEvents(events, []);
 				});
-				assertEvents(events, [0, 1]);
+				assertEvents(events, [1, 0]);
 			});
 
 			await ctx.test(`captureSelf (delayed${disposeInner ? ", dispose inner" : ""})`, () => {
@@ -151,11 +153,12 @@ await test("lifecycle", async ctx => {
 						captureSelf(inner => {
 							innerDispose = inner;
 							teardown(() => {
-								throw new Error("this should never be called");
+								events.push(2);
 							});
 							throw new Error("test");
 						});
 					}, withMsg("test"));
+					assertEvents(events, [2]);
 					if (disposeInner) {
 						innerDispose();
 					}
@@ -165,8 +168,106 @@ await test("lifecycle", async ctx => {
 				});
 				assertEvents(events, []);
 				outerDispose();
-				assertEvents(events, [0, 1]);
+				assertEvents(events, [1, 0]);
 			});
 		}
+
+		await ctx.test("capture, teardown error", () => {
+			const events: unknown[] = [];
+			const dispose = capture(() => {
+				teardown(() => {
+					events.push(0);
+				});
+				teardown(() => {
+					throw new Error("test");
+				});
+				teardown(() => {
+					events.push(1);
+				});
+			});
+			throws(dispose, withMsg("test"));
+			assertEvents(events, [1]);
+		});
+
+		await ctx.test("captureSelf, immediate, teardown error", () => {
+			const events: unknown[] = [];
+			throws(() => {
+				captureSelf(dispose => {
+					dispose();
+					teardown(() => {
+						events.push(0);
+					});
+					teardown(() => {
+						throw new Error("test");
+					});
+					teardown(() => {
+						events.push(1);
+					});
+					teardown(() => {
+						events.push(2);
+					});
+					events.push(3);
+				});
+			}, withMsg("test"));
+			assertEvents(events, [3, 2, 1]);
+		});
+
+		await ctx.test("captureSelf, deferred, teardown hook error", () => {
+			const events: unknown[] = [];
+			let disposeFn!: TeardownHook;
+			captureSelf(dispose => {
+				disposeFn = dispose;
+				teardown(() => {
+					events.push(0);
+				});
+				teardown(() => {
+					throw new Error("test");
+				});
+				teardown(() => {
+					events.push(1);
+				});
+				teardown(() => {
+					events.push(2);
+				});
+				events.push(3);
+			});
+			assertEvents(events, [3]);
+			throws(disposeFn, withMsg("test"));
+			assertEvents(events, [2, 1]);
+		});
+
+		await ctx.test("capture + teardown error", () => {
+			throws(() => {
+				capture(() => {
+					teardown(() => {
+						throw new Error("a");
+					});
+					throw new Error("b");
+				});
+			}, withMsg("a"));
+		});
+
+		await ctx.test("captureSelf (non disposed) + teardown error", () => {
+			throws(() => {
+				captureSelf(() => {
+					teardown(() => {
+						throw new Error("a");
+					});
+					throw new Error("b");
+				});
+			}, withMsg("a"));
+		});
+
+		await ctx.test("captureSelf (disposed) + teardown error", () => {
+			throws(() => {
+				captureSelf(dispose => {
+					dispose();
+					teardown(() => {
+						throw new Error("a");
+					});
+					throw new Error("b");
+				});
+			}, withMsg("a"));
+		});
 	});
 });

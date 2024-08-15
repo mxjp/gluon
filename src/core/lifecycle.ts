@@ -9,25 +9,41 @@ export type TeardownHook = () => void;
 const NOOP = () => {};
 
 /**
+ * Internal utility to dispose the specified hooks in reverse order.
+ */
+function dispose(hooks: TeardownHook[]) {
+	for (let i = hooks.length - 1; i >= 0; i--) {
+		hooks[i]();
+	}
+}
+
+/**
  * Run a function while capturing teardown hooks.
  *
+ * + If an error is thrown by the specified function, teardown hooks are called in reverse registration order and the error is re-thrown.
+ * + If an error is thrown by a teardown hook, remaining ones are not called and the error is re-thrown.
+ *
  * @param fn The function to run.
- * @returns A function to run all captured teardown hooks.
+ * @returns A function to run all captured teardown hooks in reverse registration order.
  */
 export function capture(fn: () => void): TeardownHook {
 	const hooks: TeardownHook[] = [];
-	useStack(TEARDOWN_STACK, hooks, fn);
+	try {
+		useStack(TEARDOWN_STACK, hooks, fn);
+	} catch (error) {
+		dispose(hooks);
+		throw error;
+	}
 	return hooks.length > 1
-		? () => {
-			for (let i = 0; i < hooks.length; i++) {
-				hooks[i]();
-			}
-		}
+		? () => dispose(hooks)
 		: hooks[0] ?? NOOP;
 }
 
 /**
  * Run a function while capturing teardown hooks that may dispose itself.
+ *
+ * + If an error is thrown by the specified function, teardown hooks are called in reverse registration order and the error is re-thrown.
+ * + If an error is thrown by a teardown hook, remaining ones are not called and the error is re-thrown.
  *
  * @param fn The function to run.
  * @returns The function's return value.

@@ -25,7 +25,9 @@ const dispose = capture(() => {
 
 dispose();
 ```
-Teardown hooks are called in registration order when the returned `dispose` function is called.
+Teardown hooks are called in reverse registration order when the returned `dispose` function is called.
+
+If the specified function throws an error, teardown hooks are called in reverse registration order and the error is re-thrown.
 
 ## `captureSelf`
 This is almost the same as `capture` and is meant for things that need to dispose themselves.
@@ -38,9 +40,11 @@ captureSelf(dispose => {
 	dispose();
 });
 ```
-Teardown hooks are called in registration order when the `dispose` function is called.
+Teardown hooks are called in reverse registration order when the `dispose` function is called.
 
 When `dispose` is called while the callback is still running, it has no effect and will call teardown hooks immediately after the callback completes instead.
+
+If the specified function throws an error, teardown hooks are called in reverse registration order and the error is re-thrown.
 
 ## `uncapture`
 To explicitly leak teardown hooks, the `uncapture` function can be used. Code running during the call has an infinitly long lifecycle.

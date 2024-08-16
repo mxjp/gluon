@@ -72,3 +72,5 @@ export function createText(expr: Expression<unknown>): Text {
 	watch(expr, value => text.textContent = (value ?? "") as string);
 	return text;
 }
+
+export const NOOP = (): void => {};

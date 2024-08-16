@@ -1,5 +1,5 @@
 import { shareInstancesOf } from "./globals.js";
-import { createParent, createPlaceholder, extractRange, Falsy } from "./internals.js";
+import { createParent, createPlaceholder, extractRange, Falsy, NOOP } from "./internals.js";
 import { capture, nocapture, teardown, TeardownHook } from "./lifecycle.js";
 import { render } from "./render.js";
 import { effect, Expression, get, memo, sig, Signal, watch } from "./signals.js";
@@ -489,6 +489,7 @@ export function IndexFor<T>(props: {
 						}
 						current.v.detach();
 						current.d();
+						current.d = NOOP;
 					}
 
 					const instance: Instance = {

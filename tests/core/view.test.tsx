@@ -386,13 +386,27 @@ await test("view", async ctx => {
 	});
 
 	await ctx.test("For", async ctx => {
-		function sequenceTest(sequence: unknown[][]) {
+		function sequenceTest(sequence: unknown[][], withErrors: boolean) {
+			if (withErrors) {
+				sequence = structuredClone(sequence);
+				for (let i = 1; i < sequence.length; i++) {
+					sequence[i].push(new Error(`${i}`), "unreachable value", new Error(`unreachable error`));
+				}
+			}
+
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
 			const view = uncapture(() => {
 				return <For each={signal}>
 					{(value, index) => {
+						if (value instanceof Error) {
+							events.push("+e");
+							teardown(() => {
+								events.push("-e");
+							});
+							throw value;
+						}
 						events.push(`+${value}`);
 						teardown(() => {
 							events.push(`-${value}`);
@@ -403,10 +417,15 @@ await test("view", async ctx => {
 			});
 
 			let lastValues = new Set<unknown>();
-			function assertItems(values: unknown[]) {
+			function assertItems(values: unknown[], errorIndex: number) {
+				const expectedEvents = [];
+				if (errorIndex >= 0) {
+					expectedEvents.push("+e", "-e");
+					values = values.slice(0, errorIndex);
+				}
+
 				strictEqual(text(view.take()), [...new Set(values)].map((v, i) => `[${v}:${i}]`).join(""));
 
-				const expectedEvents = [];
 				const valueSet = new Set(values);
 				for (const value of valueSet) {
 					if (!lastValues.has(value)) {
@@ -418,77 +437,93 @@ await test("view", async ctx => {
 						expectedEvents.push(`-${value}`);
 					}
 				}
+
 				lastValues = valueSet;
 				assertEvents(events.sort(), expectedEvents.sort());
 			}
 
-			assertItems(sequence[0]);
+			assertItems(sequence[0], -1);
 			for (let i = 1; i < sequence.length; i++) {
-				signal.value = sequence[i];
-				assertItems(sequence[i]);
+				const values = sequence[i];
+				const errorIndex = values.findIndex(v => v instanceof Error);
+				if (errorIndex >= 0) {
+					throws(() => {
+						signal.value = sequence[i];
+					}, error => error === values[errorIndex]);
+				} else {
+					signal.value = sequence[i];
+				}
+				assertItems(sequence[i], errorIndex);
 			}
 		}
 
-		await ctx.test("diff", () => {
-			sequenceTest([
-				// Initial items:
-				[1, 2, 3, 4, 5],
-				// Remove boundary & middle parts:
-				[2, 4],
-				// Shuffle & insert:
-				[1, 4, 3, 2, 5],
-				// Remove all:
-				[],
-				// Re-insert items:
-				[1, 2, 3, 4, 5],
-				// Shuffle & remove:
-				[5, 3, 1],
-				// Remove and insert new:
-				[2, 4],
-				// Insert many:
-				[1, 2, 3, 4, 5, 6, 7],
-				// Shuffle, insert & remove:
-				[2, 9, 10, 7, 8, 1, 5],
-				// Remove & insert duplicates:
-				[2, 2, 1, 1, 5, 5],
-				// Shuffle & insert mixed duplicates:
-				[2, 1, 5, 3, 2, 1, 3, 5, 2, 5, 1],
-				// Shuffle & remove duplicates only:
-				[3, 5, 1, 2],
-			]);
-		});
+		for (const withErrors of [false, true]) {
+			await ctx.test(withErrors ? "diff" : "error handling", async ctx => {
+				await ctx.test("fixed sequence", () => {
+					sequenceTest([
+						// Initial items:
+						[1, 2, 3, 4, 5],
+						// Remove boundary & middle parts:
+						[2, 4],
+						// Shuffle & insert:
+						[1, 4, 3, 2, 5],
+						// Remove all:
+						[],
+						// Re-insert items:
+						[1, 2, 3, 4, 5],
+						// Shuffle & remove:
+						[5, 3, 1],
+						// Remove and insert new:
+						[2, 4],
+						// Insert many:
+						[1, 2, 3, 4, 5, 6, 7],
+						// Shuffle, insert & remove:
+						[2, 9, 10, 7, 8, 1, 5],
+						// Remove & insert duplicates:
+						[2, 2, 1, 1, 5, 5],
+						// Shuffle & insert mixed duplicates:
+						[2, 1, 5, 3, 2, 1, 3, 5, 2, 5, 1],
+						// Shuffle & remove duplicates only:
+						[3, 5, 1, 2],
+					], withErrors);
+				});
 
-		await ctx.test("diff (random)", ctx => {
-			const SEQ_SIZE = 100;
-			const MAX_COUNT = 20;
-			const MAX_OFFSET = 8;
-			const MAX_DUPLICATES = 4;
+				await ctx.test("random", ctx => {
+					const SEQ_SIZE = 100;
+					const MAX_COUNT = 20;
+					const MAX_OFFSET = 8;
+					const MAX_DUPLICATES = 4;
 
-			const sequence: unknown[][] = [];
-			for (let i = 0; i < SEQ_SIZE; i++) {
-				const count = Math.floor(Math.random() * MAX_COUNT);
-				const offset = Math.floor(Math.random() * MAX_OFFSET);
-				const duplicates = Math.floor(Math.random() * MAX_DUPLICATES);
-				const values: unknown[] = [];
-				for (let c = 0; c < count; c++) {
-					values.splice(Math.floor(Math.random() * (values.length + 1)), 0, c + offset);
-				}
-				if (count > 0) {
-					for (let d = 0; d < duplicates; d++) {
-						const value = values[Math.floor(Math.random() * values.length)];
-						values.splice(Math.floor(Math.random() * (values.length + 1)), 0, value);
+					const sequence: unknown[][] = [];
+					for (let i = 0; i < SEQ_SIZE; i++) {
+						const count = Math.floor(Math.random() * MAX_COUNT);
+						const offset = Math.floor(Math.random() * MAX_OFFSET);
+						const duplicates = Math.floor(Math.random() * MAX_DUPLICATES);
+						const values: unknown[] = [];
+						for (let c = 0; c < count; c++) {
+							values.splice(Math.floor(Math.random() * (values.length + 1)), 0, c + offset);
+						}
+						if (count > 0) {
+							for (let d = 0; d < duplicates; d++) {
+								const value = values[Math.floor(Math.random() * values.length)];
+								values.splice(Math.floor(Math.random() * (values.length + 1)), 0, value);
+							}
+						}
+						sequence.push(values);
 					}
-				}
-				sequence.push(values);
-			}
 
-			try {
-				sequenceTest(sequence);
-			} catch (error) {
-				ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
-				throw error;
-			}
-		});
+					try {
+						sequenceTest(sequence, withErrors);
+					} catch (error) {
+						ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
+						throw error;
+					}
+				});
+			});
+		}
+
+		// TODO: Test immediate iteration errors.
+		// TODO: Test immediate render errors.
 
 		await ctx.test("sequential item render side effects", () => {
 			const events: unknown[] = [];
@@ -622,13 +657,23 @@ await test("view", async ctx => {
 	});
 
 	await ctx.test("IndexFor", async ctx => {
-		function sequenceTest(sequence: unknown[][]) {
+		function sequenceTest(sequence: unknown[][], withErrors: boolean) {
+			if (withErrors) {
+				sequence = structuredClone(sequence);
+				for (let i = 1; i < sequence.length; i++) {
+					sequence[i].push(new Error(`${i}`), "unreachable value", new Error(`unreachable error`));
+				}
+			}
+
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
 			const view = uncapture(() => {
 				return <IndexFor each={signal}>
 					{(value, index) => {
+						if (value instanceof Error) {
+							throw value;
+						}
 						events.push(`+${value}`);
 						teardown(() => {
 							events.push(`-${value}`);
@@ -639,9 +684,13 @@ await test("view", async ctx => {
 			});
 
 			let lastValues: unknown[] = [];
-			function assertItems(values: unknown[]) {
-				strictEqual(text(view.take()), values.map((v, i) => `[${v}:${i}]`).join(""));
+			function assertItems(values: unknown[], errorIndex: number) {
+				if (errorIndex >= 0) {
+					values = values.slice(0, errorIndex);
+				}
+
 				const expectedEvents: unknown[] = [];
+				strictEqual(text(view.take()), values.map((v, i) => `[${v}:${i}]`).join(""));
 				for (let i = 0; i < values.length; i++) {
 					if (i < lastValues.length) {
 						const last = lastValues[i];
@@ -659,46 +708,66 @@ await test("view", async ctx => {
 				lastValues = values;
 			}
 
-			assertItems(sequence[0]);
+			assertItems(sequence[0], -1);
 			for (let i = 1; i < sequence.length; i++) {
-				signal.value = sequence[i];
-				assertItems(sequence[i]);
+				const values = sequence[i];
+				const errorIndex = values.findIndex(v => v instanceof Error);
+				if (errorIndex >= 0) {
+					throws(() => {
+						signal.value = values;
+					}, error => error === values[errorIndex]);
+				} else {
+					signal.value = values;
+				}
+				assertItems(values, errorIndex);
 			}
 		}
 
-		await ctx.test("diff", () => {
-			sequenceTest([
-				[1, 2, 3],
-				[1, 4, 3],
-				[1, 4],
-				[2, 4, 5, 6],
-				[1, 2, 3],
-				[],
-			]);
-		});
+		for (const withErrors of [false, true]) {
+			await ctx.test(withErrors ? "diff" : "error handling", async ctx => {
+				await ctx.test("fixed sequence", () => {
+					sequenceTest([
+						[1, 2, 3],
+						[1, 4, 3],
+						[1, 4],
+						[2, 4, 5, 6],
+						[1, 2, 3],
+						[],
+					], withErrors);
+				});
 
-		await ctx.test("diff (random)", ctx => {
-			const SEQ_SIZE = 100;
-			const MAX_COUNT = 20;
-			const MAX_VALUE = 5;
+				await ctx.test("random", ctx => {
+					const SEQ_SIZE = 100;
+					const MAX_COUNT = 20;
+					const MAX_VALUE = 5;
 
-			const sequence: unknown[][] = [];
-			for (let i = 0; i < SEQ_SIZE; i++) {
-				const count = Math.floor(Math.random() * MAX_COUNT);
-				const values: unknown[] = [];
-				for (let c = 0; c < count; c++) {
-					values.push(Math.floor(Math.random() * MAX_VALUE));
-				}
-				sequence.push(values);
-			}
+					const sequence: unknown[][] = [];
+					for (let i = 0; i < SEQ_SIZE; i++) {
+						const count = Math.floor(Math.random() * MAX_COUNT);
+						const values: unknown[] = [];
+						for (let c = 0; c < count; c++) {
+							values.push(Math.floor(Math.random() * MAX_VALUE));
+						}
+						sequence.push(values);
+					}
 
-			try {
-				sequenceTest(sequence);
-			} catch (error) {
-				ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
-				throw error;
-			}
-		});
+					try {
+						sequenceTest(sequence, withErrors);
+					} catch (error) {
+						ctx.diagnostic(`Broken sequence: ${JSON.stringify(sequence)}`);
+						throw error;
+					}
+				});
+			});
+		}
+
+		// TODO: Test sequence error event order.
+		// TODO: Avoid double dispose by immediatly replacing disposed instances.
+
+		// TODO: Test immediate iteration errors.
+		// TODO: Test immediate render errors.
+
+		// TODO: Consider switching create/dispose order.
 
 		await ctx.test("sequential item render side effects", () => {
 			const events: unknown[] = [];

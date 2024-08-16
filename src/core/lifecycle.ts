@@ -1,12 +1,10 @@
 import { TEARDOWN_STACK } from "./internal-globals.js";
-import { TeardownFrame, useStack } from "./internals.js";
+import { NOOP, TeardownFrame, useStack } from "./internals.js";
 
 /**
  * A function that can be called to dispose something.
  */
 export type TeardownHook = () => void;
-
-const NOOP = () => {};
 
 /**
  * Internal utility to dispose the specified hooks in reverse order.

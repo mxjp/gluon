@@ -160,6 +160,8 @@ import { Show } from "@mxjp/gluon";
 </div>
 ```
 
+Reusing views while they are still attached to somewhere else results in undefined behavior. To safely move views around, consider using [`movable`](./views/movable.md) views.
+
 ### Arrays & Fragments
 Content can be wrapped in arbitrarily nested arrays and JSX fragments.
 ```jsx

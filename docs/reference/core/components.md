@@ -58,7 +58,7 @@ function Counter(props: { value: Signal<number>; }) {
 const count = sig(0);
 <Counter value={count} />
 ```
-Using signals for two way data flow also allows converting values in both direction in a nicely composable way.
+Using signals for two way data flow also allows converting values in both directions in a nicely composable way.
 
 The example below shows a basic text input and a `trim` function for trimming user input:
 ```jsx

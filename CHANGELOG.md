@@ -4,6 +4,7 @@
 + **Breaking:** Batches now run even if an error is thrown to prevent breaking unrelated signal cycles.
 + **Breaking:** Teardown hooks for the same `capture` or `captureSelf` call are now called in reverse order.
 + **Breaking:** If the function passed to `capture` or `captureSelf` throws an error, teardown hooks are now automatically called in reverse order and the error is re-thrown.
++ **Breaking:** `<For>` and `<IndexFor>` now abort the current update if an error is thrown as if the previous item was the last one and re-throw the error.
 
 ## 12.0
 + **Breaking:** Public exports have been removed: `appendContent`, `setAttributes`, `createText`.

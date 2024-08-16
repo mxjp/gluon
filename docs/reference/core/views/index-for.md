@@ -27,5 +27,8 @@ The following describes the order in which new instances are created, updated or
 
 When the view itself is disposed, instances are disposed in the latest iteration order.
 
+## Error Handling
+If an error is thrown by iterating or by rendering an item, the update is stopped as if the previous item was the last one and the error is re-thrown.
+
 ### Performance
 The current implementation has a performance of `O(n)` with `n` being the new number of items. When items are frequently moved, consider using [`<For>`](./for.md) instead.

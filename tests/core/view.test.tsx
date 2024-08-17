@@ -522,8 +522,50 @@ await test("view", async ctx => {
 			});
 		}
 
-		// TODO: Test immediate iteration errors.
-		// TODO: Test immediate render errors.
+		for (const context of [capture, uncapture]) {
+			await ctx.test(`initial iteration error handling (${context.name})`, () => {
+				const events: unknown[] = [];
+				throws(() => {
+					context(() => {
+						<For each={(function * () {
+							yield 0;
+							yield 1;
+							events.push("e");
+							throw new Error("test");
+						})()}>
+							{value => {
+								events.push(`+${value}`);
+								teardown(() => {
+									events.push(`-${value}`);
+								});
+							}}
+						</For>;
+					});
+				}, withMsg("test"));
+				assertEvents(events, context === capture ? ["+0", "+1", "e", "-0", "-1"] : ["+0", "+1", "e"]);
+			});
+
+			await ctx.test(`initial render error handling (${context.name})`, () => {
+				const events: unknown[] = [];
+				throws(() => {
+					context(() => {
+						<For each={[0, 1, 2, 3]}>
+							{value => {
+								events.push(`+${value}`);
+								teardown(() => {
+									events.push(`-${value}`);
+								});
+								if (value === 2) {
+									events.push("e");
+									throw new Error("test");
+								}
+							}}
+						</For>;
+					});
+				}, withMsg("test"));
+				assertEvents(events, context === capture ? ["+0", "+1", "+2", "e", "-2", "-0", "-1"] : ["+0", "+1", "+2", "e", "-2"]);
+			});
+		}
 
 		await ctx.test("sequential item render side effects", () => {
 			const events: unknown[] = [];
@@ -761,13 +803,50 @@ await test("view", async ctx => {
 			});
 		}
 
-		// TODO: Test sequence error event order.
-		// TODO: Avoid double dispose by immediatly replacing disposed instances.
+		for (const context of [capture, uncapture]) {
+			await ctx.test(`initial iteration error handling (${context.name})`, () => {
+				const events: unknown[] = [];
+				throws(() => {
+					context(() => {
+						<IndexFor each={(function * () {
+							yield 0;
+							yield 1;
+							events.push("e");
+							throw new Error("test");
+						})()}>
+							{value => {
+								events.push(`+${value}`);
+								teardown(() => {
+									events.push(`-${value}`);
+								});
+							}}
+						</IndexFor>;
+					});
+				});
+				assertEvents(events, context === capture ? ["+0", "+1", "e", "-0", "-1"] : ["+0", "+1", "e"]);
+			});
 
-		// TODO: Test immediate iteration errors.
-		// TODO: Test immediate render errors.
-
-		// TODO: Consider switching create/dispose order.
+			await ctx.test(`initial render error handling (${context.name})`, () => {
+				const events: unknown[] = [];
+				throws(() => {
+					context(() => {
+						<IndexFor each={[0, 1, 2, 3]}>
+							{value => {
+								events.push(`+${value}`);
+								teardown(() => {
+									events.push(`-${value}`);
+								});
+								if (value === 2) {
+									events.push("e");
+									throw new Error("test");
+								}
+							}}
+						</IndexFor>;
+					});
+				});
+				assertEvents(events, context === capture ? ["+0", "+1", "+2", "e", "-2", "-0", "-1"] : ["+0", "+1", "+2", "e", "-2"]);
+			});
+		}
 
 		await ctx.test("sequential item render side effects", () => {
 			const events: unknown[] = [];
@@ -821,7 +900,7 @@ await test("view", async ctx => {
 			}
 
 			dispose();
-			// assertEvents(events, options.disposeEvents);
+			assertEvents(events, options.disposeEvents);
 		}
 
 		await ctx.test("lifecycle & update order", () => {

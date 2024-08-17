@@ -9,7 +9,7 @@ assert(element.innerText === "Current count: 42");
 ```
 
 ## Synchronous Tests
-Gluon provides a lightweight wrapper for running small synchronous tests that provides a [context](core/context.md) and takes care of calling [teardown hooks](core/lifecycle.md) after the test.
+Gluon provides a lightweight wrapper for running small synchronous tests that provides a [context](./context.md) and takes care of calling [teardown hooks](./lifecycle.md) after the test.
 ```jsx
 import { runTest, querySelector } from "@mxjp/gluon/test";
 
@@ -25,7 +25,7 @@ runTest(ctx => {
 ```
 
 ## Asynchronous Tests
-Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context](core/context.md) will not work after awaiting something:
+Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context](./context.md) will not work after awaiting something:
 ```jsx
 inject("foo", "bar", async () => {
 	extract("foo"); // => "bar"
@@ -34,7 +34,7 @@ inject("foo", "bar", async () => {
 });
 ```
 
-There is a wrapper for async tests that allows you to run small synchronous parts of your test with a shared [context](core/context.md), an [async context](async-utilities/async.md#tracking-completion). After the test, this will run [teardown hooks](core/lifecycle.md) registered during **"use(..)"** calls and wait for any pending tasks tracked in the async context.
+There is a wrapper for async tests that allows you to run small synchronous parts of your test with a shared [context](./context.md), an [async context](./async-utilities/async.md#tracking-completion). After the test, this will run [teardown hooks](./lifecycle.md) registered during **"use(..)"** calls and wait for any pending tasks tracked in the async context.
 
 The example below shows a test that asserts that asynchronously loaded content is displayed correctly:
 ```jsx
@@ -65,7 +65,7 @@ await runAsyncTest(async ({ ctx, asyncCtx, use }) => {
 ```
 
 ## Waiting For Expressions
-You can watch arbitrary [expressions](core/signals.md#expressions) using the `watchFor` function.
+You can watch arbitrary [expressions](./signals.md#expressions) using the `watchFor` function.
 ```jsx
 import { sig, watchFor, isPending } from "@mxjp/gluon";
 
@@ -82,7 +82,7 @@ await watchFor(() => !isPending());
 ```
 
 ## Leak Detection
-The [lifecycle API](core/lifecycle.md) silently discards teardown hooks outside of `capture` calls. This can be a valid use case, for instance when rendering your application until the browser closes or when intentionally leaking teardown hooks using `uncapture`.
+The [lifecycle API](./lifecycle.md) silently discards teardown hooks outside of `capture` calls. This can be a valid use case, for instance when rendering your application until the browser closes or when intentionally leaking teardown hooks using `uncapture`.
 
 However, this can result in accidental memory leaks when registering teardown hooks in async code:
 ```jsx

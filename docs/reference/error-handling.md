@@ -4,22 +4,22 @@ To keep the runtime as small as possible, gluon uses the error codes below inste
 ## `G0`
 **Teardown hooks are explicitly not supported in this context and registering them is very likely a mistake.**
 
-This is thrown when registering teardown hooks in an expression or during [`nocapture`](./core/lifecycle.md#nocapture) calls. If you are sure that it's not a mistake if the teardown hook will never be called, you can ignore this error by using [`uncapture`](./core/lifecycle.md#uncapture).
+This is thrown when registering teardown hooks in an expression or during [`nocapture`](./lifecycle.md#nocapture) calls. If you are sure that it's not a mistake if the teardown hook will never be called, you can ignore this error by using [`uncapture`](./lifecycle.md#uncapture).
 
 ## `G1`
 **View boundary was not completely initialized.**
 
-This is thrown when a [`View`](./core/views/index.md#implementing-views) did not complete boundary initialization during it's construction. This is always a bug in the view implementation and the author of that view should ensure, that all the view implementation requirements are met.
+This is thrown when a [`View`](./views/index.md#implementing-views) did not complete boundary initialization during it's construction. This is always a bug in the view implementation and the author of that view should ensure, that all the view implementation requirements are met.
 
 ## `G2`
 **View already has a boundary owner.**
 
-[`Views`](./core/views/index.md#view-api) can only have one boundary owner at a time. This error is thrown when a previous owner wasn't disposed correctly or when the view is used in multiple places at once.
+[`Views`](./views/index.md#view-api) can only have one boundary owner at a time. This error is thrown when a previous owner wasn't disposed correctly or when the view is used in multiple places at once.
 
 ## `G3`
 **Router is not available in the current context.**
 
-This is thrown by the [`<Routes>`](./routing.md) component if no router has been provided via the current [`context`](./core/context.md).
+This is thrown by the [`<Routes>`](./routing.md) component if no router has been provided via the current [`context`](./context.md).
 
 ## `G4`
 **`onTeardownLeak` must only be called once and outside of any capture calls.**

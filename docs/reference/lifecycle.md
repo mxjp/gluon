@@ -12,7 +12,7 @@ teardown(() => {
 	clearInterval(handle);
 });
 ```
-Calling `teardown` outside of any functions listed below has no effect and "leaks" the teardown hook. When running tests, this behavior can be [configured](../testing.md#leak-detection) to log leaks or to throw an error.
+Calling `teardown` outside of any functions listed below has no effect and "leaks" the teardown hook. When running tests, this behavior can be [configured](./testing.md#leak-detection) to log leaks or to throw an error.
 
 ## `capture`
 Capture teardown hooks during a function call:

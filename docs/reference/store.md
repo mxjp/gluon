@@ -25,7 +25,7 @@ const todos = wrap([
 todos[1].done = true;
 todos.push({ name: "Baz", done: true });
 ```
-Note, that every individual update is processed immediately. To prevent this, you can use [batches](core/signals.md#batch):
+Note, that every individual update is processed immediately. To prevent this, you can use [batches](./signals.md#batch):
 ```jsx
 import { batch } from "@mxjp/gluon";
 

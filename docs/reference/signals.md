@@ -294,7 +294,7 @@ counter.value.count++;
 counter.notify();
 ```
 
-If you need deeply reactive objects, you can use the [store API](../store.md).
+If you need deeply reactive objects, you can use the [store API](./store.md).
 
 ### Static Values
 The value of signals or expressions can always be accessed in a non reactive ways:

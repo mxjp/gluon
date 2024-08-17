@@ -470,6 +470,12 @@ export function IndexFor<T>(props: {
 		setBoundary(first, first);
 
 		const instances: Instance[] = [];
+		teardown(() => {
+			for (let i = 0; i < instances.length; i++) {
+				instances[i].d();
+			}
+		});
+
 		effect(() => {
 			let parent = self.parent;
 			if (!parent) {

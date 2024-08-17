@@ -397,8 +397,9 @@ await test("view", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
-			const view = uncapture(() => {
-				return <For each={signal}>
+			let view!: View;
+			const dispose = capture(() => {
+				return view = <For each={signal}>
 					{(value, index) => {
 						if (value instanceof Error) {
 							events.push("+e");
@@ -417,14 +418,16 @@ await test("view", async ctx => {
 			});
 
 			let lastValues = new Set<unknown>();
-			function assertItems(values: unknown[], errorIndex: number) {
+			function assertItems(values: unknown[], errorIndex: number, assertContent: boolean) {
 				const expectedEvents = [];
 				if (errorIndex >= 0) {
 					expectedEvents.push("+e", "-e");
 					values = values.slice(0, errorIndex);
 				}
 
-				strictEqual(text(view.take()), [...new Set(values)].map((v, i) => `[${v}:${i}]`).join(""));
+				if (assertContent) {
+					strictEqual(text(view.take()), [...new Set(values)].map((v, i) => `[${v}:${i}]`).join(""));
+				}
 
 				const valueSet = new Set(values);
 				for (const value of valueSet) {
@@ -442,7 +445,7 @@ await test("view", async ctx => {
 				assertEvents(events.sort(), expectedEvents.sort());
 			}
 
-			assertItems(sequence[0], -1);
+			assertItems(sequence[0], -1, true);
 			for (let i = 1; i < sequence.length; i++) {
 				const values = sequence[i];
 				const errorIndex = values.findIndex(v => v instanceof Error);
@@ -453,8 +456,13 @@ await test("view", async ctx => {
 				} else {
 					signal.value = sequence[i];
 				}
-				assertItems(sequence[i], errorIndex);
+				assertItems(sequence[i], errorIndex, true);
 			}
+
+			const lastContent = text(view.take());
+			dispose();
+			assertItems([], -1, false);
+			strictEqual(text(view.take()), lastContent);
 		}
 
 		for (const withErrors of [false, true]) {
@@ -710,8 +718,9 @@ await test("view", async ctx => {
 			const events: unknown[] = [];
 			const signal = sig(sequence[0]);
 
-			const view = uncapture(() => {
-				return <IndexFor each={signal}>
+			let view!: View;
+			const dispose = capture(() => {
+				view = <IndexFor each={signal}>
 					{(value, index) => {
 						if (value instanceof Error) {
 							throw value;
@@ -726,13 +735,16 @@ await test("view", async ctx => {
 			});
 
 			let lastValues: unknown[] = [];
-			function assertItems(values: unknown[], errorIndex: number) {
+			function assertItems(values: unknown[], errorIndex: number, assertContent: boolean) {
 				if (errorIndex >= 0) {
 					values = values.slice(0, errorIndex);
 				}
 
+				if (assertContent) {
+					strictEqual(text(view.take()), values.map((v, i) => `[${v}:${i}]`).join(""));
+				}
+
 				const expectedEvents: unknown[] = [];
-				strictEqual(text(view.take()), values.map((v, i) => `[${v}:${i}]`).join(""));
 				for (let i = 0; i < values.length; i++) {
 					if (i < lastValues.length) {
 						const last = lastValues[i];
@@ -750,7 +762,7 @@ await test("view", async ctx => {
 				lastValues = values;
 			}
 
-			assertItems(sequence[0], -1);
+			assertItems(sequence[0], -1, true);
 			for (let i = 1; i < sequence.length; i++) {
 				const values = sequence[i];
 				const errorIndex = values.findIndex(v => v instanceof Error);
@@ -761,8 +773,13 @@ await test("view", async ctx => {
 				} else {
 					signal.value = values;
 				}
-				assertItems(values, errorIndex);
+				assertItems(values, errorIndex, true);
 			}
+
+			const lastContent = text(view!.take());
+			dispose();
+			assertItems([], -1, false);
+			strictEqual(text(view.take()), lastContent);
 		}
 
 		for (const withErrors of [false, true]) {

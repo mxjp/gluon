@@ -90,12 +90,6 @@ nocapture(() => {
 });
 ```
 
-## Error Handling
-The lifecycle system has **no** special error handling.
-
-+ Throwing errors from within `capture` or `captureSelf` will prevent any teardown hooks from running.
-+ Throwing errors from within a teardown hook will prevent any other teardown hooks from running.
-
 ## Async Code
 Capturing teardown hooks relies on the synchronous call stack and therefore only works partially with async code:
 ```jsx

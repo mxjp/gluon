@@ -103,3 +103,51 @@ const text = sig("");
 // readable when using multiple conversions:
 <TextInput value={text.pipe(trim).pipe(...)} />
 ```
+
+### Forwarding special attributes
+Sometimes it can be useful to forward properties to the root element of a component for allowing the user of the component to set the `class`, `style` or any other attributes.
+```jsx
+import { ClassValue, StyleValue } from "@mxjp/gluon";
+
+function Button(props: {
+	class?: ClassValue;
+	style?: StyleValue;
+	id?: Expression<string | undefined>;
+	...
+}) {
+	return <button
+		class={props.class}
+		style={props.style}
+		id={props.id}
+	>...</button>;
+}
+```
+
+In case of the `class` and `style` attributes, you can use an array as value to mix properties with values from within your component:
+```tsx
+import { ClassValue, StyleValue } from "@mxjp/gluon";
+
+function Button(props: {
+	class?: ClassValue;
+	style?: StyleValue;
+	...
+}) {
+	return <button
+		class={[props.class, "example"]}
+		style={[props.style, { color: "red" }]}
+		...
+	>...</button>;
+}
+```
+
+
+## Lifecycle Hooks
+Since components are just functions, you can register [teardown hooks](./lifecycle.md) to be called when your component is disposed.
+```jsx
+function Timer() {
+	const elapsed = sig(0);
+	const timer = setInterval(() => { elapsed.value++ }, 1000);
+	teardown(() => clearInterval(timer));
+	return elapsed;
+}
+```

@@ -1,12 +1,15 @@
 /.editorconfig
+/.eslint*
 /.github
 /.gitignore
 /assets
 /build
 /DEVELOPMENT.md
-/docs
 /docs_out
+/docs/examples
+/docs/stylesheets
 /examples
+/mkdocs*
 /package-lock.json
 /rollup*
 /scripts

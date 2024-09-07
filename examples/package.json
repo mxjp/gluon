@@ -6,7 +6,7 @@
 	},
 	"dependencies": {
 		"@mxjp/gluon": "file:..",
-		"i18next": "^23.11.5"
+		"i18next": "^23.14.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-node-resolve": "^15.2.3",

@@ -50,7 +50,7 @@ const count = sig(42);
 To support data flow in both directions, you can use [signals](signals.md) as properties.
 ```jsx
 function Counter(props: { value: Signal<number>; }) {
-	return <button $click={() => { props.value++ }}>
+	return <button on:click={() => { props.value++ }}>
 		Count: {props.value}
 	</button>;
 }
@@ -66,7 +66,7 @@ function TextInput(props: { value: Signal<string>; }) {
 	return <input
 		type="text"
 		prop:value={props.value}
-		$input={event => {
+		on:input={event => {
 			props.value.value = (event.target as HTMLInputElement).value;
 		}}
 	/>;

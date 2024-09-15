@@ -17,7 +17,7 @@ runTest(ctx => {
 	const count = sig(0);
 	const view = mount(
 		document.body,
-		<button $click={() => { count.value++; }}>Click me!</button>,
+		<button on:click={() => { count.value++; }}>Click me!</button>,
 	);
 	querySelector(view, "button")?.click();
 	assert(count.value === 1);

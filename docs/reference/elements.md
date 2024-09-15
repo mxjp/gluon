@@ -33,8 +33,7 @@ Attributes are set using `setAttribute` or `removeAttribute` by default.
 + All other values are set as strings.
 + Attributes prefixed with `prop:` are always set using the respective JavaScript properties.
 + Attributes prefixed with `attr:` are always set using the default behavior.
-+ Attributes prefixed with `$` are added as regular event listeners.
-+ Attributes prefixed with `$$` are added as capturing event listeners.
++ Attributes prefixed with `on:` are added as regular event listeners. An array can be used to pass the event listener with additional options.
 + The [`class`](#classes) and [`style`](#styles) attributes are special cases described below.
 
 ```jsx
@@ -52,7 +51,8 @@ Attributes are set using `setAttribute` or `removeAttribute` by default.
 <input disabled={false} />
 
 // Adding event listeners:
-<button $click={event => { ... }}>Click me!</button>
+<button on:click={event => { ... }}>Click me!</button>
+<button on:click={[event => { ... }, { capture: true, passive: true }]}>Click me!</button>
 ```
 
 Attribute values can be [expressions](signals.md#expressions).

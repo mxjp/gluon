@@ -105,7 +105,7 @@ import { ROUTER } from "@mxjp/gluon/router";
 
 function ExamplePage() {
 	const router = extract(ROUTER).root;
-	return <button $click={() => {
+	return <button on:click={() => {
 		router.push("/some-path");
 	}}>Navigate</button>;
 }

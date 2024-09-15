@@ -30,7 +30,7 @@ class ExampleCounter extends GluonElement {
 	#count = this.reflect("count");
 
 	render() {
-		return <button $click={() => {
+		return <button on:click={() => {
 			const newCount = Number(this.#count) + 1;
 
 			// Updating the signal will also update the "count" attribute:

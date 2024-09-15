@@ -101,9 +101,9 @@ Attributes prefixed with `prop:` are set using JavaScript properties:
 ```
 
 ## Event Listeners
-Attributes prefixed with `$` are added as event listeners. For capturing event listeners use `$$`.
+Attributes prefixed with `on:` are added as event listeners.
 ```jsx
-<button $click={event => {
+<button on:click={event => {
 	console.log("Clicked", event.target);
 }}>Click me!</button>
 ```
@@ -120,7 +120,7 @@ const showMessage = sig(false);
 mount(
 	document.body,
 	<>
-		<button $click={() => { showMessage.value = !showMessage.value }}>
+		<button on:click={() => { showMessage.value = !showMessage.value }}>
 			Toggle message
 		</button>
 
@@ -140,7 +140,7 @@ const values = sig([]);
 mount(
 	document.body,
 	<>
-		<button $click={() => { values.update(v => v.push(Date.now())) }}>
+		<button on:click={() => { values.update(v => v.push(Date.now())) }}>
 			Add current time
 		</button>
 
@@ -208,7 +208,7 @@ function TextInput(props: { value: Signal<string>; }) {
 	return <input
 		type="text"
 		prop:value={props.value}
-		$input={event => {
+		on:input={event => {
 			props.value.value = (event.target as HTMLInputElement).value;
 		}}
 	/>;

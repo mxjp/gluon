@@ -144,7 +144,7 @@ export function render(content: unknown): View {
  *     </Show>
  *   );
  *
- *   return <button $click={() => { visible.value = !visible.value; }}>
+ *   return <button on:click={() => { visible.value = !visible.value; }}>
  *     {props.text}
  *   </button>;
  * }

@@ -9,7 +9,7 @@ import { TASKS, Tasks, isPending, waitFor } from "@mxjp/gluon/async";
 		<button
 			// Disable this button when there are any pending tasks:
 			disabled={isPending}
-			$click={() => {
+			on:click={() => {
 				// Block user interactions while some operation is running:
 				waitFor(new Promise(resolve => {
 					setTimeout(resolve, 1000);

@@ -28,7 +28,7 @@ function ExamplePopover() {
 		}
 	});
 
-	return <button $click={() => { visible.value = !visible.value }}>
+	return <button on:click={() => { visible.value = !visible.value }}>
 		Toggle Popover
 	</button>;
 }

@@ -1,9 +1,12 @@
 import { Attributes } from "../element.js";
+import { TagNameMap } from "../internals.js";
 
 type NativeElement = Element;
 
 export namespace JSX {
 	export type IntrinsicElements = {
+		[K in keyof TagNameMap]: Attributes<TagNameMap[K]>;
+	} & {
 		[K in string]: Attributes<NativeElement>;
 	};
 

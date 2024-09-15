@@ -3,7 +3,7 @@ import { Expression, watch } from "./signals.js";
 
 export type Falsy = null | undefined | false | 0 | 0n | "";
 
-export type TagNameMap = HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementEventMap;
+export type TagNameMap = HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementTagNameMap;
 
 /**
  * A function that is stored inside any accessed signals alongside a cycle.

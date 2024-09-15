@@ -1,5 +1,9 @@
 # Changelog
 
+## 14.0
++ **Breaking:** Regular events are now prefixed with `on:`.
++ **Breaking:** Capturing events prefixed with `$$` have been removed. An object with event listener options can be used instead.
+
 ## 13.0
 + **Breaking:** Batches now run even if an error is thrown to prevent breaking unrelated signal cycles.
 + **Breaking:** Teardown hooks for the same `capture` or `captureSelf` call are now called in reverse order.

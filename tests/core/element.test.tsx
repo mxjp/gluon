@@ -5,6 +5,8 @@ import test from "node:test";
 
 import { extract, inject, sig, StyleMap, uncapture } from "@mxjp/gluon";
 
+import { assertEvents } from "../common.js";
+
 await test("element", async ctx => {
 	await ctx.test("element content", () => {
 		strictEqual((<div /> as HTMLElement).outerHTML, "<div></div>");
@@ -151,6 +153,37 @@ await test("element", async ctx => {
 		b.value = "silver";
 		strictEqual(elem.style.color, "silver");
 		strictEqual(elem.style.width, "7px");
+	});
+
+	await ctx.test("ref attribute", () => {
+		const events: unknown[] = [];
+		uncapture(() => <div
+			attr:data-a={() => {
+				events.push("a");
+			}}
+			ref={elem => {
+				strictEqual(elem instanceof HTMLDivElement, true);
+				events.push("ref");
+			}}
+			attr:data-b={() => {
+				events.push("b");
+			}}
+		>
+			{() => {
+				events.push("content");
+			}}
+		</div> as HTMLDivElement);
+		assertEvents(events, ["a", "ref", "b", "content"]);
+	});
+
+	await ctx.test("ref native attr", () => {
+		const elem = <div attr:ref="42" /> as HTMLDivElement;
+		strictEqual(elem.getAttribute("ref"), "42");
+	});
+
+	await ctx.test("ref native prop", () => {
+		const elem = <div prop:ref="42" /> as HTMLDivElement;
+		strictEqual((elem as any).ref, "42");
 	});
 
 	await ctx.test("api types", () => {

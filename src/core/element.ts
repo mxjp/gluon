@@ -69,6 +69,9 @@ export type StyleMap = {
 
 export type StyleValue = Expression<undefined | StyleMap | StyleValue[]>;
 
+export type RefFn<T> = (element: T) => void;
+export type RefValue<T> = (RefFn<T>) | RefFn<T>[];
+
 export type EventListener<K extends keyof HTMLElementEventMap> = (event: HTMLElementEventMap[K]) => void;
 
 export type EventArgs<K extends keyof HTMLElementEventMap> = [
@@ -79,9 +82,10 @@ export type EventArgs<K extends keyof HTMLElementEventMap> = [
 /**
  * Represents an object with element attributes.
  */
-export type Attributes = {
+export type Attributes<T extends Element> = {
 	class?: ClassValue;
 	style?: StyleValue;
+	ref?: RefValue<T>;
 } & {
 	[K in keyof HTMLElementEventMap as `on:${K}`]?: EventListener<K> | EventArgs<K>;
 } & {
@@ -159,12 +163,12 @@ function watchStyle(value: StyleValue, handler: StyleHandler) {
  * @param content The content to append.
  * @returns The element.
  */
-export function createElement<K extends keyof TagNameMap>(tagName: K, attrs: Attributes, content: unknown): TagNameMap[K];
-export function createElement<E extends Element>(tagName: string, attrs: Attributes, content: unknown): E;
-export function createElement(tagName: string, attrs: Attributes, content: unknown): Element {
+export function createElement<K extends keyof TagNameMap>(tagName: K, attrs: Attributes<TagNameMap[K]>, content: unknown): TagNameMap[K];
+export function createElement<E extends Element>(tagName: string, attrs: Attributes<E>, content: unknown): E;
+export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyof TagNameMap]>, content: unknown): Element {
 	const elem = document.createElementNS(extract(XMLNS) ?? HTML, tagName);
 	for (const name in attrs) {
-		const value = attrs[name as keyof Attributes];
+		const value = attrs[name];
 		if (value !== undefined) {
 			if (name.startsWith("on:")) {
 				let listener: EventListener<keyof HTMLElementEventMap>;
@@ -182,6 +186,12 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 			} else if (name.startsWith("attr:")) {
 				const attr = name.slice(5);
 				watch(value, value => setAttr(elem, attr, value));
+			} else if (name === "ref") {
+				if (Array.isArray(value)) {
+					value.forEach(v => (v as RefFn<Element>)(elem));
+				} else {
+					(value as RefFn<Element>)(elem);
+				}
 			} else if (name === "style") {
 				const style = (elem as HTMLElement).style;
 				watchStyle(value as StyleValue, (name, value) => style.setProperty(name, value ? String(value) : null));
@@ -220,12 +230,12 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
  * ```
  */
 export function e<K extends keyof TagNameMap>(tagName: K, content?: unknown[]): TagNameMap[K];
-export function e<K extends keyof TagNameMap>(tagName: K, attrs?: Attributes, content?: unknown[]): TagNameMap[K];
+export function e<K extends keyof TagNameMap>(tagName: K, attrs?: Attributes<TagNameMap[K]>, content?: unknown[]): TagNameMap[K];
 export function e<E extends Element>(tagName: string, content?: unknown[]): E;
-export function e<E extends Element>(tagName: string, attrs?: Attributes, content?: unknown[]): E;
+export function e<E extends Element>(tagName: string, attrs?: Attributes<E>, content?: unknown[]): E;
 export function e(tagName: string, attrs?: unknown, content?: unknown[]): Element {
 	if (Array.isArray(attrs)) {
 		return createElement(tagName, {}, attrs);
 	}
-	return createElement(tagName, attrs as Attributes ?? {}, content ?? []);
+	return createElement(tagName, attrs ?? {}, content ?? []);
 }

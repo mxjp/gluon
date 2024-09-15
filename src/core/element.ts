@@ -69,6 +69,13 @@ export type StyleMap = {
 
 export type StyleValue = Expression<undefined | StyleMap | StyleValue[]>;
 
+export type EventListener<K extends keyof HTMLElementEventMap> = (event: HTMLElementEventMap[K]) => void;
+
+export type EventArgs<K extends keyof HTMLElementEventMap> = [
+	listener: EventListener<K>,
+	options?: AddEventListenerOptions,
+];
+
 /**
  * Represents an object with element attributes.
  */
@@ -76,7 +83,7 @@ export type Attributes = {
 	class?: ClassValue;
 	style?: StyleValue;
 } & {
-	[K in keyof HTMLElementEventMap as `$${K}` | `$$${K}`]?: (event: HTMLElementEventMap[K]) => void;
+	[K in keyof HTMLElementEventMap as `on:${K}`]?: EventListener<K> | EventArgs<K>;
 } & {
 	[K in `prop:${string}`]?: Expression<unknown>;
 } & {
@@ -159,10 +166,16 @@ export function createElement(tagName: string, attrs: Attributes, content: unkno
 	for (const name in attrs) {
 		const value = attrs[name as keyof Attributes];
 		if (value !== undefined) {
-			if (name[0] === "$") {
-				const capture = name[1] === "$";
-				const event = name.slice(capture ? 2 : 1);
-				elem.addEventListener(event, wrapContext(value as (event: Event) => void), { capture });
+			if (name.startsWith("on:")) {
+				let listener: EventListener<keyof HTMLElementEventMap>;
+				let options: AddEventListenerOptions | undefined;
+				if (Array.isArray(value)) {
+					listener = (value as EventArgs<keyof HTMLElementEventMap>)[0];
+					options = (value as EventArgs<keyof HTMLElementEventMap>)[1];
+				} else {
+					listener = value as EventListener<keyof HTMLElementEventMap>;
+				}
+				elem.addEventListener(name.slice(3), wrapContext(listener), options);
 			} else if (name.startsWith("prop:")) {
 				const prop = name.slice(5);
 				watch(value, value => (elem as any)[prop] = value);

@@ -17,14 +17,14 @@ await test("element", async ctx => {
 		const events: any[] = [];
 		const elem = inject("foo", "bar", () => {
 			return <div
-				$click={event => {
+				on:click={event => {
 					strictEqual(extract("foo"), "bar");
 					// Don't remove, only for testing the type:
 					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 					const _: MouseEvent = event;
 					events.push(event);
 				}}
-				$custom-event={(event: CustomEvent) => {
+				on:custom-event={(event: CustomEvent) => {
 					strictEqual(extract("foo"), "bar");
 					events.push(event);
 				}}
@@ -41,18 +41,17 @@ await test("element", async ctx => {
 		const events: any[] = [];
 		const elem = inject("foo", "bar", () => {
 			return <div
-				$$click={event => {
+				on:click={[event => {
 					strictEqual(extract("foo"), "bar");
 					// Don't remove, only for testing the type:
 					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 					const _: MouseEvent = event;
-
 					events.push(event);
-				}}
-				$$custom-event={(event: CustomEvent) => {
+				}, { capture: true }]}
+				on:custom-event={[(event: CustomEvent) => {
 					strictEqual(extract("foo"), "bar");
 					events.push(event);
-				}}
+				}, { capture: true }]}
 			/> as HTMLElement;
 		});
 		const a = new MouseEvent("click");

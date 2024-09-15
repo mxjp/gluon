@@ -18,6 +18,8 @@ export const SVG = "http://www.w3.org/2000/svg";
  */
 export const MATHML = "http://www.w3.org/1998/Math/MathML";
 
+export type XMLNS = typeof HTML | typeof SVG | typeof MATHML;
+
 /**
  * Key for setting the namespace URI for newly created elements.
  *
@@ -30,7 +32,7 @@ export const MATHML = "http://www.w3.org/1998/Math/MathML";
  * </Inject>
  * ```
  */
-export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<typeof HTML | typeof SVG | typeof MATHML>;
+export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<XMLNS>;
 
 /**
  * Append content to a node.

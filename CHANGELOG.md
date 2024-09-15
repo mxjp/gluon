@@ -1,5 +1,8 @@
 # Changelog
 
+## 14.1
++ Add special `ref` attribute.
+
 ## 14.0
 + **Breaking:** Regular events are now prefixed with `on:`.
 + **Breaking:** Capturing events prefixed with `$$` have been removed. An object with event listener options can be used instead.

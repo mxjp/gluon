@@ -123,6 +123,22 @@ To avoid this special behavior, you can use the `attr:` prefix:
 <div attr:style="color: red;">
 ```
 
+## References
+To get the reference to an element, you can either use the JSX expression directly:
+```jsx
+const input = <input /> as HTMLInputElement;
+```
+
+Or use the special `ref` attribute:
+```jsx
+<input ref={input => { ... }} />;
+```
+
+All attributes (except `key`) are processed in the specified order. In the example below, the `ref` function is called after `data-a` is set, but before `data-b` is set:
+```jsx
+<input data-a ref={input => { ... }} data-b />;
+```
+
 ## Content
 Everything listed below can be used as element content or can be returned from [component](components.md) functions.
 

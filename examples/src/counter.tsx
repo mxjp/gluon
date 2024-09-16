@@ -9,7 +9,7 @@ import { sig } from "@mxjp/gluon";
 
 export function Example() {
 	const count = sig(0);
-	return <button $click={() => { count.value++ }}>
+	return <button on:click={() => { count.value++ }}>
 		Clicked {count} {() => count.value === 1 ? "time" : "times"}!
 	</button>;
 }

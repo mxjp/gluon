@@ -56,8 +56,8 @@ export function Example() {
 		<h1><T key="message" /></h1>
 
 		<div class="row">
-			<button $click={() => i18next.changeLanguage("en")}>en</button>
-			<button $click={() => i18next.changeLanguage("de")}>de</button>
+			<button on:click={() => i18next.changeLanguage("en")}>en</button>
+			<button on:click={() => i18next.changeLanguage("de")}>de</button>
 		</div>
 	</>;
 }

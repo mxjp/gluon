@@ -32,7 +32,7 @@ export function Example() {
 	return <div class="column">
 		<div class="row">
 			<TextInput value={text.pipe(trim)} />
-			<button $click={() => { text.value = "Hello World!" }}>Reset</button>
+			<button on:click={() => { text.value = "Hello World!" }}>Reset</button>
 		</div>
 		<div>
 			You typed: <b>{() => JSON.stringify(text.value)}</b>
@@ -46,7 +46,7 @@ function TextInput(props: {
 	return <input
 		type="text"
 		prop:value={props.value}
-		$input={event => {
+		on:input={event => {
 			props.value.value = (event.target as HTMLInputElement).value;
 		}}
 	/>;

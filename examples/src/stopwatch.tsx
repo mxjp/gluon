@@ -20,12 +20,12 @@ export function Example() {
 		</div>
 		<div class="row">
 			<Show when={timer.running} else={() => <>
-					<button $click={timer.start}>Start</button>
-					<button $click={timer.reset}>Reset</button>
+					<button on:click={timer.start}>Start</button>
+					<button on:click={timer.reset}>Reset</button>
 			</>}>
 				{() => <>
-					<button $click={timer.stop}>Stop</button>
-					<button $click={timer.lap}>Lap</button>
+					<button on:click={timer.stop}>Stop</button>
+					<button on:click={timer.lap}>Lap</button>
 				</>}
 			</Show>
 		</div>

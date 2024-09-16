@@ -46,7 +46,7 @@ export function Example() {
 	return <div class="column">
 		<div class="row">
 			<TextInput value={name} action={add} />
-			<button $click={add}>Add</button>
+			<button on:click={add}>Add</button>
 		</div>
 		<ul>
 			<For each={items}>
@@ -55,12 +55,12 @@ export function Example() {
 					<Show
 						when={() => item.done}
 						else={() => <>
-							<button $click={() => { item.done = true }}>Done</button>
+							<button on:click={() => { item.done = true }}>Done</button>
 						</>}
 					>
 						{() => <>
-							<button $click={() => { item.done = false }}>Undone</button>
-							<button $click={() => {
+							<button on:click={() => { item.done = false }}>Undone</button>
+							<button on:click={() => {
 								items.splice(items.indexOf(item), 1);
 							}}>Remove</button>
 						</>}
@@ -78,10 +78,10 @@ function TextInput(props: {
 	return <input
 		type="text"
 		prop:value={props.value}
-		$input={event => {
+		on:input={event => {
 			props.value.value = (event.target as HTMLInputElement).value;
 		}}
-		$keydown={event => {
+		on:keydown={event => {
 			if (event.key === "Enter" && props.action) {
 				event.preventDefault();
 				props.action();

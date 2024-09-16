@@ -16,9 +16,9 @@ export function Example() {
 
 	return <div class="column">
 		<div class="row">
-			<button $click={() => { rotate.emit() }}>Rotate Order</button>
-			<button $click={() => allVisible.value = !allVisible.value}>Toggle Outer Visibility</button>
-			<button $click={() => innerVisible.value = !innerVisible.value}>Toggle Inner Visibility</button>
+			<button on:click={() => { rotate.emit() }}>Rotate Order</button>
+			<button on:click={() => allVisible.value = !allVisible.value}>Toggle Outer Visibility</button>
+			<button on:click={() => innerVisible.value = !innerVisible.value}>Toggle Inner Visibility</button>
 		</div>
 		<Attach when={allVisible}>
 			<RotateOrder on={rotate.event}>

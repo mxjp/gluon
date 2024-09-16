@@ -2,7 +2,7 @@
 	"type": "module",
 	"scripts": {
 		"start": "rollup --config rollup.config.js --watch",
-		"build": "rollup --config rollup.config.js"
+		"build": "rollup --config rollup.config.js && tsc --noEmit"
 	},
 	"dependencies": {
 		"@mxjp/gluon": "file:..",

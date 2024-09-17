@@ -10,7 +10,7 @@ const count = sig(0);
 
 mount(
   document.body,
-  <button $click={() => { count.value++ }}>
+  <button on:click={() => { count.value++ }}>
     Clicked {count} times
   </button>
 );

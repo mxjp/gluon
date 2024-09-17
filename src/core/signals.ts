@@ -465,14 +465,16 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
 }
 
 /**
- * Defer signal updates while calling a function and call them immediately after all current batches have finished.
+ * Defer signal updates while calling a function and process them immediately after all current batches have finished.
  *
- * Batches also run if an error is thrown by the specified function.
+ * + When nesting batches, updates are processed after the most outer batch has completed.
+ * + Updates are also processed if an error is thrown by the specified function.
  *
  * @param fn The function to run.
  * @returns The function's return value.
  *
  * @example
+ * The example below outputs `5` and `9` once. Without batching the output would be `5, 7, 9`.
  * ```tsx
  * import { batch, sig, watch } from "@mxjp/gluon";
  *
@@ -490,19 +492,18 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  * ```
  */
 export function batch<T>(fn: () => T): T {
+	if (BATCH_STACK.length > 0) {
+		return fn();
+	}
 	const deps: Dependant[] = [];
 	try {
 		BATCH_STACK.push(deps);
 		return fn();
 	} finally {
 		BATCH_STACK.pop();
-		if (BATCH_STACK.length > 0) {
-			BATCH_STACK[BATCH_STACK.length - 1].push(...deps);
-		} else {
-			for (let i = 0; i < deps.length; i++) {
-				const [fn, cycle] = deps[i];
-				fn(cycle);
-			}
+		for (let i = 0; i < deps.length; i++) {
+			const [fn, cycle] = deps[i];
+			fn(cycle);
 		}
 	}
 }

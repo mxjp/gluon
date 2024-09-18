@@ -143,3 +143,39 @@ innerRouter.push("/bar");
 // To navigate globally, use the root router instead:
 innerRouter.root.push("/foo/bar");
 ```
+
+## Async Content
+You can use the [`<Async>`](./async-utilities/async.md) component to dynamically import & render components.
+```jsx
+// example-page.tsx:
+export default function() {
+	return <>Hello World!</>;
+}
+
+// main.tsx:
+<Routes routes={[
+	{
+		match: "/",
+		content: () => <Async source={() => import("./example-page")}>
+			{pageModule => <pageModule.default />}
+		</Async>
+	},
+]} />
+```
+
+Depending on how you want to implement things like error handling and loading indicators, you can build a small function like this:
+```jsx
+function page(importModule: () => Promise<{ default: () => unknown }>) {
+	return () => <Async source={importModule}
+		pending={() => <>Loading...</>}
+		rejected={error => <>Error: {error}</>}
+	>
+		{pageModule => <pageModule.default />}
+	</Async>;
+}
+
+<Routes routes={[
+	{ match: "/", content: page(() => import("./home")) },
+	{ match: "/example", content: page(() => import("./example")) },
+]} />
+```

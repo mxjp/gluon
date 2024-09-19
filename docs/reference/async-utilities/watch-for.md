@@ -1,6 +1,8 @@
 # `watchFor`
 This is a utility for watching an expression until it's output satisfies a condition.
 ```jsx
+import { watchFor } from "@mxjp/gluon/async";
+
 // Wait for an expression to return a truthy result:
 await watchFor(() => signal.value > 42);
 

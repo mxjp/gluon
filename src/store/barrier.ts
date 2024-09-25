@@ -126,6 +126,27 @@ function defaultWrapInstance<T extends object>(value: T): T {
 	return createReactiveProxy(value, STORE);
 }
 
+/**
+ * Allow instances of the specified target class to be wrapped.
+ *
+ * @param targetClass The target class.
+ * @param wrap A function to wrap an instance. By default `createReactiveProxy` is used with `wrap` and `unwrap` for inner values.
+ *
+ * @example
+ * ```tsx
+ * class Example {
+ *   static {
+ *     // Using the default "createReactiveProxy":
+ *     wrapInstancesOf(this);
+ *
+ *     // Or a custom wrapper:
+ *     wrapInstancesOf(this, instance => {
+ *       return createSomeWrapperFor(instance);
+ *     });
+ *   }
+ * }
+ * ```
+ */
 export function wrapInstancesOf<T extends object>(targetClass: new(...args: any) => T, wrap?: (instance: T) => T): void {
 	Object.defineProperty(targetClass, WRAP_INSTANCE, {
 		configurable: true,

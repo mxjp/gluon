@@ -4,7 +4,7 @@ import { sig } from "../core/signals.js";
 /**
  * Represents pending operations in an asynchronously rendered tree.
  *
- * This can be used to wait until an entire async tree is rendered or to check if any errors occurred.
+ * This can be used to wait until an entire async tree is rendered or to check if any unhandled errors occurred.
  */
 export class AsyncContext {
 	#parent: AsyncContext | undefined;
@@ -84,6 +84,9 @@ export class AsyncContext {
 	}
 }
 
+/**
+ * Thrown by {@link AsyncContext.complete} if multiple unhandled {@link errors} occurred.
+ */
 export class AsyncError extends Error {
 	errors: unknown[];
 

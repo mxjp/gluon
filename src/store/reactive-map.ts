@@ -79,19 +79,19 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 		});
 	}
 
-	* entries(): IterableIterator<[K, V]> {
+	* entries(): MapIterator<[K, V]> {
 		this.#iterators.access();
 		for (const entry of this.#target.entries()) {
 			yield [entry[0], this.#barrier.wrap(entry[1])];
 		}
 	}
 
-	keys(): IterableIterator<K> {
+	keys(): MapIterator<K> {
 		this.#iterators.access();
 		return this.#target.keys();
 	}
 
-	* values(): IterableIterator<V> {
+	* values(): MapIterator<V> {
 		this.#iterators.access();
 		for (const entry of this.#target.values()) {
 			yield this.#barrier.wrap(entry);
@@ -103,7 +103,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 		return this.#target.forEach((value, key) => callback.call(thisArg, this.#barrier.wrap(value), key, this));
 	}
 
-	* [Symbol.iterator](): IterableIterator<[K, V]> {
+	* [Symbol.iterator](): MapIterator<[K, V]> {
 		this.#iterators.access();
 		for (const entry of this.#target.entries()) {
 			yield [entry[0], this.#barrier.wrap(entry[1])];

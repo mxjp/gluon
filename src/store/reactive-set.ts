@@ -71,7 +71,7 @@ export class ReactiveSet<T> extends Set<T> {
 		});
 	}
 
-	* entries(): IterableIterator<[T, T]> {
+	* entries(): SetIterator<[T, T]> {
 		this.#iterators.access();
 		for (const entry of this.#target.entries()) {
 			const value = this.#barrier.wrap(entry[0]);
@@ -79,14 +79,14 @@ export class ReactiveSet<T> extends Set<T> {
 		}
 	}
 
-	* keys(): IterableIterator<T> {
+	* keys(): SetIterator<T> {
 		this.#iterators.access();
 		for (const key of this.#target.keys()) {
 			yield this.#barrier.wrap(key);
 		}
 	}
 
-	* values(): IterableIterator<T> {
+	* values(): SetIterator<T> {
 		this.#iterators.access();
 		for (const value of this.#target.values()) {
 			yield this.#barrier.wrap(value);
@@ -101,7 +101,7 @@ export class ReactiveSet<T> extends Set<T> {
 		}, thisArg);
 	}
 
-	* [Symbol.iterator](): IterableIterator<T> {
+	* [Symbol.iterator](): SetIterator<T> {
 		this.#iterators.access();
 		for (const value of this.#target) {
 			yield this.#barrier.wrap(value);

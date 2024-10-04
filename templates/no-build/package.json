@@ -1,0 +1,10 @@
+{
+	"name": "gluon-quick-start",
+	"type": "module",
+	"scripts": {
+		"start": "vite"
+	},
+	"devDependencies": {
+		"vite": "^5.4.8"
+	}
+}

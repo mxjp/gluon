@@ -1,5 +1,8 @@
 # Changelog
 
+## 14.2
++ Allow arbitrary values as content in the `e()` shorthand.
+
 ## 14.1
 + Add special `ref` attribute.
 

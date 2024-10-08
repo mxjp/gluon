@@ -124,7 +124,7 @@ function Button(props: {
 ```
 
 In case of the `class` and `style` attributes, you can use an array as value to mix properties with values from within your component:
-```tsx
+```jsx
 import { ClassValue, StyleValue } from "@mxjp/gluon";
 
 function Button(props: {

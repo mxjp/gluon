@@ -12,13 +12,13 @@ const text = document.createTextNode("");
 text.textContent = String(untrusted);
 ```
 
-Interpolation in attribute values is safe to use as long as the same is true for HTML itself. E.g. an image `title` attribute is fine, but `href` is not.
+Interpolation in attribute values is safe to use as long as the same is true for HTML itself. E.g. an image `alt` attribute is fine, but `href` is not.
 ```jsx
-// The safety of this depends on the attribute ("title" in this case):
-<img title={untrusted} />;
+// The safety of this depends on the attribute ("alt" in this case):
+<img alt={untrusted} />;
 
 // Using interpolation in attribute values is equivalent to the following code:
-elem.setAttribute("title", String(untrusted));
+image.setAttribute("alt", String(untrusted));
 ```
 
 ## Some Common Mistakes
@@ -40,3 +40,5 @@ The examples below show some common mistakes and how they could be exploited.
 <a href={untrusted}>Click me!</a>
 <a href="javascript:alert(location.origin)">Click me!</a>
 ```
+
+Note, that this is only a small fraction of things that can go wrong.

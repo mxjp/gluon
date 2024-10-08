@@ -1,7 +1,11 @@
 # Routing
 Routers provide a reactive path and query parameters and allow navigating in their current context.
 
-Currently, there is a **HistoryRouter** that uses the location and history API and a **HashRouter** that uses the location hash as the path. You can also implement custom routers by implementing the **Router** interface.
+You can either implement your own router using the `Router` interface or use one of the provided implementations:
++ `HistoryRouter` - Uses the location and history API for navigation.
++ `HashRouter` - Uses the location hash.
++ `MemoryRouter` - Keeps it's state in memory instead of the actual browser location. This can be useful for testing purposes.
+
 ```jsx
 import { Inject } from "@mxjp/gluon";
 import { ROUTER, HistoryRouter } from "@mxjp/gluon/router";
@@ -13,7 +17,7 @@ import { ROUTER, HistoryRouter } from "@mxjp/gluon/router";
 </Inject>
 ```
 
-The **Routes** component can be used to render content based on the current path.
+The `Routes` component can be used to render content based on the current path.
 ```jsx
 import { Inject } from "@mxjp/gluon";
 import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
@@ -94,6 +98,20 @@ import { normalize } from "@mxjp/gluon/router";
 
 ## Path Normalization
 Paths are normalized, so that non-empty paths always start with a slash and the root path is represented as an empty string.
+
+Below are some examples:
+```jsx
+import { normalize } from "@mxjp/gluon/router";
+
+normalize("") // ""
+normalize("/") // ""
+normalize("foo") // "/foo"
+normalize("/foo") // "/foo"
+normalize("/foo/") // "/foo/"
+
+// Trailing slashes can be discarded:
+normalize("/foo/", false) // "/foo"
+```
 
 ## Navigation
 The router in the current context can be used for navigation.

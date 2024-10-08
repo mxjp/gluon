@@ -49,6 +49,7 @@ sig(42, false);
 
 By providing a function, a custom equality check can be used:
 ```jsx
+// This is the default behavior:
 sig(42, (a, b) => Object.is(a, b));
 ```
 

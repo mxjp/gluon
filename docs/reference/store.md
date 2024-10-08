@@ -12,7 +12,7 @@ const state = wrap({
 <h1>{() => state.message}</h1>
 ```
 
-By default, `Arrays`, `Maps`, `Sets` and `Objects` without or with the `Object` constructor are reactive. Anything else is returned as is.
+By default, `Arrays`, `Maps`, `Sets` and `Objects` without any or with the `Object` constructor are reactive. Anything else is returned as is.
 
 ## Updates
 To update a reactive object, you can directly modify the wrapper.

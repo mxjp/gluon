@@ -1,6 +1,6 @@
 import { ContextKey, extract, wrapContext } from "./context.js";
 import { createText, TagNameMap } from "./internals.js";
-import { Expression, get, watch } from "./signals.js";
+import { Expression, get, Signal, watch } from "./signals.js";
 import { View } from "./view.js";
 
 /**
@@ -212,8 +212,8 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
  * Shorthand for creating an element in places where JSX can't be used.
  *
  * @param tagName The tag name.
- * @param attrs The attributes to set.
- * @param content An array of content to append.
+ * @param attrs Optional attributes to set.
+ * @param content Content to append.
  * @returns The element.
  *
  * @example
@@ -225,18 +225,21 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
  *   // Element with attributes only:
  *   e("div", { class: "example" }),
  *   // Element with attributes and content:
- *   e("div", { class: "example" }, [
- *     "Hello World!",
- *   ]),
+ *   e("div", { class: "example" }, "Hello World!"),
  * ]);
  * ```
+ *
+ * Note, that in the rare case of creating an element without attributes and with content which may be an arbitrary object, you should wrap the content in an array to ensure it's not used as attributes.
+ * ```ts
+ * e("div", [contentOfUnknownType])
+ * ```
  */
-export function e<K extends keyof TagNameMap>(tagName: K, content?: unknown[]): TagNameMap[K];
-export function e<K extends keyof TagNameMap>(tagName: K, attrs?: Attributes<TagNameMap[K]>, content?: unknown[]): TagNameMap[K];
-export function e<E extends Element>(tagName: string, content?: unknown[]): E;
-export function e<E extends Element>(tagName: string, attrs?: Attributes<E>, content?: unknown[]): E;
-export function e(tagName: string, attrs?: unknown, content?: unknown[]): Element {
-	if (Array.isArray(attrs)) {
+export function e<K extends keyof TagNameMap>(tagName: K, content?: unknown): TagNameMap[K];
+export function e<K extends keyof TagNameMap>(tagName: K, attrs?: Attributes<TagNameMap[K]>, content?: unknown): TagNameMap[K];
+export function e<E extends Element>(tagName: string, content?: unknown): E;
+export function e<E extends Element>(tagName: string, attrs?: Attributes<E>, content?: unknown): E;
+export function e(tagName: string, attrs?: unknown, content?: unknown): Element {
+	if (attrs === null || typeof attrs !== "object" || attrs instanceof Signal || attrs instanceof View || Array.isArray(attrs)) {
 		return createElement(tagName, {}, attrs);
 	}
 	return createElement(tagName, attrs ?? {}, content ?? []);

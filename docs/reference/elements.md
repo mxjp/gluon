@@ -6,23 +6,28 @@ To create an element, you can either use JSX element expressions:
 <div class="example">Hello World!</div>
 ```
 
-To create an element from a dynamic tag name, use the `createElement` function:
+To create an element from a dynamic tag name, use the `createElement` function or JSX expressions:
 ```jsx
 import { createElement } from "@mxjp/gluon";
 
 createElement("div", {}, undefined);
 createElement("div", { class: "example" }, undefined);
 createElement("div", { class: "example" }, "Hello World!");
+
+const TagName = "div";
+<TagName />
+<TagName class="example" />
+<TagName class="example">Hello World!</TagName>
 ```
 
-In environments where no JSX transpiler is available, you can use the `e` function which is the same as `createElement` but with the option to not specify attributes or content:
+In environments where no JSX transpiler is available, you can use the `e` shorthand which is the same as `createElement` but with optional attributes or content:
 ```jsx
 import { e } from "@mxjp/gluon";
 
 e("div");
 e("div", { class: "example" });
-e("div", { class: "example" }, ["Hello World!"]);
-e("div", ["Hello World!"]);
+e("div", { class: "example" }, "Hello World!");
+e("div", "Hello World!");
 ```
 
 ## Attributes
@@ -72,7 +77,10 @@ Note, that the rules specified above apply to all attributes including aria attr
 ```jsx
 import { string, optionalString } from "@mxjp/gluon";
 
+// Convert all values to strings including "null" and "undefined":
 <div aria-disabled={string(someBooleanExpression)} />
+
+// Convert values to strings excluding "null" or "undefined":
 <div aria-disabled={optionalString(someBooleanExpression)} />
 ```
 
@@ -105,13 +113,13 @@ Properties use the same casing as in css.
 <div style={{ color: "red" }} />
 <div style={() => [
 	{
-		color: "red",
+		"color": "red",
 		"font-size": "1rem",
 	},
-	{ color: () => "blue" },
-	{ color: someSignal },
+	{ "color": () => "blue" },
+	{ "color": someSignal },
 	[
-		{ width: "42px" },
+		{ "width": "42px" },
 	],
 ]} />
 ```
@@ -164,8 +172,10 @@ Any DOM nodes are moved into the parent element.
 
 Note, that nodes are removed from their parent depending on when the content is actually used in an element. E.g. when returning a document fragment from a [component](components.md), it's children are removed from the fragment as soon as the components return value is used in an element expression.
 
+Reusing DOM nodes may result in undefined behavior. Consider using [`movable`](./views/movable.md) for safely reusing & moving arbitrary content.
+
 ### Views
-When [views](views/index.md) are used as content, they are owned by the element expression until the [lifecycle](lifecycle.md) during which the element was created is disposed.
+[Views](views/index.md) are an abstraction for sequences of DOM nodes that may change over time. When views are used as content, they are owned by the element expression until the [lifecycle](lifecycle.md) during which the element was created is disposed.
 ```jsx
 import { Show } from "@mxjp/gluon";
 
@@ -176,7 +186,7 @@ import { Show } from "@mxjp/gluon";
 </div>
 ```
 
-Reusing views while they are still attached to somewhere else results in undefined behavior. To safely move views around, consider using [`movable`](./views/movable.md) views.
+Reusing view instances may result in undefined behavior. Consider using [`movable`](./views/movable.md) for safely reusing & moving arbitrary content.
 
 ### Arrays & Fragments
 Content can be wrapped in arbitrarily nested arrays and JSX fragments.

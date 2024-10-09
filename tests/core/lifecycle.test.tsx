@@ -1,9 +1,9 @@
 import "../env.js";
 
-import { strictEqual, throws } from "node:assert";
+import { fail, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { capture, captureSelf, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
+import { capture, captureSelf, isolate, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
 
 import { assertEvents, withMsg } from "../common.js";
 
@@ -85,6 +85,46 @@ await test("lifecycle", async ctx => {
 			dispose();
 			events.push(5);
 			assertEvents(events, [0, 1, 3, 4, 2, 5]);
+		});
+	});
+
+	await ctx.test("isolate", async ctx => {
+		await ctx.test("no error", () => {
+			const events: unknown[] = [];
+			const dispose = capture(() => {
+				teardown(() => events.push(0));
+				isolate(() => {
+					teardown(() => events.push(1));
+					teardown(() => events.push(2));
+				});
+				teardown(() => events.push(3));
+				assertEvents(events, []);
+			});
+			assertEvents(events, []);
+			dispose();
+			assertEvents(events, [3, 2, 1, 0]);
+		});
+
+		await ctx.test("error", () => {
+			const events: unknown[] = [];
+			const dispose = capture(() => {
+				try {
+					teardown(() => events.push(0));
+					isolate(() => {
+						events.push("isolate");
+						teardown(() => events.push(1));
+						teardown(() => events.push(2));
+						throw new Error("error");
+					});
+					fail("unreachable");
+				} catch (error) {
+					assertEvents(events, ["isolate", 2, 1]);
+					events.push((error as Error).message);
+				}
+			});
+			assertEvents(events, ["error"]);
+			dispose();
+			assertEvents(events, [0]);
 		});
 	});
 

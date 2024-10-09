@@ -84,7 +84,7 @@ isolate(() => {
 ```
 
 ## Nesting
-Calls to `capture`, `captureSelf`, `uncapture` and `nocapture` can be arbitrarily nested:
+Calls to `capture`, `captureSelf`, `uncapture`, `nocapture` and `isolate` can be arbitrarily nested:
 ```jsx
 import { capture, captureSelf, uncapture, nocapture } from "@mxjp/gluon";
 

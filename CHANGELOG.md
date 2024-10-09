@@ -1,5 +1,8 @@
 # Changelog
 
+## 14.3
++ Add `isolate` utility.
+
 ## 14.2
 + Allow arbitrary values as content in the `e()` shorthand.
 

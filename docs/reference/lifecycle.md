@@ -68,6 +68,21 @@ nocapture(() => {
 });
 ```
 
+## `isolate`
+Run a function within an error isolation boundary.
+
++ If an error is thrown, teardown hooks are immediately called in reverse registration order and the error is re-thrown.
++ If no error is thrown, this behaves as if teardown hooks were registered in the outer context.
+
+```jsx
+import { isolate } from "@mxjp/gluon";
+
+isolate(() => {
+	teardown(() => doSomeCleanup());
+	throw new Error("something went wrong");
+});
+```
+
 ## Nesting
 Calls to `capture`, `captureSelf`, `uncapture` and `nocapture` can be arbitrarily nested:
 ```jsx

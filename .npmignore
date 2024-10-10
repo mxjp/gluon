@@ -14,6 +14,7 @@
 /rollup*
 /scripts
 /templates
+/test_data
 /tests
 /tests_out
 /tsconfig*

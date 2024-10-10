@@ -1,5 +1,3 @@
-import "../env.js";
-
 import { deepStrictEqual, notStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 

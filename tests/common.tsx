@@ -1,5 +1,3 @@
-import "./env.js";
-
 import { deepStrictEqual, strictEqual } from "node:assert";
 
 import { shareInstancesOf, teardown, View, ViewBoundaryOwner } from "@mxjp/gluon";

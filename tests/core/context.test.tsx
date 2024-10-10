@@ -1,5 +1,3 @@
-import "../env.js";
-
 import { strictEqual, throws } from "node:assert";
 import test from "node:test";
 

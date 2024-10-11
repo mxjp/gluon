@@ -5,7 +5,7 @@ import * as vCurrent from "@mxjp/gluon";
 
 import { NEXT_ID } from "../../dist/es/core/internal-globals.js";
 import * as v5 from "../../test_data/compat/gluon-5.2.0.js";
-import { assertEvents } from "../common.js";
+import { assertEvents, text } from "../common.js";
 
 await test("compat: core", async ctx => {
 	for (const [name, a, b] of [
@@ -139,6 +139,48 @@ await test("compat: core", async ctx => {
 					}),
 					[1, 2, 3, undefined],
 				);
+			});
+
+			await ctx.test("view", async () => {
+				const events: unknown[] = [];
+
+				function createView(lib: typeof vCurrent | typeof v5, source: vCurrent.Signal<number> | v5.Signal<number>) {
+					function inner() {
+						const value = source.value;
+						return () => String(value);
+					}
+					return lib === vCurrent
+						? <vCurrent.Nest>{inner}</vCurrent.Nest> as vCurrent.View
+						: v5.nest(inner);
+				}
+
+				b.uncapture(() => {
+					const signalA = a.sig(0);
+					const signalB = b.sig(1);
+
+					const viewA = createView(b, signalA);
+					const viewB = createView(a, signalB);
+
+					const wrapper = a.render([
+						viewA,
+						viewB,
+					]);
+
+					wrapper.setBoundaryOwner((first, last) => {
+						events.push(first, last);
+					});
+
+					assertEvents(events, []);
+					strictEqual(text(wrapper.take()), "01");
+
+					signalA.value = 2;
+					assertEvents(events, [viewA.first, viewB.last]);
+					strictEqual(text(wrapper.take()), "21");
+
+					signalB.value = 3;
+					assertEvents(events, [viewA.first, viewB.last]);
+					strictEqual(text(wrapper.take()), "23");
+				});
 			});
 		});
 	}

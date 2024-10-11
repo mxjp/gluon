@@ -29,7 +29,7 @@ JSX expressions in gluon directly create real DOM elements which is relatively f
 Everything in gluon is composable without any restrictions. You can define reactive state anywhere you like and use it anywhere else, dynamically define and pass around components, etc.
 
 ### Bundle Size
-The entire gluon core module has a size of [~4KB gzipped](https://bundlephobia.com/package/@mxjp/gluon) and almost everything in gluon is tree-shakeable, so you only pay for what you need.
+The entire gluon core module has a size of less than [5KB gzipped](https://bundlephobia.com/package/@mxjp/gluon) and almost everything in gluon is tree-shakeable, so you only pay for what you need.
 
 ### Build Setup
 Gluon only requires a standard JSX transpiler and therefore works with all modern bundlers and build systems. There also is a human readable pre-bundled version for use in environments where no build system can be used.

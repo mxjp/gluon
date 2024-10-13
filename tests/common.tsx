@@ -1,6 +1,6 @@
-import { deepStrictEqual, strictEqual } from "node:assert";
+import { deepStrictEqual } from "node:assert";
 
-import { shareInstancesOf, teardown, View, ViewBoundaryOwner } from "@mxjp/gluon";
+import { teardown, View, ViewBoundaryOwner } from "@mxjp/gluon";
 
 export function assertEvents(events: unknown[], expected: unknown[]): void {
 	deepStrictEqual(events, expected);
@@ -77,20 +77,6 @@ export function future<T = void>(): [Promise<T>, ResolveFn<T>, RejectFn] {
 		reject = rej;
 	});
 	return [promise, resolve, reject];
-}
-
-export function assertSharedInstance<T extends new(...args: any) => unknown>(targetClass: T, symbolKey: string, sampleInstance: InstanceType<T>): void {
-	// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-	class Dummy {
-		static {
-			shareInstancesOf(this, symbolKey);
-		}
-	}
-
-	strictEqual(sampleInstance instanceof targetClass, true);
-	strictEqual({ [Symbol.for(symbolKey)]: true } instanceof targetClass, true);
-	strictEqual(new Dummy() instanceof targetClass, true);
-	strictEqual(sampleInstance instanceof Dummy, true);
 }
 
 export function withMsg(message: string): (error: unknown) => boolean {

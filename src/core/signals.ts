@@ -1,5 +1,4 @@
 import { getContext, runInContext } from "./context.js";
-import { shareInstancesOf } from "./globals.js";
 import { BATCH_STACK, Dependant, DependantFn, DEPENDANTS_STACK, TRACKING_STACK, TRIGGERS_STACK, useStack } from "./internals.js";
 import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 
@@ -46,10 +45,6 @@ const SIGNAL_EQUALS_DISABLED: SignalEqualsFn<unknown> = () => false;
  * Represents a value that changes over time.
  */
 export class Signal<T> {
-	static {
-		shareInstancesOf(this, "gluon:signal_instance");
-	}
-
 	/**
 	 * The current value.
 	 */

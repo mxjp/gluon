@@ -1,15 +1,11 @@
 import { deepStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, effect, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, Signal, string, teardown, TeardownHook, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
+import { batch, capture, effect, extract, get, inject, isTracking, lazy, map, memo, optionalString, sig, string, teardown, TeardownHook, track, trigger, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
 
-import { assertEvents, assertSharedInstance, lifecycleEvent, withMsg } from "../common.js";
+import { assertEvents, lifecycleEvent, withMsg } from "../common.js";
 
 await test("signals", async ctx => {
-	await ctx.test("shared instances", () => {
-		assertSharedInstance(Signal, "gluon:signal_instance", sig(42));
-	});
-
 	await ctx.test("inert usage", () => {
 		const signal = sig(42);
 		strictEqual(signal.value, 42);

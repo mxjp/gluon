@@ -4,16 +4,9 @@ import test from "node:test";
 import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
 import { wrap } from "@mxjp/gluon/store";
 
-import { assertEvents, assertSharedInstance, boundaryEvents, lifecycleEvent, TestView, testView, text, withMsg } from "../common.js";
+import { assertEvents, boundaryEvents, lifecycleEvent, TestView, testView, text, withMsg } from "../common.js";
 
 await test("view", async ctx => {
-	await ctx.test("shared instances", () => {
-		assertSharedInstance(View, "gluon:view_instance", new View(setBoundary => {
-			const boundary = document.createComment("");
-			setBoundary(boundary, boundary);
-		}));
-	});
-
 	await ctx.test("init incomplete", () => {
 		throws(() => new View(() => {}), withMsg("G1"));
 		throws(() => new View(setBoundary => {

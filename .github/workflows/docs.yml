@@ -31,8 +31,8 @@ jobs:
       - run: npm run build
       - run: npm ci --prefix examples
       - run: npm run build --prefix examples
-      - run: python -m venv pyenv
-      - run: ./pyenv/bin/activate
+      - run: python -m venv venv
+      - run: source venv/bin/activate
       - run: pip install mkdocs-material
       - run: mkdocs build --site-dir docs_out
       - uses: actions/upload-pages-artifact@v2

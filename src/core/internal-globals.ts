@@ -1,12 +1,7 @@
 import { sharedGlobal } from "./globals.js";
-import type { Dependant, TeardownFrame } from "./internals.js";
+import type { Dependant } from "./internals.js";
 
 interface Globals {
-	/**
-	 * A stack where the last item may be an array which teardown hooks are captured in.
-	 */
-	TEARDOWN_STACK: (TeardownFrame | undefined)[];
-
 	/**
 	 * A stack where the last item is the current signal batch. This may be empty.
 	 */
@@ -29,9 +24,6 @@ interface Globals {
 }
 
 const GLOBALS = sharedGlobal("gluon:globals", () => ({} as Globals));
-
-const TEARDOWN_STACK_KEY = "TEARDOWN_STACK" as const;
-export const TEARDOWN_STACK = GLOBALS[TEARDOWN_STACK_KEY] ??= [];
 
 const BATCH_STACK_KEY = "BATCH_STACK" as const;
 export const BATCH_STACK = GLOBALS[BATCH_STACK_KEY] ??= [];

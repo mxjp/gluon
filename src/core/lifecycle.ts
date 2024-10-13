@@ -1,4 +1,4 @@
-import { TEARDOWN_STACK } from "./internal-globals.js";
+import { TEARDOWN_STACK } from "./internals.js";
 import { NOOP, TeardownFrame, useStack } from "./internals.js";
 
 /**

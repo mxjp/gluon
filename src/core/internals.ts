@@ -12,6 +12,11 @@ export const NEXT_ID: { value: number | bigint } = { value: 0 };
  */
 export const CONTEXT_STACK: (ReadonlyContext | undefined)[] = [];
 
+/**
+ * A stack where the last item may be an array which teardown hooks are captured in.
+ */
+export const TEARDOWN_STACK: (TeardownFrame | undefined)[] = [];
+
 export type Falsy = null | undefined | false | 0 | 0n | "";
 
 export type TagNameMap = HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementTagNameMap;

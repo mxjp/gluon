@@ -1,4 +1,4 @@
-import { TEARDOWN_STACK } from "../core/internal-globals.js";
+import { TEARDOWN_STACK } from "../core/internals.js";
 import { TeardownHook } from "../core/lifecycle.js";
 
 export type TeardownLeakHook = (hooK: TeardownHook) => void;

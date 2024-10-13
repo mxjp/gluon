@@ -204,7 +204,7 @@ export function Nest(props: {
 			self.detach();
 			setBoundary(view.first, view.last);
 			view.setBoundaryOwner(setBoundary);
-		}, true);
+		});
 	});
 }
 
@@ -408,7 +408,7 @@ export function For<T>(props: {
 				cycle = (cycle + 1) | 0;
 				setBoundary(undefined, last);
 			}
-		}, true);
+		});
 	});
 }
 
@@ -524,7 +524,7 @@ export function IndexFor<T>(props: {
 				}
 				setBoundary(undefined, last);
 			}
-		}, true);
+		});
 	});
 }
 

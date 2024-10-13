@@ -1,6 +1,27 @@
-import { getContext, runInContext } from "./context.js";
-import { BATCH_STACK, Dependant, DependantFn, DEPENDANTS_STACK, TRACKING_STACK, TRIGGERS_STACK, useStack } from "./internals.js";
-import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
+import { wrapContext } from "./context.js";
+import { useStack } from "./internals.js";
+import { capture, nocapture, teardown, TeardownHook } from "./lifecycle.js";
+
+let BATCH: Set<NotifyHook> | undefined;
+const TRACKING_STACK: boolean[] = [true];
+const ACCESS_STACK: AccessHook[] = [];
+
+/**
+ * A function that is called by a signal or batch when updated.
+ */
+interface NotifyHook {
+	(): void;
+}
+
+/**
+ * A function that is called by a signal when accessed.
+ */
+interface AccessHook {
+	/**
+	 * @param hooks A set of notify hooks that an observer can attach to.
+	 */
+	(hooks: Set<NotifyHook>): void;
+}
 
 /**
  * A function used in signals to determine if the signal should update during a value assignment.
@@ -14,29 +35,8 @@ export interface SignalEqualsFn<T> {
 	(previous: T, current: T): boolean;
 }
 
-/**
- * Internal utility for capturing dependants.
- *
- * @param stack The stack to capture from.
- * @param map The map to store captured dependants in.
- */
-function access(stack: Dependant[][], map: Map<DependantFn, number>): void {
-	const top = stack[stack.length - 1];
-	for (let i = 0; i < top.length; i++) {
-		const [fn, cycle] = top[i];
-		map.set(fn, cycle);
-	}
-}
-
-/**
- * Internal utility for calling a dependant when using forEach on a map of captured dependants.
- *
- * @param cycle The cycle the dependant was captured at.
- * @param fn The dependant to call.
- */
-function callDependant(cycle: number, fn: DependantFn) {
-	fn(cycle);
-}
+const notify = (fn: NotifyHook) => fn();
+const queueBatch = (fn: NotifyHook) => BATCH!.add(fn);
 
 const SIGNAL_EQUALS_DEFAULT: SignalEqualsFn<unknown> = Object.is;
 const SIGNAL_EQUALS_DISABLED: SignalEqualsFn<unknown> = () => false;
@@ -55,15 +55,7 @@ export class Signal<T> {
 	 */
 	#equals: SignalEqualsFn<T>;
 
-	/**
-	 * A map of captured triggers and latest accessed cycles.
-	 */
-	#triggers = new Map<DependantFn, number>();
-
-	/**
-	 * A map of captured dependants and latest accessed cycles.
-	 */
-	#dependants = new Map<DependantFn, number>();
+	#hooks = new Set<NotifyHook>();
 
 	/**
 	 * Create a new signal.
@@ -137,12 +129,10 @@ export class Signal<T> {
 	}
 
 	/**
-	 * Check if this signal has any triggers or dependants to notify.
-	 *
-	 * When this is false, it is guaranteed that updating the value does not result in immediate side effects.
+	 * Check if this signal has any active dependants.
 	 */
 	get active(): boolean {
-		return this.#triggers.size > 0 || this.#dependants.size > 0;
+		return this.#hooks.size > 0;
 	}
 
 	/**
@@ -150,8 +140,7 @@ export class Signal<T> {
 	 */
 	access(): void {
 		if (TRACKING_STACK[TRACKING_STACK.length - 1]) {
-			access(TRIGGERS_STACK, this.#triggers);
-			access(DEPENDANTS_STACK, this.#dependants);
+			ACCESS_STACK[ACCESS_STACK.length - 1]?.(this.#hooks);
 		}
 	}
 
@@ -159,17 +148,12 @@ export class Signal<T> {
 	 * Manually notify dependants.
 	 */
 	notify(): void {
-		const triggers = this.#triggers;
-		this.#triggers = new Map();
-		triggers.forEach(callDependant);
-
-		const dependants = this.#dependants;
-		if (BATCH_STACK.length > 0) {
-			BATCH_STACK[BATCH_STACK.length - 1].push(...dependants);
-			dependants.clear();
+		if (BATCH === undefined) {
+			const hooks = Array.from(this.#hooks);
+			this.#hooks.clear();
+			hooks.forEach(notify);
 		} else {
-			this.#dependants = new Map();
-			dependants.forEach(callDependant);
+			this.#hooks.forEach(queueBatch);
 		}
 	}
 
@@ -240,87 +224,32 @@ export type Expression<T> = T | Signal<T> | (() => T);
 export type ExpressionResult<T> = T extends Expression<infer R> ? R : never;
 
 /**
- * Wrap a dependant function so that recursive side effects run in sequence instead of immediately.
+ * Internal utility to unfold potential recursion into a sequence.
  */
-function sequentialize(dependant: DependantFn): DependantFn {
-	let queue = 0;
-	let cycleOffset = 0;
-	return accessedCycle => {
-		if (queue < 2) {
-			queue++;
+const _unfold = (hook: NotifyHook): NotifyHook => {
+	let depth = 0;
+	return () => {
+		if (depth < 2) {
+			depth++;
 		}
-		if (queue === 1) {
+		if (depth === 1) {
 			try {
-				while (queue > 0) {
-					dependant(accessedCycle + cycleOffset);
-					cycleOffset++;
-					queue--;
+				while (depth > 0) {
+					hook();
+					depth--;
 				}
 			} finally {
-				queue = 0;
-				cycleOffset = 0;
+				depth = 0;
 			}
 		}
 	};
-}
-
-/**
- * Internal utility for starting a watch cycle.
- *
- * @param sequential True to wrap the internal dependant using {@link sequentialize}.
- * @param createCycleFn A function to create the cycle function that is called immediately and by the dependant.
- * @param innerFn The inner function that can be called by the cycle function while capturing teardown hooks.
- */
-function startCycle(
-	sequential: boolean,
-	createCycleFn: (
-		dependant: Dependant,
-		innerFn: (disposeSelf: TeardownHook) => void,
-		dispose: () => void,
-	) => (() => void),
-	innerFn: () => void,
-) {
-	const context = getContext();
-	let disposed = false;
-	let disposeFn: TeardownHook | undefined;
-
-	teardown(() => {
-		disposed = true;
-		disposeFn?.();
-	});
-
-	let dependantFn = (accessedCycle: number): void => {
-		if (!disposed && dependant[1] === accessedCycle) {
-			dependant[1] = (dependant[1] + 1) | 0;
-			runInContext(context, cycleFn);
-		}
-	};
-	if (sequential) {
-		dependantFn = sequentialize(dependantFn);
-	}
-
-	const dependant: Dependant = [dependantFn, 0];
-
-	const captureInnerFn = (disposeSelf: TeardownHook) => {
-		disposeFn = disposeSelf;
-		innerFn();
-	};
-
-	const cycleFn = createCycleFn(
-		dependant,
-		captureInnerFn,
-		() => disposeFn?.(),
-	);
-
-	dependantFn(0);
-}
+};
 
 /**
  * Watch an expression until the current lifecycle is disposed.
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result. This is guaranteed to be called at least once immediately. Lifecycle hooks are called before the next function call or when the current lifecycle is disposed.
- * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  *
  * @example
  * ```tsx
@@ -344,28 +273,51 @@ function startCycle(
  * count.value = 2;
  * ```
  */
-export function watch<T>(expr: Expression<T>, fn: (value: T) => void, sequential = false): void {
+export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 	if (expr instanceof Signal || typeof expr === "function") {
+		const signals = new Set<Set<NotifyHook>>();
+
+		const unsub = (hooks: Set<NotifyHook>): void => {
+			signals.delete(hooks);
+			hooks.delete(entry);
+		};
+
+		const sub = (hooks: Set<NotifyHook>): void => {
+			signals.add(hooks);
+			hooks.add(entry);
+		};
+
 		let value: T;
-		const runExpr = expr instanceof Signal
-			? () => value = expr.value
-			: () => value = nocapture(expr as () => T);
-		startCycle(
-			sequential,
-			(dependant, innerFn, dispose) => () => {
-				TRIGGERS_STACK.push([]);
-				DEPENDANTS_STACK.push([dependant]);
-				try {
-					runExpr();
-				} finally {
-					TRIGGERS_STACK.pop();
-					DEPENDANTS_STACK.pop();
-				}
-				dispose();
-				captureSelf(innerFn);
-			},
-			() => fn(value),
-		);
+		let disposed = false;
+		let dispose: TeardownHook | undefined;
+
+		const runExpr = wrapContext(() => {
+			value = get(expr);
+		});
+		const runFn = wrapContext(() => fn(value));
+		const entry = _unfold(() => {
+			if (disposed) {
+				return;
+			}
+			try {
+				signals.forEach(unsub);
+				ACCESS_STACK.push(sub);
+				nocapture(runExpr);
+			} finally {
+				ACCESS_STACK.pop();
+			}
+			dispose?.();
+			dispose = capture(runFn);
+		});
+
+		teardown(() => {
+			// TODO: Explicitly test late disposal during batches.
+			disposed = true;
+			signals.forEach(unsub);
+			dispose?.();
+		});
+
+		entry();
 	} else {
 		fn(expr);
 	}
@@ -376,10 +328,9 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void, sequential
  *
  * @param expr The expression to watch.
  * @param fn The function to call with the expression result when any updates occur.
- * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  * @returns The first expression result.
  */
-export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, sequential?: boolean): T {
+export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void): T {
 	let first: T;
 	let update = false;
 	watch(expr, value => {
@@ -389,7 +340,7 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, seq
 			first = value;
 			update = true;
 		}
-	}, sequential);
+	});
 	return first!;
 }
 
@@ -399,70 +350,52 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void, seq
  * Note, that this doesn't separate signal accesses from side effects which makes it easier to accidentally cause infinite loops. If possible, use {@link watch} or {@link watchUpdates} instead.
  *
  * @param fn The function to run. Lifecycle hooks  are called before the next function call or when the current lifecycle is disposed.
- * @param sequential If true, recursive side effects run in sequence instead of immediately. Default is false.
  */
-export function effect(fn: () => void, sequential = false): void {
-	startCycle(
-		sequential,
-		(dependant, innerFn, dispose) => () => {
-			dispose();
-			TRIGGERS_STACK.push([]);
-			DEPENDANTS_STACK.push([dependant]);
-			try {
-				captureSelf(innerFn);
-			} finally {
-				TRIGGERS_STACK.pop();
-				DEPENDANTS_STACK.pop();
-			}
-		},
-		fn,
-	);
-}
+export function effect(fn: () => void): void {
+	const signals = new Set<Set<NotifyHook>>();
 
-/**
- * Evaluate an expression and call a function once when any accessed signals are updated.
- *
- * It is guaranteed that all triggers are called before other non-trigger dependants per signal update or batch.
- *
- * @param expr The expression evaluate.
- * @param fn The function to call when any accessed signals are updated.
- * @param cycle An arbitrary number to pass back to the function.
- *
- * @example
- * ```tsx
- * import { sig, trigger } from "@mxjp/gluon";
- *
- * const count = sig(0);
- *
- * console.log("Count:", trigger(count, cycle => {
- *   console.log("Count is being updated:", cycle);
- * }, 42));
- *
- * count.value++;
- * ```
- */
-export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cycle = 0): T {
-	if (expr instanceof Signal || typeof expr === "function") {
-		const triggers = TRIGGERS_STACK[TRIGGERS_STACK.length - 1];
-		triggers.push([cycle => uncapture(() => fn(cycle)), cycle]);
-		try {
-			if (expr instanceof Signal) {
-				return expr.value;
-			}
-			return (expr as () => T)();
-		} finally {
-			triggers.pop();
+	const unsub = (hooks: Set<NotifyHook>): void => {
+		signals.delete(hooks);
+		hooks.delete(entry);
+	};
+
+	const sub = (hooks: Set<NotifyHook>): void => {
+		signals.add(hooks);
+		hooks.add(entry);
+	};
+
+	let disposed = false;
+	let dispose: TeardownHook | undefined;
+
+	const runFn = wrapContext(fn);
+	const entry = _unfold(() => {
+		if (disposed) {
+			return;
 		}
-	} else {
-		return expr;
-	}
+		dispose?.();
+		try {
+			signals.forEach(unsub);
+			ACCESS_STACK.push(sub);
+			dispose = capture(runFn);
+		} finally {
+			ACCESS_STACK.pop();
+		}
+	});
+
+	teardown(() => {
+		disposed = true;
+		signals.forEach(unsub);
+		dispose?.();
+	});
+
+	entry();
 }
 
 /**
- * Defer signal updates while calling a function and process them immediately after all current batches have finished.
+ * Defer signal updates until a function finishes.
  *
  * + When nesting batches, updates are processed after the most outer batch has completed.
- * + Updates are also processed if an error is thrown by the specified function.
+ * + When updates cause immediate side effects, these side effects will run as part of the batch.
  *
  * @param fn The function to run.
  * @returns The function's return value.
@@ -486,20 +419,24 @@ export function trigger<T>(expr: Expression<T>, fn: (cycle: number) => void, cyc
  * ```
  */
 export function batch<T>(fn: () => T): T {
-	if (BATCH_STACK.length > 0) {
-		return fn();
-	}
-	const deps: Dependant[] = [];
-	try {
-		BATCH_STACK.push(deps);
-		return fn();
-	} finally {
-		BATCH_STACK.pop();
-		for (let i = 0; i < deps.length; i++) {
-			const [fn, cycle] = deps[i];
-			fn(cycle);
+	if (BATCH === undefined) {
+		const batch = new Set<NotifyHook>();
+		let value: T;
+		try {
+			BATCH = batch;
+			value = fn();
+			while (batch.size > 0) {
+				batch.forEach(notify => {
+					batch.delete(notify);
+					notify();
+				});
+			}
+		} finally {
+			BATCH = undefined;
 		}
+		return value;
 	}
+	return fn();
 }
 
 /**
@@ -528,64 +465,6 @@ export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolea
 	const signal = sig<T>(undefined!, equals);
 	watch(expr, value => signal.value = value);
 	return () => signal.value;
-}
-
-/**
- * Wrap an expression to be evaulated only when any of the accessed signals have been updated.
- *
- * This is similar to {@link memo}, but the expression is only evaulated if it is actually used.
- *
- * @param expr The expression to wrap.
- * @returns A function to lazily evaluate the expression.
- *
- * @example
- * ```tsx
- * import { sig, lazy, watch } from "@mxjp/gluon";
- *
- * const count = sig(42);
- *
- * const computed = lazy(() => someExpensiveComputation(count.value));
- *
- * watch(computed, count => {
- *   console.log("Count:", count);
- * });
- * ```
- */
-export function lazy<T>(expr: Expression<T>): () => T {
-	let value: T;
-	let current = false;
-
-	let proxyMap = new Map<DependantFn, number>();
-	const proxy: Dependant = [accessedCycle => {
-		if (proxy[1] === accessedCycle) {
-			proxy[1] = (proxy[1] + 1) | 0;
-			const map = proxyMap;
-			proxyMap = new Map();
-			map.forEach(callDependant);
-		}
-	}, 0];
-
-	const triggerFn = (accessedCycle: number) => {
-		if (cycle === accessedCycle) {
-			cycle = (cycle + 1) | 0;
-			current = false;
-		}
-	};
-
-	let cycle = 0;
-	return () => {
-		access(DEPENDANTS_STACK, proxyMap);
-		if (!current) {
-			current = true;
-			DEPENDANTS_STACK.push([proxy]);
-			try {
-				value = trigger(expr, triggerFn, cycle);
-			} finally {
-				DEPENDANTS_STACK.pop();
-			}
-		}
-		return value;
-	};
 }
 
 /**
@@ -628,11 +507,10 @@ export function track<T>(fn: () => T): T {
 }
 
 /**
- * Check if an expression is currently evaluated to track signal accesses.
+ * Check if a currently evaluating expression is tracking signal accesses.
  */
 export function isTracking(): boolean {
-	return TRACKING_STACK[TRACKING_STACK.length - 1]
-		&& (TRIGGERS_STACK[TRIGGERS_STACK.length - 1].length > 0 || DEPENDANTS_STACK[DEPENDANTS_STACK.length - 1].length > 0);
+	return TRACKING_STACK[TRACKING_STACK.length - 1] && ACCESS_STACK[ACCESS_STACK.length - 1]?.length > 0;
 }
 
 /**

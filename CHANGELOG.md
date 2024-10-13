@@ -1,5 +1,8 @@
 # Changelog
 
+## 15.0
++ **Breaking:** Remove all shared globals & utilities. This also breaks interoperability with other major versions.
+
 ## 14.3
 + Add `isolate` utility.
 

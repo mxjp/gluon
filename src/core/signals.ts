@@ -291,9 +291,7 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 		let disposed = false;
 		let dispose: TeardownHook | undefined;
 
-		const runExpr = wrapContext(() => {
-			value = get(expr);
-		});
+		const runExpr = wrapContext(() => value = get(expr));
 		const runFn = wrapContext(() => fn(value));
 		const entry = _unfold(() => {
 			if (disposed) {

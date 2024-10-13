@@ -4,11 +4,6 @@ import type { Dependant, TeardownFrame } from "./internals.js";
 
 interface Globals {
 	/**
-	 * The next suffix for generating unique ids in the current thread.
-	 */
-	NEXT_ID: { value: number | bigint };
-
-	/**
 	 * A stack where the last item is the current context.
 	 */
 	CONTEXT_STACK: (ReadonlyContext | undefined)[];
@@ -40,9 +35,6 @@ interface Globals {
 }
 
 const GLOBALS = sharedGlobal("gluon:globals", () => ({} as Globals));
-
-const NEXT_ID_KEY = "NEXT_ID" as const;
-export const NEXT_ID = GLOBALS[NEXT_ID_KEY] ??= { value: 0 };
 
 const CONTEXT_STACK_KEY = "CONTEXT_STACK" as const;
 export const CONTEXT_STACK = GLOBALS[CONTEXT_STACK_KEY] ??= [];

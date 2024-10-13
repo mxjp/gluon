@@ -1,4 +1,4 @@
-import { NEXT_ID } from "./internal-globals.js";
+import { NEXT_ID } from "./internals.js";
 
 /**
  * Allocate an ID that is unique in the current thread.

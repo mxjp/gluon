@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { uniqueId } from "@mxjp/gluon";
 
-import { NEXT_ID } from "../../dist/es/core/internal-globals.js";
+import { NEXT_ID } from "../../dist/es/core/internals.js";
 
 await test("uniqueId", async ctx => {
 	await ctx.test("initial usage", () => {

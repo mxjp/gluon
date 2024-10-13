@@ -17,3 +17,4 @@
 /tests
 /tests_out
 /tsconfig*
+/venv

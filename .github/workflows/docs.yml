@@ -1,7 +1,8 @@
 name: GitHub Pages
 
 on:
-  push:
+  - workflow_dispatch
+  - push:
     tags:
       - v*
 
@@ -31,8 +32,9 @@ jobs:
       - run: npm run build
       - run: npm ci --prefix examples
       - run: npm run build --prefix examples
-      - run: pip install --user mkdocs-material
-      - run: python -m mkdocs build --site-dir docs_out
+      - run: python -m venv venv
+      - run: venv/bin/pip install mkdocs-material
+      - run: venv/bin/python -m mkdocs build --site-dir docs_out
       - uses: actions/upload-pages-artifact@v2
         with:
           path: './docs_out'

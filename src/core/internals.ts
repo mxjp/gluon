@@ -1,7 +1,16 @@
+import type { ReadonlyContext } from "./context.js";
 import type { TeardownHook } from "./lifecycle.js";
 import { Expression, watch } from "./signals.js";
 
+/**
+ * The next suffix for generating unique ids in the current thread.
+ */
 export const NEXT_ID: { value: number | bigint } = { value: 0 };
+
+/**
+ * A stack where the last item is the current context.
+ */
+export const CONTEXT_STACK: (ReadonlyContext | undefined)[] = [];
 
 export type Falsy = null | undefined | false | 0 | 0n | "";
 

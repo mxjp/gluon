@@ -1,13 +1,7 @@
-import type { ReadonlyContext } from "./context.js";
 import { sharedGlobal } from "./globals.js";
 import type { Dependant, TeardownFrame } from "./internals.js";
 
 interface Globals {
-	/**
-	 * A stack where the last item is the current context.
-	 */
-	CONTEXT_STACK: (ReadonlyContext | undefined)[];
-
 	/**
 	 * A stack where the last item may be an array which teardown hooks are captured in.
 	 */
@@ -35,9 +29,6 @@ interface Globals {
 }
 
 const GLOBALS = sharedGlobal("gluon:globals", () => ({} as Globals));
-
-const CONTEXT_STACK_KEY = "CONTEXT_STACK" as const;
-export const CONTEXT_STACK = GLOBALS[CONTEXT_STACK_KEY] ??= [];
 
 const TEARDOWN_STACK_KEY = "TEARDOWN_STACK" as const;
 export const TEARDOWN_STACK = GLOBALS[TEARDOWN_STACK_KEY] ??= [];

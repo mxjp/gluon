@@ -1,4 +1,4 @@
-import { CONTEXT_STACK } from "./internal-globals.js";
+import { CONTEXT_STACK } from "./internals.js";
 import { useStack } from "./internals.js";
 
 /**

@@ -114,27 +114,6 @@ effect(() => {
 });
 ```
 
-## `trigger`
-Evaluate an expression and call a function once when any accessed signals are updated.
-```jsx
-import { trigger } from "@mxjp/gluon";
-
-const currentCount = trigger(count, () => {
-	console.log("Count has been changed.");
-});
-```
-
-+ It is guaranteed that trigger callbacks run before all other [watch](#watch), [watchUpdates](#watchupdates) or [effect](#effect) callbacks.
-+ Trigger callbacks run during [batches](#batch).
-
-When using `trigger` in a loop, e.g. in an expression the last `cycle` parameter is passed back into the callback and can be used to keep track of which iteration caused the update.
-```jsx
-const currentCount = trigger(count, cycle => {
-	// cycle === 42
-	console.log("Count has been changed.");
-}, 42);
-```
-
 ## `batch`
 Signal updates are always processed immediately. The `batch` function can be used to deduplicate and defer updates until the batch callback finishes:
 ```jsx
@@ -148,18 +127,6 @@ batch(() => {
 	b.value++;
 });
 ```
-
-## `lazy`
-Wrap an expression to be evaluated only when it is used **and** any accessed signals have been updated. This is meant to avoid expensive computations.
-```jsx
-import { lazy } from "@mxjp/gluon";
-
-const getValue = lazy(() => someExpensiveComputation(a.value, b.value));
-```
-
-+ This inherits the [context](context.md) and [lifecycle](lifecycle.md) behavior from where it's used. E.g:
-	+ When used inside the expression of [`watch`](#watch), teardown hooks are not supported.
-	+ When used inside the callback of [`effect`](#effect), teardown hooks are supported.
 
 ## `memo`
 Watch an expression and get a function to reactively access it's latest result with the same [equality check](#equality) that is also used for signals.
@@ -205,7 +172,7 @@ map(sig(6), value => value * 7);
 ```
 
 ## Immediate Side Effects
-All signal updates are immediately processed by default. This includes nested updates:
+By default, signal updates are processed immediately. If an update causes recursive side effects, they run in sequence instead.
 ```jsx
 import { sig, watch } from "@mxjp/gluon";
 
@@ -219,32 +186,6 @@ watch(count, value => {
 	}
 	console.groupEnd();
 });
-
-console.log("Final count:", count.value);
-```
-```
-Count: 0
-	Count: 1
-		Count: 2
-		New count: 2
-	New count: 2
-Final count: 2
-```
-
-If needed, nested updates can also be processed in sequence by setting the last parameter in `watch`, `watchUpdates` or `effect` to true:
-```jsx
-import { sig, watch } from "@mxjp/gluon";
-
-const count = sig(0);
-
-watch(count, value => {
-	console.group("Count:", value);
-	if (value < 2) {
-		count.value++;
-		console.log("New count:", count.value);
-	}
-	console.groupEnd();
-}, true);
 
 console.log("Final count:", count.value);
 ```

@@ -127,6 +127,7 @@ batch(() => {
 	b.value++;
 });
 ```
+If updates from a batch cause immediate recursive side effects, these are also processed as part of the batch.
 
 ## `memo`
 Watch an expression and get a function to reactively access it's latest result with the same [equality check](#equality) that is also used for signals.

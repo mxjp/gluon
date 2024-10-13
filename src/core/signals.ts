@@ -1,7 +1,6 @@
 import { getContext, runInContext } from "./context.js";
 import { shareInstancesOf } from "./globals.js";
-import { BATCH_STACK, DEPENDANTS_STACK, TRACKING_STACK, TRIGGERS_STACK } from "./internal-globals.js";
-import { Dependant, DependantFn, useStack } from "./internals.js";
+import { BATCH_STACK, Dependant, DependantFn, DEPENDANTS_STACK, TRACKING_STACK, TRIGGERS_STACK, useStack } from "./internals.js";
 import { captureSelf, nocapture, teardown, TeardownHook, uncapture } from "./lifecycle.js";
 
 /**

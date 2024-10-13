@@ -17,6 +17,26 @@ export const CONTEXT_STACK: (ReadonlyContext | undefined)[] = [];
  */
 export const TEARDOWN_STACK: (TeardownFrame | undefined)[] = [];
 
+/**
+ * A stack where the last item is the current signal batch. This may be empty.
+ */
+export const BATCH_STACK: Dependant[][] = [];
+
+/**
+ * A stack where the last item indicates if signal access is currently tracked. This contains at least `true` by default.
+ */
+export const TRACKING_STACK: boolean[] = [true];
+
+/**
+ * A stack where the last item is an array of triggers to capture in any accessed signals. This is never empty.
+ */
+export const TRIGGERS_STACK: Dependant[][] = [[]];
+
+/**
+ * A stack where the last item is an array of dependants to capture in any accessed signals. This is never empty.
+ */
+export const DEPENDANTS_STACK: Dependant[][] = [[]];
+
 export type Falsy = null | undefined | false | 0 | 0n | "";
 
 export type TagNameMap = HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementTagNameMap;

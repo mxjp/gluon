@@ -954,6 +954,40 @@ await test("signals", async ctx => {
 			strictEqual(signal.value, 3);
 			assertEvents(events, [3]);
 		});
+
+		await ctx.test("disposed watch", () => {
+			const events: unknown[] = [];
+			const signal = sig(42);
+			const dispose = capture(() => watch(signal, value => {
+				events.push("a", value);
+			}));
+			uncapture(() => watch(signal, value => {
+				events.push("b", value);
+			}));
+			assertEvents(events, ["a", 42, "b", 42]);
+			batch(() => {
+				signal.value = 77;
+				dispose();
+			});
+			assertEvents(events, ["b", 77]);
+		});
+
+		await ctx.test("disposed effect", () => {
+			const events: unknown[] = [];
+			const signal = sig(42);
+			const dispose = capture(() => effect(() => {
+				events.push("a", signal.value);
+			}));
+			uncapture(() => effect(() => {
+				events.push("b", signal.value);
+			}));
+			assertEvents(events, ["a", 42, "b", 42]);
+			batch(() => {
+				signal.value = 77;
+				dispose();
+			});
+			assertEvents(events, ["b", 77]);
+		});
 	});
 
 	await ctx.test("mapper", () => {

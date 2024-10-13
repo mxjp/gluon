@@ -311,7 +311,6 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 		});
 
 		teardown(() => {
-			// TODO: Explicitly test late disposal during batches.
 			disposed = true;
 			signals.forEach(unsub);
 			dispose?.();

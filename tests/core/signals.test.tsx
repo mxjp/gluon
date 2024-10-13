@@ -931,7 +931,6 @@ await test("signals", async ctx => {
 			}, withMsg("test"));
 
 			strictEqual(signal.value, 77);
-			// TODO: Check if this behavior is useful.
 			assertEvents(events, []);
 
 			signal.value = 2;

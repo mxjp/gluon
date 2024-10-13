@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, effect, extract, get, inject, isTracking, map, memo, optionalString, sig, string, teardown, TeardownHook, track, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
+import { batch, capture, effect, extract, get, inject, isTracking, map, memo, optionalString, sig, string, teardown, TeardownHook, track, trigger, TriggerPipe, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
 
 import { assertEvents, lifecycleEvent, withMsg } from "../common.js";
 
@@ -1012,5 +1012,59 @@ await test("signals", async ctx => {
 		strictEqual(get(optionalString(42)), "42");
 		strictEqual(get(optionalString(null)), null);
 		strictEqual(get(optionalString(undefined)), undefined);
+	});
+
+	await ctx.test("trigger", async ctx => {
+		await ctx.test("usage & lifecycle", () => {
+			const events: unknown[] = [];
+			const signalA = sig(42);
+			const signalB = sig(1);
+
+			let pipe!: TriggerPipe;
+			const dispose = capture(() => {
+				pipe = trigger(() => {
+					events.push("trigger");
+				});
+			});
+
+			strictEqual(signalA.active, false);
+			strictEqual(pipe(() => {
+				events.push("pipe");
+				strictEqual(isTracking(), true);
+				return signalA.value;
+			}), 42);
+			strictEqual(signalA.active, true);
+			assertEvents(events, ["pipe"]);
+
+			signalA.value = 13;
+			assertEvents(events, ["trigger"]);
+			strictEqual(signalA.active, false);
+
+			signalA.value = 77;
+			assertEvents(events, []);
+			strictEqual(signalA.active, false);
+
+			strictEqual(pipe(() => signalA.value), 77);
+			strictEqual(signalA.active, true);
+
+			strictEqual(pipe(() => signalB.value), 1);
+			strictEqual(signalA.active, false);
+			strictEqual(signalB.active, true);
+
+			signalA.value = 123;
+			assertEvents(events, []);
+			signalB.value = 2;
+			assertEvents(events, ["trigger"]);
+
+			strictEqual(pipe(() => signalB.value), 2);
+			strictEqual(signalB.active, true);
+
+			dispose();
+			strictEqual(signalB.active, false);
+
+			signalB.value = 3;
+			assertEvents(events, []);
+			strictEqual(signalB.active, false);
+		});
 	});
 });

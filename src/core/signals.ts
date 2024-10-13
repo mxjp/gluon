@@ -501,6 +501,38 @@ export function isTracking(): boolean {
 }
 
 /**
+ * **This is experimental.**
+ */
+export interface TriggerPipe {
+	<T>(expr: Expression<T>): T;
+}
+
+/**
+ * **This is experimental.**
+ */
+export function trigger(fn: () => void): TriggerPipe {
+	const hookFn = wrapContext(() => {
+		clear();
+		fn();
+	});
+	const { clear, sub } = _observer(hookFn);
+	teardown(clear);
+	return <T>(expr: Expression<T>) => {
+		clear();
+		try {
+			const outer = ACCESS_STACK[ACCESS_STACK.length - 1] as AccessHook | undefined;
+			ACCESS_STACK.push(hooks => {
+				sub(hooks);
+				outer?.(hooks);
+			});
+			return get(expr);
+		} finally {
+			ACCESS_STACK.pop();
+		}
+	};
+}
+
+/**
  * Evaulate an expression.
  *
  * This can be used to access reactive and non reactive inputs.

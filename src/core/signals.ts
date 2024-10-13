@@ -245,6 +245,24 @@ const _unfold = (hook: NotifyHook): NotifyHook => {
 	};
 };
 
+const _observer = (hook: NotifyHook) => {
+	const signals = new Set<Set<NotifyHook>>();
+
+	const unsub = (hooks: Set<NotifyHook>): void => {
+		signals.delete(hooks);
+		hooks.delete(hook);
+	};
+
+	const sub = (hooks: Set<NotifyHook>): void => {
+		signals.add(hooks);
+		hooks.add(hook);
+	};
+
+	const clear = () => signals.forEach(unsub);
+
+	return { clear, sub };
+};
+
 /**
  * Watch an expression until the current lifecycle is disposed.
  *
@@ -275,22 +293,9 @@ const _unfold = (hook: NotifyHook): NotifyHook => {
  */
 export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 	if (expr instanceof Signal || typeof expr === "function") {
-		const signals = new Set<Set<NotifyHook>>();
-
-		const unsub = (hooks: Set<NotifyHook>): void => {
-			signals.delete(hooks);
-			hooks.delete(entry);
-		};
-
-		const sub = (hooks: Set<NotifyHook>): void => {
-			signals.add(hooks);
-			hooks.add(entry);
-		};
-
 		let value: T;
 		let disposed = false;
 		let dispose: TeardownHook | undefined;
-
 		const runExpr = wrapContext(() => value = get(expr));
 		const runFn = wrapContext(() => fn(value));
 		const entry = _unfold(() => {
@@ -298,7 +303,7 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 				return;
 			}
 			try {
-				signals.forEach(unsub);
+				clear();
 				ACCESS_STACK.push(sub);
 				nocapture(runExpr);
 			} finally {
@@ -307,13 +312,12 @@ export function watch<T>(expr: Expression<T>, fn: (value: T) => void): void {
 			dispose?.();
 			dispose = capture(runFn);
 		});
-
+		const { clear, sub } = _observer(entry);
 		teardown(() => {
 			disposed = true;
-			signals.forEach(unsub);
+			clear();
 			dispose?.();
 		});
-
 		entry();
 	} else {
 		fn(expr);
@@ -349,21 +353,8 @@ export function watchUpdates<T>(expr: Expression<T>, fn: (value: T) => void): T 
  * @param fn The function to run. Lifecycle hooks  are called before the next function call or when the current lifecycle is disposed.
  */
 export function effect(fn: () => void): void {
-	const signals = new Set<Set<NotifyHook>>();
-
-	const unsub = (hooks: Set<NotifyHook>): void => {
-		signals.delete(hooks);
-		hooks.delete(entry);
-	};
-
-	const sub = (hooks: Set<NotifyHook>): void => {
-		signals.add(hooks);
-		hooks.add(entry);
-	};
-
 	let disposed = false;
 	let dispose: TeardownHook | undefined;
-
 	const runFn = wrapContext(fn);
 	const entry = _unfold(() => {
 		if (disposed) {
@@ -371,20 +362,19 @@ export function effect(fn: () => void): void {
 		}
 		dispose?.();
 		try {
-			signals.forEach(unsub);
+			clear();
 			ACCESS_STACK.push(sub);
 			dispose = capture(runFn);
 		} finally {
 			ACCESS_STACK.pop();
 		}
 	});
-
+	const { clear, sub } = _observer(entry);
 	teardown(() => {
 		disposed = true;
-		signals.forEach(unsub);
+		clear();
 		dispose?.();
 	});
-
 	entry();
 }
 

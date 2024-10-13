@@ -28,5 +28,5 @@ pip install mkdocs-material
 npm run build --prefix examples
 
 # Build the documentation:
-python -m mkdocs build --site-dir docs_out
+mkdocs build --site-dir docs_out
 ```

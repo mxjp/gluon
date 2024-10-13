@@ -1,4 +1,3 @@
-import { sharedGlobal } from "../core/globals.js";
 import { createReactiveArrayProxy } from "./reactive-array-proxy.js";
 import { ReactiveMap } from "./reactive-map.js";
 import { createReactiveProxy } from "./reactive-proxy.js";
@@ -37,12 +36,12 @@ const WRAP_INSTANCE = Symbol.for("gluon:store:wrap_instance");
 /**
  * A map of targets to wrappers.
  */
-const WRAPPERS = sharedGlobal("gluon:store:wrappers", () => new WeakMap<object, object>());
+const WRAPPERS = new WeakMap<object, object>();
 
 /**
  * A map of wrappers to targets.
  */
-const TARGETS = sharedGlobal("gluon:store:targets", () => new WeakMap<object, object>());
+const TARGETS = new WeakMap<object, object>();
 
 export interface WrapInstanceFn<T> {
 	(instance: T): T;

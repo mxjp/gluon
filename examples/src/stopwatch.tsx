@@ -7,7 +7,7 @@ This example also demonstrates how state and logic can be separated from it's re
 
 */
 
-import { Expression, IndexFor, Show, get, lazy, sig, teardown } from "@mxjp/gluon";
+import { Expression, IndexFor, Show, get, memo, sig, teardown } from "@mxjp/gluon";
 
 export function Example() {
 	// Create a reactive timer instance:
@@ -89,7 +89,7 @@ function createTimer() {
 
 	// Compute the elapsed time on demand from
 	// the current time and state signals:
-	const elapsed = lazy(() => {
+	const elapsed = memo(() => {
 		switch (state.value.type) {
 			case "paused": return state.value.elapsed;
 			case "running": return now.value - state.value.started;

@@ -14,6 +14,6 @@
 		"webpack-dev-server": "^5.1.0"
 	},
 	"dependencies": {
-		"@mxjp/gluon": "^14.1.4"
+		"@mxjp/gluon": "^15.0.0"
 	}
 }

@@ -135,3 +135,26 @@ const dispose = capture(async () => {
 	teardown(() => { ... });
 });
 ```
+
+In a test or development environment, you can configure [how leaked teardown hooks behave](./testing.md#leak-detection).
+
+To dispose things that are initialized later, you manually need to capture it's teardown hooks:
+```jsx
+const dispose = capture(async () => {
+	let disposed = false;
+	let disposeLater: TeardownHook | undefined;
+
+	teardown(() => {
+		disposed = true;
+		disposeLater?.();
+	});
+
+	await something;
+
+	if (!disposed) {
+		disposeLater = capture(() => {
+			// Register some teardown hooks here...
+		});
+	}
+});
+```

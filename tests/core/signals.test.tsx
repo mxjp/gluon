@@ -1066,5 +1066,144 @@ await test("signals", async ctx => {
 			assertEvents(events, []);
 			strictEqual(signalB.active, false);
 		});
+
+		await ctx.test("distinct update order, pre+post", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			uncapture(() => watch(signal, () => events.push("a")));
+			const pipe = uncapture(() => trigger(() => events.push("t")));
+			strictEqual(pipe(signal), 1);
+			uncapture(() => watch(signal, () => events.push("b")));
+			assertEvents(events, ["a", "b"]);
+			signal.value = 2;
+			assertEvents(events, ["a", "t", "b"]);
+			signal.value = 3;
+			assertEvents(events, ["a", "b"]);
+		});
+
+		await ctx.test("distinct update order, pre", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			const pipe = uncapture(() => trigger(() => events.push("t")));
+			strictEqual(pipe(signal), 1);
+			uncapture(() => watch(signal, () => events.push("a")));
+			uncapture(() => watch(signal, () => events.push("b")));
+			assertEvents(events, ["a", "b"]);
+			signal.value = 2;
+			assertEvents(events, ["t", "a", "b"]);
+			signal.value = 3;
+			assertEvents(events, ["a", "b"]);
+		});
+
+		await ctx.test("distinct update order, post", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			uncapture(() => watch(signal, () => events.push("a")));
+			uncapture(() => watch(signal, () => events.push("b")));
+			const pipe = uncapture(() => trigger(() => events.push("t")));
+			strictEqual(pipe(signal), 1);
+			assertEvents(events, ["a", "b"]);
+			signal.value = 2;
+			assertEvents(events, ["a", "b", "t"]);
+			signal.value = 3;
+			assertEvents(events, ["a", "b"]);
+		});
+
+		await ctx.test("nested update order", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			const pipeA = uncapture(() => trigger(() => events.push("a")));
+			const pipeB = uncapture(() => trigger(() => events.push("b")));
+			uncapture(() => watch(() => {
+				return pipeA(() => {
+					return pipeB(() => {
+						return signal.value;
+					});
+				});
+			}, value => {
+				events.push("update", value);
+			}));
+			assertEvents(events, ["update", 1]);
+			signal.value = 2;
+			assertEvents(events, ["b", "a", "update", 2]);
+			signal.value = 3;
+			assertEvents(events, ["b", "a", "update", 3]);
+		});
+
+		await ctx.test("implicit update disposal", () => {
+			const events: unknown[] = [];
+			const signalA = sig(1);
+			const signalB = sig(2);
+			const pipe = uncapture(() => trigger(() => events.push("t")));
+			strictEqual(pipe(() => signalA.value + signalB.value), 3);
+			assertEvents(events, []);
+
+			signalA.value = 3;
+			assertEvents(events, ["t"]);
+			signalB.value = 4;
+			assertEvents(events, []);
+
+			strictEqual(pipe(() => signalB.value + signalA.value), 7);
+			signalA.value = 5;
+			assertEvents(events, ["t"]);
+			signalB.value = 6;
+			assertEvents(events, []);
+			signalA.value = 7;
+			assertEvents(events, []);
+		});
+
+		await ctx.test("batch", () => {
+			const events: unknown[] = [];
+			const signalA = sig(1);
+			const signalB = sig(2);
+			const pipe = uncapture(() => trigger(() => events.push("t")));
+			strictEqual(pipe(() => signalA.value + signalB.value), 3);
+			assertEvents(events, []);
+
+			batch(() => {
+				signalA.value = 3;
+				assertEvents(events, []);
+			});
+			assertEvents(events, ["t"]);
+			signalB.value = 4;
+			assertEvents(events, []);
+
+			strictEqual(pipe(() => signalA.value + signalB.value), 7);
+			batch(() => {
+				signalA.value = 5;
+				signalB.value = 6;
+				assertEvents(events, []);
+			});
+			assertEvents(events, ["t"]);
+
+			signalA.value = 7;
+			signalB.value = 8;
+			assertEvents(events, []);
+		});
+
+		await ctx.test("nested + batch", () => {
+			const events: unknown[] = [];
+			const signal = sig(1);
+			const pipe = uncapture(() => trigger(() => events.push("t")));
+			uncapture(() => watch(() => {
+				return pipe(() => {
+					return signal.value;
+				});
+			}, value => {
+				events.push(value);
+			}));
+			assertEvents(events, [1]);
+			batch(() => {
+				signal.value = 2;
+				assertEvents(events, []);
+			});
+			assertEvents(events, ["t", 2]);
+			batch(() => {
+				signal.value = 3;
+				signal.value = 4;
+				assertEvents(events, []);
+			});
+			assertEvents(events, ["t", 4]);
+		});
 	});
 });

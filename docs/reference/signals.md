@@ -172,6 +172,69 @@ map(6, value => value * 7);
 map(sig(6), value => value * 7);
 ```
 
+## `trigger`
+Create an expression evaluator pipe that calls a function once when any accessed signals from the latest evaluated expression are updated.
+
+When the lifecycle at which the pipe was created is disposed, the callback function will not be called anymore.
+```jsx
+import { trigger, sig } from "@mxjp/gluon";
+
+// Create a new pipe that is bound to the current lifecycle:
+const pipe = trigger(() => {
+	console.log("Signal has been updated.");
+});
+
+const signal = sig(42);
+
+// Evaluating an expression through the pipe will track all signal accesses:
+console.log(pipe(signal)); // 42
+console.log(pipe(() => signal.value)); // 42
+
+// This will trigger the callback:
+signal.value = 77;
+```
+
+It is guaranteed that the function is called before any other observers like [`watch`](#watch) or [`effect`](#effect) are notified. This can be used to run side effects like clearing a cache before an expression is re-evaluated:
+```jsx
+import { trigger, sig, watch } from "@mxjp/gluon";
+
+const pipe = trigger(() => {
+	console.log("Signal has been updated.");
+});
+
+const signal = sig(42);
+watch(() => {
+	console.log("Evaluating...");
+	return pipe(signal);
+}, value => {
+	console.log("Value:", value);
+});
+
+signal.value = 77;
+```
+```
+Evaluating...
+Value: 42
+Signal has been updated.
+Evaluating...
+Value: 77
+```
+
+If pipes are nested, the callback for the most inner one is called first. In the example below, the callback for `pipeB` is called first:
+```jsx
+import { trigger, sig } from "@mxjp/gluon";
+
+const pipeA = trigger(() => console.log("Pipe A"));
+const pipeB = trigger(() => console.log("Pipe B"));
+
+const signal = sig(42);
+pipeA(() => pipeB(signal)); // 42
+
+signal.value = 77;
+```
+
+
+
 ## Immediate Side Effects
 By default, signal updates are processed immediately. If an update causes recursive side effects, they run in sequence instead.
 ```jsx

@@ -500,15 +500,19 @@ export function isTracking(): boolean {
 	return TRACKING_STACK[TRACKING_STACK.length - 1] && ACCESS_STACK[ACCESS_STACK.length - 1]?.length > 0;
 }
 
-/**
- * **This is experimental.**
- */
 export interface TriggerPipe {
 	<T>(expr: Expression<T>): T;
 }
 
 /**
- * **This is experimental.**
+ * Create an expression evaluator pipe that calls a function once when any accessed signals from the latest evaluated expression are updated.
+ *
+ * + When the lifecycle at which the pipe was created is disposed, the callback function will not be called anymore.
+ * + It is guaranteed that the function is called before any other observers like {@link watch} or {@link effect} are notified.
+ * + If pipes are nested, the callback for the most inner one is called first.
+ *
+ * @param fn The callback to invoke when a signal is updated.
+ * @returns The pipe to evaluate expressions.
  */
 export function trigger(fn: () => void): TriggerPipe {
 	const hookFn = wrapContext(() => {

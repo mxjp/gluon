@@ -105,6 +105,23 @@ nocapture(() => {
 });
 ```
 
+## Repetitive Disposal
+By default, lifecycle hooks can be called multiple times and primitives like [`capture`](#capture) and [`captureSelf`](#captureself) don't provide any logic for preventing multiple calls.
+
+```jsx
+const dispose = capture(() => {
+	teardown(() => {
+		console.log("teardown");
+	});
+});
+
+// This will call all registered hooks twice:
+dispose();
+dispose();
+```
+
+In general, teardown hooks should never cause any unintended behavior just because they are called multiple times. Preventing something from being called multiple times must be implemented manually.
+
 ## Async Code
 Capturing teardown hooks relies on the synchronous call stack and therefore only works partially with async code:
 ```jsx

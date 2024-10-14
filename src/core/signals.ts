@@ -246,20 +246,17 @@ const _unfold = (hook: NotifyHook): NotifyHook => {
 };
 
 const _observer = (hook: NotifyHook) => {
-	const signals = new Set<Set<NotifyHook>>();
-
-	const unsub = (hooks: Set<NotifyHook>): void => {
-		signals.delete(hooks);
-		hooks.delete(hook);
-	};
-
+	const signals: Set<NotifyHook>[] = [];
 	const sub = (hooks: Set<NotifyHook>): void => {
-		signals.add(hooks);
+		signals.push(hooks);
 		hooks.add(hook);
 	};
-
-	const clear = () => signals.forEach(unsub);
-
+	const clear = () => {
+		for (let i = 0; i < signals.length; i++) {
+			signals[i].delete(hook);
+		}
+		signals.length = 0;
+	};
 	return { clear, sub };
 };
 

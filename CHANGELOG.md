@@ -1,5 +1,8 @@
 # Changelog
 
+## 15.1
++ Add new `trigger` API.
+
 ## 15.0
 + **Breaking:** Remove all shared globals & utilities. This also breaks interoperability with other major versions.
 + **Breaking:** Removed `lazy` and `trigger`.

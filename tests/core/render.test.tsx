@@ -71,6 +71,72 @@ await test("render", async ctx => {
 		strictEqual(view.first, view.last);
 	});
 
+	await ctx.test("empty document fragment in array with view", () => {
+		const events: unknown[] = [];
+		const inner = testView();
+		const view = uncapture(() => {
+			return render([
+				document.createDocumentFragment(),
+				inner.view,
+				document.createDocumentFragment(),
+			]);
+		});
+		strictEqual(text(view.first), "f");
+		strictEqual(text(view.last), "l");
+		uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
+		assertEvents(events, []);
+
+		inner.nextFirst();
+		assertEvents(events, ["f0l"]);
+		inner.nextLast();
+		assertEvents(events, ["f0l1"]);
+	});
+
+	await ctx.test("empty document fragments in array with view", () => {
+		const events: unknown[] = [];
+		const inner = testView();
+		const view = uncapture(() => {
+			return render([
+				document.createDocumentFragment(),
+				document.createDocumentFragment(),
+				inner.view,
+				document.createDocumentFragment(),
+				document.createDocumentFragment(),
+			]);
+		});
+		strictEqual(text(view.first), "f");
+		strictEqual(text(view.last), "l");
+		uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
+		assertEvents(events, []);
+
+		inner.nextFirst();
+		assertEvents(events, ["f0l"]);
+		inner.nextLast();
+		assertEvents(events, ["f0l1"]);
+	});
+
+	await ctx.test("non empty document fragments in array with view", () => {
+		const events: unknown[] = [];
+		const inner = testView();
+		const view = uncapture(() => {
+			return render([
+				document.createDocumentFragment(),
+				render([1, "2"]),
+				document.createDocumentFragment(),
+				inner.view,
+				document.createDocumentFragment(),
+				render([3, "4"]),
+				document.createDocumentFragment(),
+			]);
+		});
+		strictEqual(text(view.first), "1");
+		strictEqual(text(view.last), "4");
+		uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
+		inner.nextFirst();
+		inner.nextLast();
+		assertEvents(events, []);
+	});
+
 	await ctx.test("node", () => {
 		for (const node of [
 			document.createElement("div"),

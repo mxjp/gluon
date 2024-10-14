@@ -71,7 +71,9 @@ export function render(content: unknown): View {
 	}
 	return new View(setBoundary => {
 		if (Array.isArray(content)) {
-			const flat = content.flat(Infinity) as unknown[];
+			const flat = content.flat(Infinity).filter(part => {
+				return !(part instanceof Node) || part.nodeName !== "#document-fragment" || part.childNodes.length > 0;
+			}) as unknown[];
 			if (flat.length > 1) {
 				const parent = createParent();
 				for (let i = 0; i < flat.length; i++) {

@@ -17,6 +17,8 @@ By default, `Arrays`, `Maps`, `Sets` and `Objects` without any or with the `Obje
 ## Updates
 To update a reactive object, you can directly modify the wrapper.
 ```jsx
+import { wrap } from "@mxjp/gluon/store";
+
 const todos = wrap([
 	{ name: "Foo", done: false },
 	{ name: "Bar", done: false },
@@ -38,7 +40,7 @@ batch(() => {
 ## Classes
 By default, arbitrary class instances are not reactive unless you specify, how to wrap them:
 ```jsx
-import { wrapInstancesOf } from "@mxjp/gluon";
+import { wrapInstancesOf } from "@mxjp/gluon/store";
 
 class Example {
 	static {
@@ -56,6 +58,8 @@ class Example {
 ### Private Fields
 Private fields are not reactive. Also, you need to ensure they are accessed through the original object instead of reactive wrappers by using `unwrap`.
 ```jsx
+import { wrapInstancesOf, wrap, unwrap } from "@mxjp/gluon/store";
+
 class Example {
 	static {
 		wrapInstancesOf(this);

@@ -21,7 +21,7 @@ Interpolation in attribute values is safe to use as long as the same is true for
 image.setAttribute("alt", String(untrusted));
 ```
 
-## Some Common Mistakes
+## Common Mistakes
 The examples below show some common mistakes and how they could be exploited.
 ```jsx
 // Setting "innerHTML" to untrusted input:

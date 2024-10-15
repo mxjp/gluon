@@ -1,6 +1,8 @@
 import type { ReadonlyContext } from "./context.js";
+import type { ClassValue, StyleValue } from "./element-common.js";
 import type { TeardownHook } from "./lifecycle.js";
-import { Expression, watch } from "./signals.js";
+import { Expression, get, watch } from "./signals.js";
+import { View } from "./view.js";
 
 /**
  * The next suffix for generating unique ids in the current thread.
@@ -75,6 +77,90 @@ export function createText(expr: Expression<unknown>): Text {
 	const text = document.createTextNode("");
 	watch(expr, value => text.textContent = (value ?? "") as string);
 	return text;
+}
+
+/**
+ * Append content to a node.
+ *
+ * @param node The node.
+ * @param content The content to append.
+ */
+export function appendContent(node: Node, content: unknown): void {
+	if (content === null || content === undefined) {
+		return;
+	}
+	if (Array.isArray(content)) {
+		for (let i = 0; i < content.length; i++) {
+			appendContent(node, content[i]);
+		}
+	} else if (content instanceof Node) {
+		node.appendChild(content);
+	} else if (content instanceof View) {
+		node.appendChild(content.take());
+	} else {
+		node.appendChild(createText(content));
+	}
+}
+
+export function setAttr(elem: Element, name: string, value: Expression<unknown>): void {
+	watch(value, value => {
+		if (value === null || value === undefined || value === false) {
+			elem.removeAttribute(name);
+		} else {
+			elem.setAttribute(name, value === true ? "" : value as string);
+		}
+	});
+}
+
+export function getClassTokens(value: ClassValue): string {
+	value = get(value);
+	if (typeof value === "string") {
+		return value;
+	} else if (value) {
+		let tokens = "";
+		if (Array.isArray(value)) {
+			for (let i = 0; i < value.length; i++) {
+				tokens += getClassTokens(value[i]) + " ";
+			}
+		} else {
+			for (const key in value) {
+				if (get(value[key])) {
+					tokens += key + " ";
+				}
+			}
+		}
+		return tokens;
+	}
+	return "";
+}
+
+type StyleHandler = (name: string, value: unknown) => void;
+
+export function watchStyle(value: StyleValue, handler: StyleHandler): void {
+	watch(value, value => {
+		if (Array.isArray(value)) {
+			const overwrites: string[][] = [];
+			for (let i = value.length - 1; i >= 0; i--) {
+				const self: string[] = [];
+				overwrites[i] = self;
+				watchStyle(value[i], (name, value) => {
+					if (!self.includes(name)) {
+						self.push(name);
+					}
+					for (let o = i + 1; o < overwrites.length; o++) {
+						if (overwrites[o].includes(name)) {
+							return;
+						}
+					}
+					handler(name, value);
+				});
+			}
+		} else if (value) {
+			for (const name in value) {
+				watch(value[name]!, value => handler(name, value));
+			}
+		}
+	});
 }
 
 export const NOOP = (): void => {};

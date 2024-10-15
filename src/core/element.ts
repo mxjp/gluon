@@ -1,85 +1,11 @@
-import { ContextKey, extract, wrapContext } from "./context.js";
-import { createText, TagNameMap } from "./internals.js";
-import { Expression, get, Signal, watch } from "./signals.js";
+import { extract, wrapContext } from "./context.js";
+import { ClassValue, EventArgs, EventListener, HTML, StyleValue, XMLNS } from "./element-common.js";
+import { appendContent, getClassTokens, setAttr, TagNameMap, watchStyle } from "./internals.js";
+import { Expression, Signal, watch } from "./signals.js";
 import { View } from "./view.js";
-
-/**
- * Namespace URI for HTML elements.
- */
-export const HTML = "http://www.w3.org/1999/xhtml";
-
-/**
- * Namespace URI for SVG elements.
- */
-export const SVG = "http://www.w3.org/2000/svg";
-
-/**
- * Namespace URI for MathML elements.
- */
-export const MATHML = "http://www.w3.org/1998/Math/MathML";
-
-export type XMLNS = typeof HTML | typeof SVG | typeof MATHML;
-
-/**
- * Key for setting the namespace URI for newly created elements.
- *
- * @example
- * ```tsx
- * import { XMLNS, SVG, Inject } from "@mxjp/gluon";
- *
- * <Inject key={XMLNS} value={SVG}>
- *   {() => <svg>...</svg>}
- * </Inject>
- * ```
- */
-export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<XMLNS>;
-
-/**
- * Append content to a node.
- *
- * @param node The node.
- * @param content The content to append.
- */
-function appendContent(node: Node, content: unknown): void {
-	if (content === null || content === undefined) {
-		return;
-	}
-	if (Array.isArray(content)) {
-		for (let i = 0; i < content.length; i++) {
-			appendContent(node, content[i]);
-		}
-	} else if (content instanceof Node) {
-		node.appendChild(content);
-	} else if (content instanceof View) {
-		node.appendChild(content.take());
-	} else {
-		node.appendChild(createText(content));
-	}
-}
-
-export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean | undefined>> | ClassValue[]>;
-
-type HyphenCase<T> = T extends `${infer A}${infer B}`
-	? `${A extends Capitalize<A> ? "-" : ""}${Lowercase<A>}${HyphenCase<B>}`
-	: T;
-
-export type StyleMap = {
-	[K in keyof CSSStyleDeclaration as HyphenCase<K>]?: Expression<undefined | null | string>;
-} & {
-	[K in string]?: Expression<undefined | null | string>;
-};
-
-export type StyleValue = Expression<undefined | StyleMap | StyleValue[]>;
 
 export type RefFn<T> = (element: T) => void;
 export type RefValue<T> = (RefFn<T>) | RefFn<T>[];
-
-export type EventListener<K extends keyof HTMLElementEventMap> = (event: HTMLElementEventMap[K]) => void;
-
-export type EventArgs<K extends keyof HTMLElementEventMap> = [
-	listener: EventListener<K>,
-	options?: AddEventListenerOptions,
-];
 
 /**
  * Represents an object with element attributes.
@@ -97,65 +23,6 @@ export type Attributes<T extends Element> = {
 } & {
 	[K in string]?: Expression<unknown>;
 };
-
-function setAttr(elem: Element, name: string, value: unknown): void {
-	if (value === null || value === undefined || value === false) {
-		elem.removeAttribute(name);
-	} else {
-		elem.setAttribute(name, value === true ? "" : value as string);
-	}
-}
-
-function getClassTokens(value: ClassValue): string {
-	value = get(value);
-	if (typeof value === "string") {
-		return value;
-	} else if (value) {
-		let tokens = "";
-		if (Array.isArray(value)) {
-			for (let i = 0; i < value.length; i++) {
-				tokens += getClassTokens(value[i]) + " ";
-			}
-		} else {
-			for (const key in value) {
-				if (get(value[key])) {
-					tokens += key + " ";
-				}
-			}
-		}
-		return tokens;
-	}
-	return "";
-}
-
-type StyleHandler = (name: string, value: unknown) => void;
-
-function watchStyle(value: StyleValue, handler: StyleHandler) {
-	watch(value, value => {
-		if (Array.isArray(value)) {
-			const overwrites: string[][] = [];
-			for (let i = value.length - 1; i >= 0; i--) {
-				const self: string[] = [];
-				overwrites[i] = self;
-				watchStyle(value[i], (name, value) => {
-					if (!self.includes(name)) {
-						self.push(name);
-					}
-					for (let o = i + 1; o < overwrites.length; o++) {
-						if (overwrites[o].includes(name)) {
-							return;
-						}
-					}
-					handler(name, value);
-				});
-			}
-		} else if (value) {
-			for (const name in value) {
-				watch(value[name]!, value => handler(name, value));
-			}
-		}
-	});
-}
 
 /**
  * Create an element.
@@ -187,7 +54,7 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
 				watch(value, value => (elem as any)[prop] = value);
 			} else if (name.startsWith("attr:")) {
 				const attr = name.slice(5);
-				watch(value, value => setAttr(elem, attr, value));
+				setAttr(elem, attr, value);
 			} else if (name === "ref") {
 				if (Array.isArray(value)) {
 					value.forEach(v => (v as RefFn<Element>)(elem));
@@ -200,7 +67,7 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
 			} else if (name === "class") {
 				watch(() => getClassTokens(value as ClassValue), tokens => elem.setAttribute("class", tokens));
 			} else {
-				watch(value, value => setAttr(elem, name, value));
+				setAttr(elem, name, value);
 			}
 		}
 	}

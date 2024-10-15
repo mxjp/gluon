@@ -1,3 +1,4 @@
+import { NODE, NodeTarget } from "./element-common.js";
 import { createParent, createPlaceholder, createText } from "./internals.js";
 import { teardown } from "./lifecycle.js";
 import { View, ViewSetBoundaryFn } from "./view.js";
@@ -75,10 +76,13 @@ export function render(content: unknown): View {
 			if (flat.length > 1) {
 				const parent = createParent();
 				for (let i = 0; i < flat.length; i++) {
-					const part = flat[i];
+					let part = flat[i];
 					if (part === null || part === undefined) {
 						parent.appendChild(createPlaceholder());
 					} else if (typeof part === "object") {
+						if (NODE in part) {
+							part = (part as NodeTarget)[NODE];
+						}
 						if (part instanceof Node) {
 							if (part.nodeName === "#document-fragment" && part.childNodes.length === 0) {
 								parent.appendChild(createPlaceholder());
@@ -106,15 +110,23 @@ export function render(content: unknown): View {
 		}
 		if (content === null || content === undefined) {
 			empty(setBoundary);
-		} else if (content instanceof Node) {
-			if (content.nodeName === "#document-fragment") {
-				use(setBoundary, content);
-			} else {
-				setBoundary(content, content);
+		} else if (typeof content === "object") {
+			if (NODE in content) {
+				content = (content as NodeTarget)[NODE];
 			}
-		} else if (content instanceof View) {
-			setBoundary(content.first, content.last);
-			content.setBoundaryOwner(setBoundary);
+			if (content instanceof Node) {
+				if (content.nodeName === "#document-fragment") {
+					use(setBoundary, content);
+				} else {
+					setBoundary(content, content);
+				}
+			} else if (content instanceof View) {
+				setBoundary(content.first, content.last);
+				content.setBoundaryOwner(setBoundary);
+			} else {
+				const text = createText(content);
+				setBoundary(text, text);
+			}
 		} else {
 			const text = createText(content);
 			setBoundary(text, text);

@@ -1,7 +1,7 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { render, sig, uncapture, View, viewNodes } from "@mxjp/gluon";
+import { NODE, render, sig, uncapture, View, viewNodes } from "@mxjp/gluon";
 
 import { createText } from "../../dist/es/core/internals.js";
 import { assertEvents, boundaryEvents, testView, text } from "../common.js";
@@ -54,6 +54,21 @@ await test("render", async ctx => {
 		notStrictEqual(fragment, next);
 		strictEqual(a.parentNode, next);
 		strictEqual(b.parentNode, next);
+	});
+
+	await ctx.test("node target", () => {
+		const view = render({ [NODE]: document.createTextNode("test") });
+		strictEqual(view.first instanceof Text, true);
+		strictEqual(view.first, view.last);
+		strictEqual(text(view.take()), "test");
+	});
+
+	await ctx.test("node targets", () => {
+		const view = render([
+			{ [NODE]: document.createTextNode("a") },
+			{ [NODE]: document.createTextNode("b") },
+		]);
+		strictEqual(text(view.take()), "ab");
 	});
 
 	await ctx.test("empty document fragment", () => {

@@ -52,3 +52,15 @@ export type EventArgs<K extends keyof HTMLElementEventMap> = [
 	listener: EventListener<K>,
 	options?: AddEventListenerOptions,
 ];
+
+/**
+ * **This is experimental API.**
+ */
+export const NODE = Symbol.for("gluon:node");
+
+/**
+ * **This is experimental API.**
+ */
+export interface NodeTarget {
+	[NODE]: Node;
+}

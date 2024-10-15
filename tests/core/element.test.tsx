@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { createElement, e, extract, inject, Show, sig, StyleMap, uncapture } from "@mxjp/gluon";
+import { createElement, e, extract, inject, NODE, Show, sig, StyleMap, uncapture } from "@mxjp/gluon";
 
 import { assertEvents } from "../common.js";
 
@@ -196,6 +196,13 @@ await test("element", async ctx => {
 			strictEqual(<></>, undefined);
 			strictEqual(<>test</>, "test");
 			deepStrictEqual(<>{1}{2}</>, [1, 2]);
+		});
+
+		await ctx.test("node target", () => {
+			const elem = <div>
+				{{ [NODE]: document.createTextNode("test") }}
+			</div> as HTMLElement;
+			strictEqual(elem.outerHTML, "<div>test</div>");
 		});
 
 		await ctx.test("nesting", () => {

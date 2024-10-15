@@ -1,5 +1,5 @@
 import type { ReadonlyContext } from "./context.js";
-import type { ClassValue, StyleValue } from "./element-common.js";
+import { type ClassValue, NODE, NodeTarget, type StyleValue } from "./element-common.js";
 import type { TeardownHook } from "./lifecycle.js";
 import { Expression, get, watch } from "./signals.js";
 import { View } from "./view.js";
@@ -97,6 +97,8 @@ export function appendContent(node: Node, content: unknown): void {
 		node.appendChild(content);
 	} else if (content instanceof View) {
 		node.appendChild(content.take());
+	} else if (typeof content === "object" && NODE in content) {
+		node.appendChild((content as NodeTarget)[NODE]);
 	} else {
 		node.appendChild(createText(content));
 	}

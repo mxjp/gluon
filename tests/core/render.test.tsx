@@ -68,7 +68,7 @@ await test("render", async ctx => {
 			document.createDocumentFragment(),
 		]);
 		strictEqual(view.first instanceof Comment, true);
-		strictEqual(view.first, view.last);
+		strictEqual(view.last instanceof Comment, true);
 	});
 
 	await ctx.test("empty document fragment in array with view", () => {
@@ -81,15 +81,11 @@ await test("render", async ctx => {
 				document.createDocumentFragment(),
 			]);
 		});
-		strictEqual(text(view.first), "f");
-		strictEqual(text(view.last), "l");
+		strictEqual(text(view.take()), "fl");
 		uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
-		assertEvents(events, []);
-
 		inner.nextFirst();
-		assertEvents(events, ["f0l"]);
 		inner.nextLast();
-		assertEvents(events, ["f0l1"]);
+		assertEvents(events, []);
 	});
 
 	await ctx.test("empty document fragments in array with view", () => {
@@ -104,15 +100,13 @@ await test("render", async ctx => {
 				document.createDocumentFragment(),
 			]);
 		});
-		strictEqual(text(view.first), "f");
-		strictEqual(text(view.last), "l");
+		strictEqual(text(view.take()), "fl");
 		uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
-		assertEvents(events, []);
-
+		strictEqual(view.first instanceof Comment, true);
+		strictEqual(view.last instanceof Comment, true);
 		inner.nextFirst();
-		assertEvents(events, ["f0l"]);
 		inner.nextLast();
-		assertEvents(events, ["f0l1"]);
+		assertEvents(events, []);
 	});
 
 	await ctx.test("non empty document fragments in array with view", () => {
@@ -129,8 +123,7 @@ await test("render", async ctx => {
 				document.createDocumentFragment(),
 			]);
 		});
-		strictEqual(text(view.first), "1");
-		strictEqual(text(view.last), "4");
+		strictEqual(text(view.take()), "12fl34");
 		uncapture(() => view.setBoundaryOwner(boundaryEvents(events)));
 		inner.nextFirst();
 		inner.nextLast();
@@ -194,21 +187,21 @@ await test("render", async ctx => {
 
 			{
 				const nodes = Array.from(viewNodes(view));
-				strictEqual(nodes.length, 5);
+				strictEqual(nodes.length, 7);
 				strictEqual(text(nodes[0]), "foo");
-				strictEqual(text(nodes[1]), "f");
-				strictEqual(text(nodes[2]), "l");
-				strictEqual(text(nodes[3]), "bar");
-				strictEqual(nodes[4], fragmentChild);
+				strictEqual(text(nodes[2]), "f");
+				strictEqual(text(nodes[3]), "l");
+				strictEqual(text(nodes[4]), "bar");
+				strictEqual(nodes[5], fragmentChild);
 			}
 
 			{
 				inner.nextFirst();
 				inner.nextLast();
 				const nodes = Array.from(viewNodes(view));
-				strictEqual(nodes.length, 5);
-				strictEqual(text(nodes[1]), "f0");
-				strictEqual(text(nodes[2]), "l1");
+				strictEqual(nodes.length, 7);
+				strictEqual(text(nodes[2]), "f0");
+				strictEqual(text(nodes[3]), "l1");
 			}
 		});
 

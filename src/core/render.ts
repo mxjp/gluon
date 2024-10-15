@@ -71,25 +71,41 @@ export function render(content: unknown): View {
 	}
 	return new View(setBoundary => {
 		if (Array.isArray(content)) {
-			const flat = content.flat(Infinity).filter(part => {
-				return !(part instanceof Node) || part.nodeName !== "#document-fragment" || part.childNodes.length > 0;
-			}) as unknown[];
+			const flat = content.flat(Infinity) as unknown[];
 			if (flat.length > 1) {
 				const parent = createParent();
-				for (let i = 0; i < flat.length; i++) {
+				let firstNode = 0;
+				let lastNode = flat.length - 1;
+				let firstView: number | undefined = undefined;
+				let lastView: number | undefined = undefined;
+				parts: for (let i = 0; i < flat.length; i++) {
 					const part = flat[i];
 					if (part instanceof Node) {
+						if (part.nodeName === "#document-fragment" && part.childNodes.length === 0) {
+							if (firstNode === i) {
+								firstNode++;
+							}
+							continue parts;
+						}
 						parent.appendChild(part);
 					} else if (part instanceof View) {
 						parent.appendChild(part.take());
-						if (i === 0) {
-							part.setBoundaryOwner((first, _) => setBoundary(first, undefined));
-						} else if (i === flat.length - 1) {
-							part.setBoundaryOwner((_, last) => setBoundary(undefined, last));
-						}
+						firstView ??= i;
+						lastView = i;
 					} else if (part !== null && part !== undefined) {
 						parent.appendChild(createText(part));
 					}
+					lastNode = i;
+				}
+				if (firstNode === firstView) {
+					if (firstNode === lastNode) {
+						(flat[firstView] as View).setBoundaryOwner(setBoundary);
+					} else {
+						(flat[firstView] as View).setBoundaryOwner((first, _) => setBoundary(first, undefined));
+					}
+				}
+				if (lastNode === lastView && firstNode !== lastNode) {
+					(flat[lastView] as View).setBoundaryOwner((_, last) => setBoundary(undefined, last));
 				}
 				use(setBoundary, parent);
 				return;

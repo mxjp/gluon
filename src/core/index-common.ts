@@ -1,6 +1,5 @@
 export * from "./context.js";
 export * from "./element-common.js";
-export * from "./element-create.js";
 export * from "./events.js";
 export * from "./ids.js";
 export * from "./lifecycle.js";

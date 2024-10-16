@@ -20,12 +20,12 @@
 	"license": "MIT",
 	"version": "15.1.3",
 	"type": "module",
-	"main": "./dist/es/core/index.js",
+	"main": "./dist/es/core/index-jsx.js",
 	"sideEffects": false,
 	"exports": {
 		".": {
-			"types": "./dist/es/core/index.d.ts",
-			"default": "./dist/es/core/index.js"
+			"types": "./dist/es/core/index-jsx.d.ts",
+			"default": "./dist/es/core/index-jsx.js"
 		},
 		"./jsx": {
 			"types": "./dist/es/core/jsx/legacy.d.ts",
@@ -69,8 +69,8 @@
 		"build:es": "tsc -p tsconfig-es.json",
 		"build:types": "tsc -p tsconfig-types.json",
 		"build:tests": "tsc -p tests/tsconfig.json",
-		"build:bundle:core": "node scripts/bundle.js -m core/index-bundle -o dist/gluon",
-		"build:bundle:all": "node scripts/bundle.js -m async core element router store test -o dist/gluon.all",
+		"build:bundle:core": "node scripts/bundle.js -m core/index-builder -o dist/gluon",
+		"build:bundle:all": "node scripts/bundle.js -m async core/index-all element router store test -o dist/gluon.all",
 		"start": "concurrently npm:start:*",
 		"start:es": "tsc -p tsconfig-es.json -w --preserveWatchOutput",
 		"start:types": "tsc -p tsconfig-types.json -w --preserveWatchOutput",

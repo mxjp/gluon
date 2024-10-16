@@ -1,6 +1,6 @@
 import { extract, wrapContext } from "./context.js";
 import { ClassValue, EventListener, HTML, StyleValue, XMLNS } from "./element-common.js";
-import { appendContent, getClassTokens, setAttr, TagNameMap, watchStyle } from "./internals.js";
+import { appendContent, setAttr, setClass, setStyle, TagNameMap } from "./internals.js";
 import { Expression, watch } from "./signals.js";
 
 export type RefFn<T> = (element: T) => void;
@@ -66,10 +66,9 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
 					(value as RefFn<Element>)(elem);
 				}
 			} else if (name === "style") {
-				const style = (elem as HTMLElement).style;
-				watchStyle(value as StyleValue, (name, value) => style.setProperty(name, value ? String(value) : null));
+				setStyle(elem, value as StyleValue);
 			} else if (name === "class") {
-				watch(() => getClassTokens(value as ClassValue), tokens => elem.setAttribute("class", tokens));
+				setClass(elem, value as ClassValue);
 			} else {
 				setAttr(elem, name, value);
 			}

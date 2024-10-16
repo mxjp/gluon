@@ -1,6 +1,6 @@
 import { extract, wrapContext } from "./context.js";
 import { ClassValue, EventListener, HTML, NODE, NodeTarget, StyleValue, XMLNS } from "./element-common.js";
-import { appendContent, getClassTokens, setAttr, TagNameMap, watchStyle } from "./internals.js";
+import { appendContent, setAttr, setClass, setStyle, TagNameMap } from "./internals.js";
 import { Expression, watch } from "./signals.js";
 
 export class ElementBuilder<E extends Element> implements NodeTarget {
@@ -22,13 +22,12 @@ export class ElementBuilder<E extends Element> implements NodeTarget {
 	}
 
 	style(value: StyleValue): Omit<this, "style"> {
-		const style = (this.elem as Element as HTMLElement).style;
-		watchStyle(value, (name, value) => style.setProperty(name, value ? String(value) : null));
+		setStyle(this.elem, value);
 		return this;
 	}
 
 	class(value: ClassValue): Omit<this, "class"> {
-		watch(() => getClassTokens(value), tokens => this.elem.setAttribute("class", tokens));
+		setClass(this.elem, value);
 		return this;
 	}
 

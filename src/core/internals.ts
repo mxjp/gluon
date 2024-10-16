@@ -114,7 +114,7 @@ export function setAttr(elem: Element, name: string, value: Expression<unknown>)
 	});
 }
 
-export function getClassTokens(value: ClassValue): string {
+function getClassTokens(value: ClassValue): string {
 	value = get(value);
 	if (typeof value === "string") {
 		return value;
@@ -136,9 +136,13 @@ export function getClassTokens(value: ClassValue): string {
 	return "";
 }
 
+export function setClass(elem: Element, value: ClassValue): void {
+	watch(() => getClassTokens(value), tokens => elem.setAttribute("class", tokens));
+}
+
 type StyleHandler = (name: string, value: unknown) => void;
 
-export function watchStyle(value: StyleValue, handler: StyleHandler): void {
+function watchStyle(value: StyleValue, handler: StyleHandler): void {
 	watch(value, value => {
 		if (Array.isArray(value)) {
 			const overwrites: string[][] = [];
@@ -163,6 +167,11 @@ export function watchStyle(value: StyleValue, handler: StyleHandler): void {
 			}
 		}
 	});
+}
+
+export function setStyle(elem: Element, value: StyleValue): void {
+	const style = (elem as HTMLElement).style;
+	watchStyle(value, (name, value) => style.setProperty(name, value ? String(value) : null));
 }
 
 export const NOOP = (): void => {};

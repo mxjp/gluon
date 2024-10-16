@@ -1,11 +1,21 @@
 # Installation
+
+## Buildless Options
+Gluon can be used without any build system by directly using one of the es module bundles listed below. Note, that these bundles don't include any JSX related code.
+
+| Modules | Human Readable | Minified | Types |
+|-|-|-|-|
+| Core + Builder API | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
+| All | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
+
+## Npm Package
 Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon).
 ```bash
 npm i @mxjp/gluon
 ```
 
 ## JSX
-Gluon provides a react 17 JSX runtime and a legacy runtime in case your build tool dosn't support the new runtime.
+Gluon provides a react 17 and a legacy JSX runtime.
 
 ### TypeScript
 To use JSX with typescript, add the following options to your tsconfig:
@@ -70,14 +80,6 @@ To use the legacy runtime, you can manually import the `jsx` factory and the `Fr
 ```js
 import { jsx, Fragment } from "@mxjp/gluon/jsx";
 ```
-
-## Buildless Options
-You can also use gluon without any build system by directly using one of the es module bundles listed below. Note, that these bundles don't include any JSX related code and components.
-
-| Modules | Human Readable | Minified | Types |
-|-|-|-|-|
-| Core Only | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
-| All | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
 
 ### Custom Bundles
 If the bundles above don't fit your needs, you can build a custom bundle that only includes the modules you need:

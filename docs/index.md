@@ -23,22 +23,22 @@ mount(
 ## Concept
 
 ### Low Level
-JSX expressions in gluon directly create real DOM elements which is relatively fast and has a low memory footprint compared to virtual DOMs. For rendering conditional or repeated nodes, gluon uses so called Views which are just sequences of nodes that can change themselves over time.
+In gluon, you directly create real DOM elements which is relatively fast and has a low memory footprint compared to virtual DOMs. For rendering conditional or repeated nodes, gluon uses so called Views which are just sequences of nodes that can change themselves over time.
 
 ### Composability
 Everything in gluon is composable without any restrictions. You can define reactive state anywhere you like and use it anywhere else, dynamically define and pass around components, etc.
 
-### Bundle Size
-The entire gluon core module has a size of less than [5KB gzipped](https://bundlephobia.com/package/@mxjp/gluon) and almost everything in gluon is tree-shakeable, so you only pay for what you need.
+### No/Minimal Build System
+Gluon doesn't require a build system. You can choose between an element builder API, any standard JSX transpiler or both if you need to.
 
-### Build Setup
-Gluon only requires a standard JSX transpiler and therefore works with all modern bundlers and build systems. There also is a human readable pre-bundled version for use in environments where no build system can be used.
+### Bundle Size
+The entire gluon core module has a size of [~4KB gzipped](https://bundlephobia.com/package/@mxjp/gluon) and almost everything in gluon is tree-shakeable, so you only pay for what you need.
 
 ### Strongly Typed Reactivity
 When using gluon with TypeScript, the fact which component properties may be reactive is [encoded in the type system](./reference/components.md#expressions). This allows developers to know what to expect of a component and eliminates weird caveats when accessing properties from a component's props argument.
 
 ### Immediate Updates
-Signal updates are processed immediately. This results in more predictable behavior and makes your application easy to test. If needed, you can still use batching to process multiple updates in one instant.
+Signal updates are always processed immediately. This ensures that your application state stays consistent & predictable at any time.
 
 ## Features
 Gluon supports all the client side features you would expect from a modern framework including:

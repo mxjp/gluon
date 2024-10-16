@@ -47,6 +47,12 @@ export class ElementBuilder<E extends Element> implements NodeTarget {
 	}
 }
 
+/**
+ * Create a new element builder.
+ *
+ * @param tagName The tag name.
+ * @returns The builder.
+ */
 export function e<K extends keyof TagNameMap>(tagName: K): ElementBuilder<TagNameMap[K]>;
 export function e<E extends Element>(tagName: string): ElementBuilder<E>;
 export function e(tagName: string): ElementBuilder<Element> {

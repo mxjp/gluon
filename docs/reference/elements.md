@@ -1,33 +1,21 @@
 # Elements
-To create an element, you can either use JSX element expressions:
+To create an element, you can use JSX element expressions:
 ```jsx
 <div />
 <div class="example" />
 <div class="example">Hello World!</div>
 ```
 
-To create an element from a dynamic tag name, use the `createElement` function or JSX expressions:
+or the element builder API without any build system:
 ```jsx
-import { createElement } from "@mxjp/gluon";
+// From the npm package:
+import { e } from "@mxjp/gluon/builder";
+// Or:
+import { e } from "./gluon.min.js";
 
-createElement("div", {}, undefined);
-createElement("div", { class: "example" }, undefined);
-createElement("div", { class: "example" }, "Hello World!");
-
-const TagName = "div";
-<TagName />
-<TagName class="example" />
-<TagName class="example">Hello World!</TagName>
-```
-
-In environments where no JSX transpiler is available, you can use the `e` shorthand which is the same as `createElement` but with optional attributes or content:
-```jsx
-import { e } from "@mxjp/gluon";
-
-e("div");
-e("div", { class: "example" });
-e("div", { class: "example" }, "Hello World!");
-e("div", "Hello World!");
+e("div")
+	.class("example")
+	.append("Hello World!")
 ```
 
 ## Attributes
@@ -36,10 +24,11 @@ Attributes are set using `setAttribute` or `removeAttribute` by default.
 + Attributes set to `null`, `undefined` or `false` are removed.
 + Attributes set to `true` are set as an empty string.
 + All other values are set as strings.
-+ Attributes prefixed with `prop:` are always set using the respective JavaScript properties.
-+ Attributes prefixed with `attr:` are always set using the default behavior.
-+ Attributes prefixed with `on:` are added as regular event listeners. An array can be used to pass the event listener with additional options.
-+ The [`class`](#classes) and [`style`](#styles) attributes are special cases described below.
++ When using JSX:
+	+ Attributes prefixed with `prop:` are always set using the respective JavaScript properties.
+	+ Attributes prefixed with `attr:` are always set using the default behavior.
+	+ Attributes prefixed with `on:` are added as regular event listeners. An array can be used to pass the event listener with additional options.
+	+ The [`class`](#classes) and [`style`](#styles) attributes are special cases described below.
 
 ```jsx
 // Using setAttribute:

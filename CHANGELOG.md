@@ -1,5 +1,8 @@
 # Changelog
 
+## 16.0
++ **Breaking:** Replace `e` function with an element builder API.
+
 ## 15.1
 + Add new `trigger` API.
 

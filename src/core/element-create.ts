@@ -1,8 +1,7 @@
 import { extract, wrapContext } from "./context.js";
-import { ClassValue, EventArgs, EventListener, HTML, StyleValue, XMLNS } from "./element-common.js";
+import { ClassValue, EventListener, HTML, StyleValue, XMLNS } from "./element-common.js";
 import { appendContent, getClassTokens, setAttr, TagNameMap, watchStyle } from "./internals.js";
-import { Expression, Signal, watch } from "./signals.js";
-import { View } from "./view.js";
+import { Expression, watch } from "./signals.js";
 
 export type RefFn<T> = (element: T) => void;
 export type RefValue<T> = (RefFn<T>) | RefFn<T>[];
@@ -15,7 +14,7 @@ export type Attributes<T extends Element> = {
 	style?: StyleValue;
 	ref?: RefValue<T>;
 } & {
-	[K in keyof HTMLElementEventMap as `on:${K}`]?: EventListener<K> | EventArgs<K>;
+	[K in keyof HTMLElementEventMap as `on:${K}`]?: EventListener<HTMLElementEventMap[K]> | EventArgs<HTMLElementEventMap[K]>;
 } & {
 	[K in `prop:${string}`]?: Expression<unknown>;
 } & {
@@ -23,6 +22,11 @@ export type Attributes<T extends Element> = {
 } & {
 	[K in string]?: Expression<unknown>;
 };
+
+export type EventArgs<E extends Event> = [
+	listener: EventListener<E>,
+	options?: AddEventListenerOptions,
+];
 
 /**
  * Create an element.
@@ -40,13 +44,13 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
 		const value = attrs[name];
 		if (value !== undefined) {
 			if (name.startsWith("on:")) {
-				let listener: EventListener<keyof HTMLElementEventMap>;
+				let listener: EventListener<Event>;
 				let options: AddEventListenerOptions | undefined;
 				if (Array.isArray(value)) {
-					listener = (value as EventArgs<keyof HTMLElementEventMap>)[0];
-					options = (value as EventArgs<keyof HTMLElementEventMap>)[1];
+					listener = (value as EventArgs<Event>)[0];
+					options = (value as EventArgs<Event>)[1];
 				} else {
-					listener = value as EventListener<keyof HTMLElementEventMap>;
+					listener = value as EventListener<Event>;
 				}
 				elem.addEventListener(name.slice(3), wrapContext(listener), options);
 			} else if (name.startsWith("prop:")) {
@@ -73,41 +77,4 @@ export function createElement(tagName: string, attrs: Attributes<TagNameMap[keyo
 	}
 	appendContent(elem, content);
 	return elem;
-}
-
-/**
- * Shorthand for creating an element in places where JSX can't be used.
- *
- * @param tagName The tag name.
- * @param attrs Optional attributes to set.
- * @param content Content to append.
- * @returns The element.
- *
- * @example
- * ```ts
- * import { e } from "@mxjp/gluon";
- *
- * // Element with content only:
- * e("div", [
- *   // Element with attributes only:
- *   e("div", { class: "example" }),
- *   // Element with attributes and content:
- *   e("div", { class: "example" }, "Hello World!"),
- * ]);
- * ```
- *
- * Note, that in the rare case of creating an element without attributes and with content which may be an arbitrary object, you should wrap the content in an array to ensure it's not used as attributes.
- * ```ts
- * e("div", [contentOfUnknownType])
- * ```
- */
-export function e<K extends keyof TagNameMap>(tagName: K, content?: unknown): TagNameMap[K];
-export function e<K extends keyof TagNameMap>(tagName: K, attrs?: Attributes<TagNameMap[K]>, content?: unknown): TagNameMap[K];
-export function e<E extends Element>(tagName: string, content?: unknown): E;
-export function e<E extends Element>(tagName: string, attrs?: Attributes<E>, content?: unknown): E;
-export function e(tagName: string, attrs?: unknown, content?: unknown): Element {
-	if (attrs === null || typeof attrs !== "object" || attrs instanceof Signal || attrs instanceof View || Array.isArray(attrs)) {
-		return createElement(tagName, {}, attrs);
-	}
-	return createElement(tagName, attrs ?? {}, content ?? []);
 }

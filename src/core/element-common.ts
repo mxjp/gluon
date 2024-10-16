@@ -46,12 +46,7 @@ export type StyleMap = {
 
 export type StyleValue = Expression<undefined | StyleMap | StyleValue[]>;
 
-export type EventListener<K extends keyof HTMLElementEventMap> = (event: HTMLElementEventMap[K]) => void;
-
-export type EventArgs<K extends keyof HTMLElementEventMap> = [
-	listener: EventListener<K>,
-	options?: AddEventListenerOptions,
-];
+export type EventListener<E extends Event> = (event: E) => void;
 
 /**
  * **This is experimental API.**

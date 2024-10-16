@@ -1,4 +1,4 @@
-import { Attributes } from "../element.js";
+import { Attributes } from "../element-create.js";
 import { TagNameMap } from "../internals.js";
 
 type NativeElement = Element;

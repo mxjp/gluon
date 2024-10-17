@@ -8,6 +8,8 @@ Gluon can be used without any build system by directly using one of the es modul
 | Core + Builder API | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
 | All | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
 
+If none of these fit your needs, you can [create a custom bundle](#custom-bundles).
+
 ## Npm Package
 Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon).
 ```bash

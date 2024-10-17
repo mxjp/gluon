@@ -1,20 +1,42 @@
 # `<IndexFor>`
 Render [content](../elements.md#content) for each index in an iterable [expression](../signals.md#expressions).
-```jsx
-import { IndexFor } from "@mxjp/gluon";
 
-<IndexFor each={someIterable}>
-	{value => <li>{value}</li>}
-</IndexFor>
-```
+=== "JSX"
+	```jsx
+	import { IndexFor } from "@mxjp/gluon";
+
+	<IndexFor each={someIterable}>
+		{value => <li>{value}</li>}
+	</IndexFor>
+	```
+
+=== "No Build"
+	```jsx
+	import { IndexFor, e } from "./gluon.js";
+
+	IndexFor({
+		each: someIterable,
+		children: value => e("li").append(value),
+	})
+	```
 
 ## Index
 The index is passed as the second argument:
-```jsx
-<IndexFor each={someIterable}>
-	{(value, index) => <li>{() => index + 1}: {value}</li>}
-</IndexFor>
-```
+
+=== "JSX"
+	```jsx
+	<IndexFor each={someIterable}>
+		{(value, index) => <li>{index + 1}: {value}</li>}
+	</IndexFor>
+	```
+
+=== "No Build"
+	```jsx
+	IndexFor({
+		each: someIterable,
+		children: (value, index) => e("li").append(index + 1, ": ", value),
+	})
+	```
 
 ## Update Order
 For every update, this view runs a simple diffing algorithm between existing instances and new values at the same index.

@@ -45,28 +45,55 @@ Lifecycle hooks are automatically captured in:
 Gluon has no dedicated error handling while rendering. If something in the synchronous render tree fails, the entire tree will fail to render and lifecycle hooks are called as [specified above](#lifecycle-hooks).
 
 If you need some kind of error boundary, you can use a component like in the example below.
-```jsx
-import { isolate } from "@mxjp/gluon";
 
-function TryRender(props: {
-	children: () => unknown;
-	onError: (error: unknown) => unknown;
-}) {
-	try {
-		return isolate(props.children);
-	} catch (error) {
-		console.error(error);
-		return props.onError(error);
+=== "JSX"
+	```jsx
+	import { isolate } from "@mxjp/gluon";
+
+	function TryRender(props: {
+		onError: (error: unknown) => unknown;
+		children: () => unknown;
+	}) {
+		try {
+			return isolate(props.children);
+		} catch (error) {
+			console.error(error);
+			return props.onError(error);
+		}
 	}
-}
 
-<TryRender onError={error => "Something went wrong."}>
-	{() => <>
-		<SomethingDangerous />
-		Hello World!
-	</>}
-</TryRender>
-```
+	<TryRender onError={error => "Something went wrong."}>
+		{() => <>
+			<SomethingDangerous />
+			Hello World!
+		</>}
+	</TryRender>
+	```
+
+=== "No Build"
+	```jsx
+	import { isolate } from "./gluon.js";
+
+	function TryRender(props: {
+		onError: (error: unknown) => unknown;
+		children: () => unknown;
+	}) {
+		try {
+			return isolate(props.children);
+		} catch (error) {
+			console.error(error);
+			return props.onError(error);
+		}
+	}
+
+	TryRender({
+		onError: error => "Something went wrong.",
+		children: () => [
+			SomethingDangerous(),
+			"Hello World!",
+		]
+	})
+	```
 
 ## Error Codes
 To keep the runtime as small as possible, gluon uses the error codes below instead of error messages.

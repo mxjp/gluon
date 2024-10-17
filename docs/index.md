@@ -7,18 +7,33 @@ title: Overview
 # Gluon
 This is a signal based frontend framework.
 
-```jsx
-import { mount, sig } from "@mxjp/gluon";
+=== "JSX"
+	```jsx
+	import { mount, sig } from "@mxjp/gluon";
 
-const count = sig(0);
+	const count = sig(0);
 
-mount(
-	document.body,
-	<button on:click={() => { count.value++ }}>
-		Clicked {count} times
-	</button>
-);
-```
+	mount(
+		document.body,
+		<button on:click={() => { count.value++ }}>
+			Clicked {count} times
+		</button>
+	);
+	```
+
+=== "No Build"
+	```jsx
+	import { mount, sig, e } from "./gluon.js";
+
+	const count = sig(0);
+
+	mount(
+		document.body,
+		e("button").on("click", () => { count.value++ }).append(
+			"Clicked ", count, " times",
+		),
+	);
+	```
 
 ## Concept
 

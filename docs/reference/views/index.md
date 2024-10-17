@@ -14,18 +14,36 @@ Gluon provides the following components for common use cases:
 + [`movable`](movable.md) - Wrap content for safely moving it somewhere else.
 
 You can also directly create views from arbitrary [content](../elements.md#content) using the `render` and `mount` functions:
-```jsx
-import { render } from "@mxjp/gluon";
 
-const view = render(<>Hello World!</>);
+=== "JSX"
+	```jsx
+	import { render } from "@mxjp/gluon";
 
-```
+	const view = render(<>Hello World!</>);
+	```
+
+=== "No Build"
+	```jsx
+	import { render } from "./gluon.js";
+
+	const view = render("Hello World!");
+	```
+
 The `mount` function creates a view and appends it to an element until the current [lifecycle](../lifecycle.md) is disposed:
-```jsx
-import { mount } from "@mxjp/gluon";
 
-const view = mount(document.body, <>Hello World!</>);
-```
+=== "JSX"
+	```jsx
+	import { mount } from "@mxjp/gluon";
+
+	const view = mount(document.body, <>Hello World!</>);
+	```
+
+=== "No Build"
+	```jsx
+	import { mount } from "./gluon.js";
+
+	const view = mount(document.body, "Hello World!");
+	```
 
 ## View API
 As a consumer of the view API, you need to guarantee that:
@@ -67,73 +85,149 @@ When implementing your own view, you need to guarantee that:
 + When changing nodes, the view must remain in it's current position.
 
 A view is created using the `View` constructor. The example below creates a view that consists of a single text node:
-```jsx
-import { View } from "@mxjp/gluon";
 
-const view = new View((setBoundary, self) => {
-	// "self" is this view instance.
+=== "JSX"
+	```jsx
+	import { View } from "@mxjp/gluon";
 
-	const node = document.createTextNode("Hello World!");
+	const view = new View((setBoundary, self) => {
+		// "self" is this view instance.
 
-	// Set the initial first and last node:
-	// (This must be called at least once before this callback returns)
-	setBoundary(node, node);
-});
-```
+		const node = document.createTextNode("Hello World!");
 
-Most of the view implementations provided by gluon are returned from component functions like in the example below:
-```jsx
-function ExampleView(props: { message: string }) {
-	return new View((setBoundary, self) => {
-		const node = document.createTextNode(props.message);
+		// Set the initial first and last node:
+		// (This must be called at least once before this callback returns)
 		setBoundary(node, node);
 	});
-}
+	```
 
-<ExampleView message="Hello World!" />
-```
+=== "No Build"
+	```jsx
+	import { View } from "./gluon.js";
+
+	const view = new View((setBoundary, self) => {
+		// "self" is this view instance.
+
+		const node = document.createTextNode("Hello World!");
+
+		// Set the initial first and last node:
+		// (This must be called at least once before this callback returns)
+		setBoundary(node, node);
+	});
+	```
+
+Most of the view implementations provided by gluon are returned from component functions like in the example below:
+
+=== "JSX"
+	```jsx
+	function ExampleView(props: { message: string }) {
+		return new View((setBoundary, self) => {
+			const node = document.createTextNode(props.message);
+			setBoundary(node, node);
+		});
+	}
+
+	<ExampleView message="Hello World!" />
+	```
+
+=== "No Build"
+	```jsx
+	function ExampleView(props: { message: string }) {
+		return new View((setBoundary, self) => {
+			const node = document.createTextNode(props.message);
+			setBoundary(node, node);
+		});
+	}
+
+	ExampleView({ message: "Hello World!" })
+	```
 
 The example below appends an element every time an event is fired:
-```jsx
-import { View, Event, Emitter } from "@mxjp/gluon";
 
-function LogEvents(props: { messages: Event<[string]> }) {
-	return new View((setBoundary, self) => {
-		// Create a placeholder node:
-		// In this example, this will always be the last node of the view.
-		const placeholder = document.createComment("");
-		setBoundary(placeholder, placeholder);
+=== "JSX"
+	```jsx
+	import { View, Event, Emitter } from "@mxjp/gluon";
 
-		props.messages(message => {
-			// Ensure, that there is a parent node to append to:
-			let parent = self.parent;
-			if (!parent) {
-				parent = document.createDocumentFragment();
-				parent.appendChild(placeholder);
-			}
+	function LogEvents(props: { messages: Event<[string]> }) {
+		return new View((setBoundary, self) => {
+			// Create a placeholder node:
+			// In this example, this will always be the last node of the view.
+			const placeholder = document.createComment("");
+			setBoundary(placeholder, placeholder);
 
-			// Create & insert the new node before the placeholder:
-			const node = <li>{message}</li> as Node;
-			parent.insertBefore(node, placeholder);
+			props.messages(message => {
+				// Ensure, that there is a parent node to append to:
+				let parent = self.parent;
+				if (!parent) {
+					parent = document.createDocumentFragment();
+					parent.appendChild(placeholder);
+				}
 
-			// If this is the first message to append, update the boundary:
-			if (placeholder === self.first) {
-				setBoundary(node, undefined);
-				// After this, the view boundary will always consist
-				// of the first appended message and the placeholder.
-			}
+				// Create & insert the new node before the placeholder:
+				const node = <li>{message}</li> as Node;
+				parent.insertBefore(node, placeholder);
+
+				// If this is the first message to append, update the boundary:
+				if (placeholder === self.first) {
+					setBoundary(node, undefined);
+					// After this, the view boundary will always consist
+					// of the first appended message and the placeholder.
+				}
+			});
 		});
-	});
-}
+	}
 
-const messages = new Emitter<[string]>();
+	const messages = new Emitter<[string]>();
 
-<ul>
-	<LogEvents messages={messages.event} />
-</ul>
+	<ul>
+		<LogEvents messages={messages.event} />
+	</ul>
 
-messages.emit("Foo");
-messages.emit("Bar");
-```
+	messages.emit("Foo");
+	messages.emit("Bar");
+	```
+
+=== "No Build"
+	```jsx
+	import { View, Event, Emitter, e } from "./gluon.js";
+
+	function LogEvents(props) {
+		return new View((setBoundary, self) => {
+			// Create a placeholder node:
+			// In this example, this will always be the last node of the view.
+			const placeholder = document.createComment("");
+			setBoundary(placeholder, placeholder);
+
+			props.messages(message => {
+				// Ensure, that there is a parent node to append to:
+				let parent = self.parent;
+				if (!parent) {
+					parent = document.createDocumentFragment();
+					parent.appendChild(placeholder);
+				}
+
+				// Create & insert the new node before the placeholder:
+				const node = e("li").append(message).elem;
+				parent.insertBefore(node, placeholder);
+
+				// If this is the first message to append, update the boundary:
+				if (placeholder === self.first) {
+					setBoundary(node, undefined);
+					// After this, the view boundary will always consist
+					// of the first appended message and the placeholder.
+				}
+			});
+		});
+	}
+
+	const messages = new Emitter<[string]>();
+
+	e("ul").append(
+		LogEvents({ messages: messages.event })
+	)
+
+	messages.emit("Foo");
+	messages.emit("Bar");
+	```
 
 You can find more complex view implementation examples [in gluon's core view module](https://github.com/mxjp/gluon/blob/main/src/core/view.ts) and [this example](../../examples/custom-view.md).

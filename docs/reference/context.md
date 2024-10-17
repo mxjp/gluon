@@ -6,89 +6,179 @@ Contexts automatically work with synchronous code & all gluon APIs.
 + The `inject` function runs a callback and provides a single key value pair.
 + The `extract` function gets a value from the current context.
 
-```jsx
-import { inject, extract } from "@mxjp/gluon";
+=== "JSX"
+	```jsx
+	import { inject, extract } from "@mxjp/gluon";
 
-inject("message", "Hello World!", () => {
-	extract("message"); // "Hello World!"
-	extract("something else"); // undefined
-});
-```
+	inject("message", "Hello World!", () => {
+		extract("message"); // "Hello World!"
+		extract("something else"); // undefined
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { inject, extract } from "./gluon.js";
+
+	inject("message", "Hello World!", () => {
+		extract("message"); // "Hello World!"
+		extract("something else"); // undefined
+	});
+	```
 
 To inject multiple keys or to delete keys from a context, use `deriveContext`:
-```jsx
-import { deriveContext, extract } from "@mxjp/gluon";
 
-deriveContext(ctx => {
-	ctx.set("message", "Hello World!");
-	ctx.delete("something else");
+=== "JSX"
+	```jsx
+	import { deriveContext, extract } from "@mxjp/gluon";
 
-	extract("message"); // "Hello World!"
-});
-```
+	deriveContext(ctx => {
+		ctx.set("message", "Hello World!");
+		ctx.delete("something else");
+
+		extract("message"); // "Hello World!"
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { deriveContext, extract } from "./gluon.js";
+
+	deriveContext(ctx => {
+		ctx.set("message", "Hello World!");
+		ctx.delete("something else");
+
+		extract("message"); // "Hello World!"
+	});
+	```
 
 ## Components
-To use contexts while rendering, you can use the `<Inject>` and `<DeriveContext>` components:
-```jsx
-import { Inject, DeriveContext, extract } from "@mxjp/gluon";
+When rendering content, you can use the `<Inject>` and `<DeriveContext>` components with JSX or the functions specified above:
 
-<Inject key="value" value={42}>
-	{() => <>Value: {extract("value")}</>}
-</Inject>
+=== "JSX"
+	```jsx
+	import { Inject, DeriveContext, extract } from "@mxjp/gluon";
 
-<DeriveContext>
-	{ctx => {
+	<Inject key="value" value={42}>
+		{() => <>Value: {extract("value")}</>}
+	</Inject>
+
+	<DeriveContext>
+		{ctx => {
+			ctx.set("value", 42);
+			return <>Value: {extract("value")}</>;
+		}}
+	</DeriveContext>
+	```
+
+=== "No Build"
+	```jsx
+	import { inject, deriveContext, extract } from "./gluon.js";
+
+	inject("value", 42, () => {
+		return ["Value: ", extract("value")];
+	})
+
+	deriveContext(ctx => {
 		ctx.set("value", 42);
-		return <>Value: {extract("value")}</>;
-	}}
-</DeriveContext>
-```
+		return ["Value: ", extract("value")];
+	})
+	```
 
 ## Typed Keys
 Context values are typed as `unknown` by default.
 
 You can use symbols in combination with the `ContextKey` type as keys:
-```jsx
-import { ContextKey, inject, extract } from "@mxjp/gluon";
 
-const MESSAGE = Symbol("message") as ContextKey<string>;
+=== "JSX"
+	```jsx
+	import { ContextKey, inject, extract } from "@mxjp/gluon";
 
-inject(MESSAGE, "Hello World!", () => {
-	extract(MESSAGE); // Type: string | undefined
-});
+	const MESSAGE = Symbol("message") as ContextKey<string>;
 
-// This is now a compiler error:
-inject(MESSAGE, 42, () => { ... });
-```
+	inject(MESSAGE, "Hello World!", () => {
+		extract(MESSAGE); // Type: string | undefined
+	});
+
+	// This is now a compiler error:
+	inject(MESSAGE, 42, () => { ... });
+	```
+
+=== "No Build"
+	```jsx
+	import { inject, extract } from "./gluon.js";
+
+	/** @type {import("./gluon.js").ContextKey<string>} */
+	const MESSAGE = Symbol("message");
+
+	inject(MESSAGE, "Hello World!", () => {
+		extract(MESSAGE); // Type: string | undefined
+	});
+
+	// This would now be a compiler error when using ts-check:
+	inject(MESSAGE, 42, () => { ... });
+	```
 
 ## Async Code
 Since contexts rely on the synchronous call stack, they only work partially with async code:
-```jsx
-import { inject, extract } from "@mxjp/gluon";
 
-inject("message", "Hello World!", async () => {
-	extract("message"); // "Hello World!"
-	await something;
-	extract("message"); // undefined
-});
-```
+=== "JSX"
+	```jsx
+	import { inject, extract } from "@mxjp/gluon";
+
+	inject("message", "Hello World!", async () => {
+		extract("message"); // "Hello World!"
+		await something;
+		extract("message"); // undefined
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { inject, extract } from "./gluon.js";
+
+	inject("message", "Hello World!", async () => {
+		extract("message"); // "Hello World!"
+		await something;
+		extract("message"); // undefined
+	});
+	```
 
 You can manually pass contexts to somewhere else to fix this:
-```jsx
-import { inject, extract, getContext, runInContext } from "@mxjp/gluon";
 
-inject("message", "Hello World!", async () => {
-	// Get a reference to the current context:
-	const context = getContext();
+=== "JSX"
+	```jsx
+	import { inject, extract, getContext, runInContext } from "@mxjp/gluon";
 
-	await something;
+	inject("message", "Hello World!", async () => {
+		// Get a reference to the current context:
+		const context = getContext();
 
-	// Run a function within the context from above:
-	runInContext(context, () => {
-		extract("message"); // "Hello World!"
+		await something;
+
+		// Run a function within the context from above:
+		runInContext(context, () => {
+			extract("message"); // "Hello World!"
+		});
 	});
-});
-```
+	```
+
+=== "No Build"
+	```jsx
+	import { inject, extract, getContext, runInContext } from "./gluon.js";
+
+	inject("message", "Hello World!", async () => {
+		// Get a reference to the current context:
+		const context = getContext();
+
+		await something;
+
+		// Run a function within the context from above:
+		runInContext(context, () => {
+			extract("message"); // "Hello World!"
+		});
+	});
+	```
 
 ## Troubleshooting
 

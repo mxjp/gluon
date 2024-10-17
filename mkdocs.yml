@@ -8,6 +8,7 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - toc.integrate
+    - content.tabs.link
   palette:
     scheme: slate
     primary: black
@@ -23,5 +24,10 @@ markdown_extensions:
   - pymdownx.highlight:
       use_pygments: true
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
 
 repo_url: https://github.com/mxjp/gluon

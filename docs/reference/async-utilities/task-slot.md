@@ -4,22 +4,41 @@ This is a queue for sequentially running async tasks that can be triggered by bo
 + **Blocking** tasks are queued normally and are guaranteed to run.
 + **Side effects** are queued, but aborted when anything else is queued.
 
-```jsx
-import { TaskSlot } from "@mxjp/gluon/async";
+=== "JSX"
+	```jsx
+	import { TaskSlot } from "@mxjp/gluon/async";
 
-const slot = new TaskSlot();
+	const slot = new TaskSlot();
 
-// Queue a blocking task:
-const value = await slot.block(async () => {
-	// ...
-	return 42;
-});
+	// Queue a blocking task:
+	const value = await slot.block(async () => {
+		// ...
+		return 42;
+	});
 
-// Queue a side effect:
-slot.sideEffect(async signal => {
-	// "signal" is an abort signal to abort this side effect if possible.
-});
-```
+	// Queue a side effect:
+	slot.sideEffect(async signal => {
+		// "signal" is an abort signal to abort this side effect if possible.
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { TaskSlot } from "./gluon.js";
+
+	const slot = new TaskSlot();
+
+	// Queue a blocking task:
+	const value = await slot.block(async () => {
+		// ...
+		return 42;
+	});
+
+	// Queue a side effect:
+	slot.sideEffect(async signal => {
+		// "signal" is an abort signal to abort this side effect if possible.
+	});
+	```
 
 ## Error Handling
 

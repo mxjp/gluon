@@ -1,20 +1,42 @@
 # `<For>`
 Render [content](../elements.md#content) for each unique value in an iterable [expression](../signals.md#expressions).
-```jsx
-import { For } from "@mxjp/gluon";
 
-<For each={someIterable}>
-	{value => <li>{value}</li>}
-</For>
-```
+=== "JSX"
+	```jsx
+	import { For } from "@mxjp/gluon";
+
+	<For each={someIterable}>
+		{value => <li>{value}</li>}
+	</For>
+	```
+
+=== "No Build"
+	```jsx
+	import { For, e } from "./gluon.js";
+
+	For({
+		each: someIterable,
+		children: value => e("li").append(value),
+	})
+	```
 
 ## Index
 A function to reactively access the current index is passed as the second argument:
-```jsx
-<For each={someIterable}>
-	{(value, index) => <li>{() => index() + 1}: {value}</li>}
-</For>
-```
+
+=== "JSX"
+	```jsx
+	<For each={someIterable}>
+		{(value, index) => <li>{() => index() + 1}: {value}</li>}
+	</For>
+	```
+
+=== "No Build"
+	```jsx
+	For({
+		each: someIterable,
+		children: (value, index) => e("li").append(() => index() + 1, ": ", value),
+	})
+	```
 
 ## Update Order
 For every update, this view runs a simple diffing algorithm between existing instances and new unique values.

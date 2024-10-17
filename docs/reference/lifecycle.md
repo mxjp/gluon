@@ -3,43 +3,85 @@ Teardown hooks are the only lifecycle hook in gluon. They can be used to run log
 
 ## `teardown`
 Register a hook to be called when the current lifecycle is disposed:
-```jsx
-import { teardown } from "@mxjp/gluon";
 
-const handle = setInterval(() => console.log("ping"), 1000);
+=== "JSX"
+	```jsx
+	import { teardown } from "@mxjp/gluon";
 
-teardown(() => {
-	clearInterval(handle);
-});
-```
+	const handle = setInterval(() => console.log("ping"), 1000);
+
+	teardown(() => {
+		clearInterval(handle);
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { teardown } from "./gluon.js";
+
+	const handle = setInterval(() => console.log("ping"), 1000);
+
+	teardown(() => {
+		clearInterval(handle);
+	});
+	```
+
 Calling `teardown` outside of any functions listed below has no effect and "leaks" the teardown hook. When running tests, this behavior can be [configured](./testing.md#leak-detection) to log leaks or to throw an error.
 
 ## `capture`
 Capture teardown hooks during a function call:
-```jsx
-import { capture, teardown } from "@mxjp/gluon";
 
-const dispose = capture(() => {
-	teardown(() => { ... });
-});
+=== "JSX"
+	```jsx
+	import { capture, teardown } from "@mxjp/gluon";
 
-dispose();
-```
+	const dispose = capture(() => {
+		teardown(() => { ... });
+	});
+
+	dispose();
+	```
+
+=== "No Build"
+	```jsx
+	import { capture, teardown } from "./gluon.js";
+
+	const dispose = capture(() => {
+		teardown(() => { ... });
+	});
+
+	dispose();
+	```
+
 Teardown hooks are called in reverse registration order when the returned `dispose` function is called.
 
 If the specified function throws an error, teardown hooks are called in reverse registration order and the error is re-thrown.
 
 ## `captureSelf`
 This is almost the same as `capture` and is meant for things that need to dispose themselves.
-```jsx
-import { captureSelf, teardown } from "@mxjp/gluon";
 
-captureSelf(dispose => {
-	teardown(() => { ... });
+=== "JSX"
+	```jsx
+	import { captureSelf, teardown } from "@mxjp/gluon";
 
-	dispose();
-});
-```
+	captureSelf(dispose => {
+		teardown(() => { ... });
+
+		dispose();
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { captureSelf, teardown } from "./gluon.js";
+
+	captureSelf(dispose => {
+		teardown(() => { ... });
+
+		dispose();
+	});
+	```
+
 Teardown hooks are called in reverse registration order when the `dispose` function is called.
 
 When `dispose` is called while the callback is still running, it has no effect and will call teardown hooks immediately after the callback completes instead.
@@ -48,25 +90,49 @@ If the specified function throws an error, teardown hooks are called in reverse 
 
 ## `uncapture`
 To explicitly leak teardown hooks, the `uncapture` function can be used. Code running during the call has an infinitly long lifecycle.
-```jsx
-import { uncapture } from "@mxjp/gluon";
 
-uncapture(() => {
-	// This has no effect here:
-	teardown(() => { ... });
-});
-```
+=== "JSX"
+	```jsx
+	import { uncapture } from "@mxjp/gluon";
+
+	uncapture(() => {
+		// This has no effect here:
+		teardown(() => { ... });
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { uncapture } from "./gluon.js";
+
+	uncapture(() => {
+		// This has no effect here:
+		teardown(() => { ... });
+	});
+	```
 
 ## `nocapture`
 There are some places where registering teardown hooks is very likely a mistake. E.g. inside of [expressions](signals.md#expressions). Trying to register teardown hooks during an `nocapture` call will throw an error:
-```jsx
-import { nocapture } from "@mxjp/gluon";
 
-nocapture(() => {
-	// This will throw an error:
-	teardown(() => { ... });
-});
-```
+=== "JSX"
+	```jsx
+	import { nocapture } from "@mxjp/gluon";
+
+	nocapture(() => {
+		// This will throw an error:
+		teardown(() => { ... });
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { nocapture } from "./gluon.js";
+
+	nocapture(() => {
+		// This will throw an error:
+		teardown(() => { ... });
+	});
+	```
 
 ## `isolate`
 Run a function within an error isolation boundary.
@@ -74,36 +140,70 @@ Run a function within an error isolation boundary.
 + If an error is thrown, teardown hooks are immediately called in reverse registration order and the error is re-thrown.
 + If no error is thrown, this behaves as if teardown hooks were registered in the outer context.
 
-```jsx
-import { isolate } from "@mxjp/gluon";
+=== "JSX"
+	```jsx
+	import { isolate } from "@mxjp/gluon";
 
-isolate(() => {
-	teardown(() => doSomeCleanup());
-	throw new Error("something went wrong");
-});
-```
+	isolate(() => {
+		teardown(() => doSomeCleanup());
+		throw new Error("something went wrong");
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { isolate } from "./gluon.js";
+
+	isolate(() => {
+		teardown(() => doSomeCleanup());
+		throw new Error("something went wrong");
+	});
+	```
 
 ## Nesting
 Calls to `capture`, `captureSelf`, `uncapture`, `nocapture` and `isolate` can be arbitrarily nested:
-```jsx
-import { capture, captureSelf, uncapture, nocapture } from "@mxjp/gluon";
 
-nocapture(() => {
-	const dispose = capture(() => {
-		// This works:
-		teardown(() => { ... });
-		uncapture(() => {
-			// This is ignored:
+=== "JSX"
+	```jsx
+	import { capture, captureSelf, uncapture, nocapture } from "@mxjp/gluon";
+
+	nocapture(() => {
+		const dispose = capture(() => {
+			// This works:
 			teardown(() => { ... });
+			uncapture(() => {
+				// This is ignored:
+				teardown(() => { ... });
+			});
 		});
+
+		dispose();
+
+		// This will fail:
+		teardown({ ... });
 	});
+	```
 
-	dispose();
+=== "No Build"
+	```jsx
+	import { capture, captureSelf, uncapture, nocapture } from "./gluon.js";
 
-	// This will fail:
-	teardown({ ... });
-});
-```
+	nocapture(() => {
+		const dispose = capture(() => {
+			// This works:
+			teardown(() => { ... });
+			uncapture(() => {
+				// This is ignored:
+				teardown(() => { ... });
+			});
+		});
+
+		dispose();
+
+		// This will fail:
+		teardown({ ... });
+	});
+	```
 
 ## Repetitive Disposal
 By default, lifecycle hooks can be called multiple times and primitives like [`capture`](#capture) and [`captureSelf`](#captureself) don't provide any logic for preventing multiple calls.

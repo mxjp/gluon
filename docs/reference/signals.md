@@ -2,14 +2,26 @@
 In gluon, a `Signal` is an object which holds an arbitrary value and keeps track of things that have accessed that value.
 
 To create a signal, you can use the `Signal` constructor or the `sig` shorthand:
-```jsx
-import { Signal, sig } from "@mxjp/gluon";
 
-// using the constructor:
-const count = new Signal(42);
-// or using the shorthand:
-const count = sig(42);
-```
+=== "JSX"
+	```jsx
+	import { Signal, sig } from "@mxjp/gluon";
+
+	// using the constructor:
+	const count = new Signal(42);
+	// or using the shorthand:
+	const count = sig(42);
+	```
+
+=== "No Build"
+	```jsx
+	import { Signal, sig } from "./gluon.js";
+
+	// using the constructor:
+	const count = new Signal(42);
+	// or using the shorthand:
+	const count = sig(42);
+	```
 
 The current value can be accessed or updated using the `value` property:
 ```jsx
@@ -66,13 +78,24 @@ sig(42);
 
 ## `watch`
 Watch an expression and run a callback with it's result.
-```jsx
-import { watch } from "@mxjp/gluon";
 
-watch(count, value => {
-	console.log("Count:", value);
-});
-```
+=== "JSX"
+	```jsx
+	import { watch } from "@mxjp/gluon";
+
+	watch(count, value => {
+		console.log("Count:", value);
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { watch } from "./gluon.js";
+
+	watch(count, value => {
+		console.log("Count:", value);
+	});
+	```
 
 + The current [context](context.md) is available in both the expression and callback.
 + Evaluation is stopped when the current [lifecycle](lifecycle.md) is disposed.
@@ -81,24 +104,45 @@ watch(count, value => {
 
 ## `watchUpdates`
 This is the same as [`watch`](#watch), but the initial value is returned instead of being passed to the callback.
-```jsx
-import { watchUpdates } from "@mxjp/gluon";
 
-const initialCount = watchUpdates(count, value => {
-	console.log("Count:", value);
-});
-```
+=== "JSX"
+	```jsx
+	import { watchUpdates } from "@mxjp/gluon";
+
+	const initialCount = watchUpdates(count, value => {
+		console.log("Count:", value);
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { watchUpdates } from "./gluon.js";
+
+	const initialCount = watchUpdates(count, value => {
+		console.log("Count:", value);
+	});
+	```
 
 ## `effect`
 Run a function and re-run when any accessed signals are updated.
 
-```jsx
-import { effect } from "@mxjp/gluon";
+=== "JSX"
+	```jsx
+	import { effect } from "@mxjp/gluon";
 
-effect(() => {
-	console.log("Count:", count.value);
-});
-```
+	effect(() => {
+		console.log("Count:", count.value);
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { effect } from "./gluon.js";
+
+	effect(() => {
+		console.log("Count:", count.value);
+	});
+	```
 
 + The current [context](context.md) is available in the callback.
 + Execution is stopped when the current [lifecycle](lifecycle.md) is disposed.
@@ -116,26 +160,51 @@ effect(() => {
 
 ## `batch`
 Signal updates are always processed immediately. The `batch` function can be used to deduplicate and defer updates until the batch callback finishes:
-```jsx
-import { batch } from "@mxjp/gluon";
 
-const a = sig(1);
-const b = sig(2);
+=== "JSX"
+	```jsx
+	import { batch } from "@mxjp/gluon";
 
-batch(() => {
-	a.value++;
-	b.value++;
-});
-```
+	const a = sig(1);
+	const b = sig(2);
+
+	batch(() => {
+		a.value++;
+		b.value++;
+	});
+	```
+
+=== "No Build"
+	```jsx
+	import { batch } from "./gluon.js";
+
+	const a = sig(1);
+	const b = sig(2);
+
+	batch(() => {
+		a.value++;
+		b.value++;
+	});
+	```
+
 If updates from a batch cause immediate recursive side effects, these are also processed as part of the batch.
 
 ## `memo`
 Watch an expression and get a function to reactively access it's latest result with the same [equality check](#equality) that is also used for signals.
-```jsx
-import { memo } from "@mxjp/gluon";
 
-const getValue = memo(() => a.value * b.value);
-```
+=== "JSX"
+	```jsx
+	import { memo } from "@mxjp/gluon";
+
+	const getValue = memo(() => a.value * b.value);
+	```
+
+=== "No Build"
+	```jsx
+	import { memo } from "./gluon.js";
+
+	const getValue = memo(() => a.value * b.value);
+	```
 
 + The current [context](context.md) is available in the expression.
 + Evaluation is stopped when the current [lifecycle](lifecycle.md) is disposed.
@@ -144,74 +213,150 @@ const getValue = memo(() => a.value * b.value);
 
 ## `track` & `untrack`
 Signal accesses are tracked in expressions by default. You can use `untrack` to disable tracking during a function call or `track` to restore the default.
-```jsx
-import { track, untrack } from "@mxjp/gluon";
 
-watch(() => a.value * untrack(() => b.value), () => { ... });
-```
+=== "JSX"
+	```jsx
+	import { track, untrack } from "@mxjp/gluon";
+
+	watch(() => a.value * untrack(() => b.value), () => { ... });
+	```
+
+=== "No Build"
+	```jsx
+	import { track, untrack } from "./gluon.js";
+
+	watch(() => a.value * untrack(() => b.value), () => { ... });
+	```
 
 ## `get`
 Manually evaluate an expression of an unknown type.
-```jsx
-import { get } from "@mxjp/gluon";
 
-get(42); // 42
-get(() => 42); // 42
-get(sig(42)); // 42
-```
+=== "JSX"
+	```jsx
+	import { get } from "@mxjp/gluon";
+
+	get(42); // 42
+	get(() => 42); // 42
+	get(sig(42)); // 42
+	```
+
+=== "No Build"
+	```jsx
+	import { get } from "./gluon.js";
+
+	get(42); // 42
+	get(() => 42); // 42
+	get(sig(42)); // 42
+	```
 
 ## `map`
 Map an expression value while preserving if the expression is static or not.
-```jsx
-import { map } from "@mxjp/gluon";
 
-// This immediately computes the value:
-map(6, value => value * 7);
+=== "JSX"
+	```jsx
+	import { map } from "@mxjp/gluon";
 
-// This returns a function to compute the value:
-map(sig(6), value => value * 7);
-```
+	// This immediately computes the value:
+	map(6, value => value * 7);
+
+	// This returns a function to compute the value:
+	map(sig(6), value => value * 7);
+	```
+
+=== "No Build"
+	```jsx
+	import { map } from "./gluon.js";
+
+	// This immediately computes the value:
+	map(6, value => value * 7);
+
+	// This returns a function to compute the value:
+	map(sig(6), value => value * 7);
+	```
 
 ## `trigger`
 Create an expression evaluator pipe that calls a function once when any accessed signals from the latest evaluated expression are updated.
 
 When the lifecycle at which the pipe was created is disposed, the callback function will not be called anymore.
-```jsx
-import { trigger, sig } from "@mxjp/gluon";
 
-// Create a new pipe that is bound to the current lifecycle:
-const pipe = trigger(() => {
-	console.log("Signal has been updated.");
-});
+=== "JSX"
+	```jsx
+	import { trigger, sig } from "@mxjp/gluon";
 
-const signal = sig(42);
+	// Create a new pipe that is bound to the current lifecycle:
+	const pipe = trigger(() => {
+		console.log("Signal has been updated.");
+	});
 
-// Evaluating an expression through the pipe will track all signal accesses:
-console.log(pipe(signal)); // 42
-console.log(pipe(() => signal.value)); // 42
+	const signal = sig(42);
 
-// This will trigger the callback:
-signal.value = 77;
-```
+	// Evaluating an expression through the pipe will track all signal accesses:
+	console.log(pipe(signal)); // 42
+	console.log(pipe(() => signal.value)); // 42
+
+	// This will trigger the callback:
+	signal.value = 77;
+	```
+
+=== "No Build"
+	```jsx
+	import { trigger, sig } from "./gluon.js";
+
+	// Create a new pipe that is bound to the current lifecycle:
+	const pipe = trigger(() => {
+		console.log("Signal has been updated.");
+	});
+
+	const signal = sig(42);
+
+	// Evaluating an expression through the pipe will track all signal accesses:
+	console.log(pipe(signal)); // 42
+	console.log(pipe(() => signal.value)); // 42
+
+	// This will trigger the callback:
+	signal.value = 77;
+	```
 
 It is guaranteed that the function is called before any other observers like [`watch`](#watch) or [`effect`](#effect) are notified. This can be used to run side effects like clearing a cache before an expression is re-evaluated:
-```jsx
-import { trigger, sig, watch } from "@mxjp/gluon";
 
-const pipe = trigger(() => {
-	console.log("Signal has been updated.");
-});
+=== "JSX"
+	```jsx
+	import { trigger, sig, watch } from "@mxjp/gluon";
 
-const signal = sig(42);
-watch(() => {
-	console.log("Evaluating...");
-	return pipe(signal);
-}, value => {
-	console.log("Value:", value);
-});
+	const pipe = trigger(() => {
+		console.log("Signal has been updated.");
+	});
 
-signal.value = 77;
-```
+	const signal = sig(42);
+	watch(() => {
+		console.log("Evaluating...");
+		return pipe(signal);
+	}, value => {
+		console.log("Value:", value);
+	});
+
+	signal.value = 77;
+	```
+
+=== "No Build"
+	```jsx
+	import { trigger, sig, watch } from "./gluon.js";
+
+	const pipe = trigger(() => {
+		console.log("Signal has been updated.");
+	});
+
+	const signal = sig(42);
+	watch(() => {
+		console.log("Evaluating...");
+		return pipe(signal);
+	}, value => {
+		console.log("Value:", value);
+	});
+
+	signal.value = 77;
+	```
+
 ```
 Evaluating...
 Value: 42
@@ -221,38 +366,74 @@ Value: 77
 ```
 
 If pipes are nested, the callback for the most inner one is called first. In the example below, the callback for `pipeB` is called first:
-```jsx
-import { trigger, sig } from "@mxjp/gluon";
 
-const pipeA = trigger(() => console.log("Pipe A"));
-const pipeB = trigger(() => console.log("Pipe B"));
+=== "JSX"
+	```jsx
+	import { trigger, sig } from "@mxjp/gluon";
 
-const signal = sig(42);
-pipeA(() => pipeB(signal)); // 42
+	const pipeA = trigger(() => console.log("Pipe A"));
+	const pipeB = trigger(() => console.log("Pipe B"));
 
-signal.value = 77;
-```
+	const signal = sig(42);
+	pipeA(() => pipeB(signal)); // 42
+
+	signal.value = 77;
+	```
+
+=== "No Build"
+	```jsx
+	import { trigger, sig } from "./gluon.js";
+
+	const pipeA = trigger(() => console.log("Pipe A"));
+	const pipeB = trigger(() => console.log("Pipe B"));
+
+	const signal = sig(42);
+	pipeA(() => pipeB(signal)); // 42
+
+	signal.value = 77;
+	```
 
 
 
 ## Immediate Side Effects
 By default, signal updates are processed immediately. If an update causes recursive side effects, they run in sequence instead.
-```jsx
-import { sig, watch } from "@mxjp/gluon";
 
-const count = sig(0);
+=== "JSX"
+	```jsx
+	import { sig, watch } from "@mxjp/gluon";
 
-watch(count, value => {
-	console.group("Count:", value);
-	if (value < 2) {
-		count.value++;
-		console.log("New count:", count.value);
-	}
-	console.groupEnd();
-});
+	const count = sig(0);
 
-console.log("Final count:", count.value);
-```
+	watch(count, value => {
+		console.group("Count:", value);
+		if (value < 2) {
+			count.value++;
+			console.log("New count:", count.value);
+		}
+		console.groupEnd();
+	});
+
+	console.log("Final count:", count.value);
+	```
+
+=== "No Build"
+	```jsx
+	import { sig, watch } from "./gluon.js";
+
+	const count = sig(0);
+
+	watch(count, value => {
+		console.group("Count:", value);
+		if (value < 2) {
+			count.value++;
+			console.log("New count:", count.value);
+		}
+		console.groupEnd();
+	});
+
+	console.log("Final count:", count.value);
+	```
+
 ```
 Count: 0
 	New count: 1
@@ -304,19 +485,43 @@ If you need deeply reactive objects, you can use the [store API](./store.md).
 
 ### Static Values
 The value of signals or expressions can always be accessed in a non reactive ways:
-```jsx
-const count = sig(0);
 
-// This isn't reactive:
-<>{count.value}</>;
-<>{get(count)}</>;
-```
+=== "JSX"
+	```jsx
+	const count = sig(0);
+
+	// This isn't reactive:
+	<>{count.value}</>;
+	<>{get(count)}</>;
+	```
+
+=== "No Build"
+	```jsx
+	const count = sig(0);
+
+	// This isn't reactive:
+	count.value;
+	get(count);
+	```
+
 For signal accesses to be reactive, they need to be done in a function call:
-```jsx
-// This is now reactive:
-<>{() => count.value}</>;
-<>{() => get(count)}</>;
 
-// Using the signal itself is also reactive:
-<>{count}</>;
-```
+=== "JSX"
+	```jsx
+	// This is now reactive:
+	<>{() => count.value}</>;
+	<>{() => get(count)}</>;
+
+	// Using the signal itself is also reactive:
+	<>{count}</>;
+	```
+
+=== "No Build"
+	```jsx
+	// This is now reactive:
+	() => count.value;
+	() => get(count);
+
+	// Using the signal itself is also reactive:
+	count;
+	```

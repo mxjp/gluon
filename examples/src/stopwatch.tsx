@@ -7,7 +7,7 @@ This example also demonstrates how state and logic can be separated from it's re
 
 */
 
-import { Expression, IndexFor, Show, get, memo, sig, teardown } from "@mxjp/gluon";
+import { Expression, IndexFor, Show, get, memo, sig, teardown } from "rvx";
 
 export function Example() {
 	// Create a reactive timer instance:

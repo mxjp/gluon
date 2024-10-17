@@ -7,7 +7,7 @@ export interface HistoryRouterOptions {
 	/**
 	 * The current location is parsed when one of these events occur.
 	 *
-	 * @default ["popstate", "gluon:router:update"]
+	 * @default ["popstate", "rvx:router:update"]
 	 */
 	parseEvents?: string[];
 
@@ -29,7 +29,7 @@ export class HistoryRouter implements Router {
 
 	constructor(options?: HistoryRouterOptions) {
 		this.#basePath = options?.basePath ?? "";
-		const parseEvents = options?.parseEvents ?? ["popstate", "gluon:router:update"];
+		const parseEvents = options?.parseEvents ?? ["popstate", "rvx:router:update"];
 		for (const name of parseEvents) {
 			window.addEventListener(name, this.#parse, { passive: true });
 			teardown(() => window.removeEventListener(name, this.#parse));
@@ -71,11 +71,11 @@ export class HistoryRouter implements Router {
 
 	push(path: string, query?: QueryInit): void {
 		history.pushState(null, "", this.#format(path, query));
-		window.dispatchEvent(new CustomEvent("gluon:router:update"));
+		window.dispatchEvent(new CustomEvent("rvx:router:update"));
 	}
 
 	replace(path: string, query?: QueryInit): void {
 		history.replaceState(null, "", this.#format(path, query));
-		window.dispatchEvent(new CustomEvent("gluon:router:update"));
+		window.dispatchEvent(new CustomEvent("rvx:router:update"));
 	}
 }

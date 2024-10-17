@@ -1,8 +1,8 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { extract, Inject, sig, uncapture, watch } from "@mxjp/gluon";
-import { ChildRouter, matchRoute, Route, ROUTER, Routes, watchRoutes } from "@mxjp/gluon/router";
+import { extract, Inject, sig, uncapture, watch } from "rvx";
+import { ChildRouter, matchRoute, Route, ROUTER, Routes, watchRoutes } from "rvx/router";
 
 import { assertEvents, lifecycleEvent, text } from "../common.js";
 import { TestRouter } from "./common.js";

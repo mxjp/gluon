@@ -4,7 +4,7 @@ Views are an abstraction for sequences of DOM nodes that may change over time. T
 Views can be used as [element content](../elements.md#content) or can be returned from [component functions](../components.md).
 
 ## Creating Views
-Gluon provides the following components for common use cases:
+Rvx provides the following components for common use cases:
 
 + [`<Show>`](show.md) - Render content if a condition is met.
 + [`<Attach>`](attach.md) -  Attach already rendered content if a condition is met.
@@ -17,14 +17,14 @@ You can also directly create views from arbitrary [content](../elements.md#conte
 
 === "JSX"
 	```jsx
-	import { render } from "@mxjp/gluon";
+	import { render } from "rvx";
 
 	const view = render(<>Hello World!</>);
 	```
 
 === "No Build"
 	```jsx
-	import { render } from "./gluon.js";
+	import { render } from "./rvx.js";
 
 	const view = render("Hello World!");
 	```
@@ -33,14 +33,14 @@ The `mount` function creates a view and appends it to an element until the curre
 
 === "JSX"
 	```jsx
-	import { mount } from "@mxjp/gluon";
+	import { mount } from "rvx";
 
 	const view = mount(document.body, <>Hello World!</>);
 	```
 
 === "No Build"
 	```jsx
-	import { mount } from "./gluon.js";
+	import { mount } from "./rvx.js";
 
 	const view = mount(document.body, "Hello World!");
 	```
@@ -88,7 +88,7 @@ A view is created using the `View` constructor. The example below creates a view
 
 === "JSX"
 	```jsx
-	import { View } from "@mxjp/gluon";
+	import { View } from "rvx";
 
 	const view = new View((setBoundary, self) => {
 		// "self" is this view instance.
@@ -103,7 +103,7 @@ A view is created using the `View` constructor. The example below creates a view
 
 === "No Build"
 	```jsx
-	import { View } from "./gluon.js";
+	import { View } from "./rvx.js";
 
 	const view = new View((setBoundary, self) => {
 		// "self" is this view instance.
@@ -116,7 +116,7 @@ A view is created using the `View` constructor. The example below creates a view
 	});
 	```
 
-Most of the view implementations provided by gluon are returned from component functions like in the example below:
+Most of the view implementations provided by rvx are returned from component functions like in the example below:
 
 === "JSX"
 	```jsx
@@ -146,7 +146,7 @@ The example below appends an element every time an event is fired:
 
 === "JSX"
 	```jsx
-	import { View, Event, Emitter } from "@mxjp/gluon";
+	import { View, Event, Emitter } from "rvx";
 
 	function LogEvents(props: { messages: Event<[string]> }) {
 		return new View((setBoundary, self) => {
@@ -189,7 +189,7 @@ The example below appends an element every time an event is fired:
 
 === "No Build"
 	```jsx
-	import { View, Event, Emitter, e } from "./gluon.js";
+	import { View, Event, Emitter, e } from "./rvx.js";
 
 	function LogEvents(props) {
 		return new View((setBoundary, self) => {
@@ -230,4 +230,4 @@ The example below appends an element every time an event is fired:
 	messages.emit("Bar");
 	```
 
-You can find more complex view implementation examples [in gluon's core view module](https://github.com/mxjp/gluon/blob/main/src/core/view.ts) and [this example](../../examples/custom-view.md).
+You can find more complex view implementation examples [in rvx's core view module](https://github.com/mxjp/rvx/blob/main/src/core/view.ts) and [this example](../../examples/custom-view.md).

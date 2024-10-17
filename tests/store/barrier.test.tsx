@@ -1,7 +1,7 @@
 import { notStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { unwrap, wrap } from "@mxjp/gluon/store";
+import { unwrap, wrap } from "rvx/store";
 
 await test("store/barrier", async ctx => {
 	await ctx.test("non-reactive types", () => {

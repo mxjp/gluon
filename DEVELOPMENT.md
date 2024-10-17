@@ -1,6 +1,6 @@
 # Development
 
-## Building Gluon
+## Building Rvx
 ```bash
 # Install dependencies:
 npm ci
@@ -13,7 +13,7 @@ npm run build
 ```
 
 ## Running Tests
-Running tests requires gluon to be already built.
+Running tests requires rvx to be already built.
 ```bash
 npm test
 ```

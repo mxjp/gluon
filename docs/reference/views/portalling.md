@@ -3,7 +3,7 @@ In addition to being the entry point of your application, the `mount` function a
 
 === "JSX"
 	```jsx
-	import { mount, capture } from "@mxjp/gluon";
+	import { mount, capture } from "rvx";
 
 	// Mount some content and capture it's lifecycle:
 	const unmount = capture(() => {
@@ -16,7 +16,7 @@ In addition to being the entry point of your application, the `mount` function a
 
 === "No Build"
 	```jsx
-	import { mount, capture } from "./gluon.js";
+	import { mount, capture } from "./rvx.js";
 
 	// Mount some content and capture it's lifecycle:
 	const unmount = capture(() => {
@@ -31,7 +31,7 @@ This can be used to implement things like popovers, dialogs or any other kind of
 
 === "JSX"
 	```jsx
-	import { mount, watch, sig } from "@mxjp/gluon";
+	import { mount, watch, sig } from "rvx";
 
 	function ExamplePopover() {
 		const visible = sig(false);
@@ -51,7 +51,7 @@ This can be used to implement things like popovers, dialogs or any other kind of
 
 === "No Build"
 	```jsx
-	import { mount, watch, sig, e } from "./gluon.js";
+	import { mount, watch, sig, e } from "./rvx.js";
 
 	function ExamplePopover() {
 		const visible = sig(false);

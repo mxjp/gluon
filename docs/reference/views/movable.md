@@ -5,7 +5,7 @@ When you want to safely reuse, keep alive or move content, you can wrap content 
 
 === "JSX"
 	```jsx
-	import { movable, MovableView } from "@mxjp/gluon";
+	import { movable, MovableView } from "rvx";
 
 	// Wrap arbitrary content:
 	const wrapper = movable(<>Hello World!</>);
@@ -22,7 +22,7 @@ When you want to safely reuse, keep alive or move content, you can wrap content 
 
 === "No Build"
 	```jsx
-	import { movable, MovableView } from "./gluon.js";
+	import { movable, MovableView } from "./rvx.js";
 
 	// Wrap arbitrary content:
 	const wrapper = movable("Hello World!");

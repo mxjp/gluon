@@ -3,7 +3,7 @@ import { NEXT_ID } from "./internals.js";
 /**
  * Allocate an ID that is unique in the current thread.
  *
- * @returns The unique id in the form `gluon_123`.
+ * @returns The unique id in the form `rvx_123`.
  */
 export function uniqueId(): string {
 	const next = NEXT_ID.value;
@@ -12,15 +12,15 @@ export function uniqueId(): string {
 	} else {
 		NEXT_ID.value++;
 	}
-	return "gluon_" + String(next);
+	return "rvx_" + String(next);
 }
 
 /**
- * A component that provides a unique id in the form `gluon_123` to it's children.
+ * A component that provides a unique id in the form `rvx_123` to it's children.
  *
  * @example
  * ```tsx
- * import { UseUniqueId } from "@mxjp/gluon";
+ * import { UseUniqueId } from "rvx";
  *
  * <UseUniqueId>
  *   {id => <>

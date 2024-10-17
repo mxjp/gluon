@@ -23,14 +23,14 @@ export type XMLNS = typeof HTML | typeof SVG | typeof MATHML;
  *
  * @example
  * ```tsx
- * import { XMLNS, SVG, Inject } from "@mxjp/gluon";
+ * import { XMLNS, SVG, Inject } from "rvx";
  *
  * <Inject key={XMLNS} value={SVG}>
  *   {() => <svg>...</svg>}
  * </Inject>
  * ```
  */
-export const XMLNS = Symbol.for("gluon:namespace") as ContextKey<XMLNS>;
+export const XMLNS = Symbol.for("rvx:namespace") as ContextKey<XMLNS>;
 
 export type ClassValue = Expression<undefined | null | false | string | Record<string, Expression<boolean | undefined>> | ClassValue[]>;
 
@@ -51,7 +51,7 @@ export type EventListener<E extends Event> = (event: E) => void;
 /**
  * **This is experimental API.**
  */
-export const NODE = Symbol.for("gluon:node");
+export const NODE = Symbol.for("rvx:node");
 
 /**
  * **This is experimental API.**

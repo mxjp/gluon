@@ -1,5 +1,5 @@
 {
-	"name": "gluon-quick-start",
+	"name": "rvx-quick-start",
 	"type": "module",
 	"scripts": {
 		"start": "vite --open",
@@ -10,6 +10,6 @@
 		"vite": "^5.4.9"
 	},
 	"dependencies": {
-		"@mxjp/gluon": "^16.0.0"
+		"rvx": "^16.0.0"
 	}
 }

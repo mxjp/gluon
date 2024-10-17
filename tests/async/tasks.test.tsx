@@ -1,8 +1,8 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { capture, extract, inject, mount, uncapture, watch, wrapContext } from "@mxjp/gluon";
-import { isPending, isSelfPending, TASKS, Tasks, waitFor } from "@mxjp/gluon/async";
+import { capture, extract, inject, mount, uncapture, watch, wrapContext } from "rvx";
+import { isPending, isSelfPending, TASKS, Tasks, waitFor } from "rvx/async";
 
 import { assertEvents, future } from "../common.js";
 

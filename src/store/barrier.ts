@@ -31,7 +31,7 @@ export interface Barrier {
 /**
  * Symbol for storing functions for wrapping an instance on it's constructor.
  */
-const WRAP_INSTANCE = Symbol.for("gluon:store:wrap_instance");
+const WRAP_INSTANCE = Symbol.for("rvx:store:wrap_instance");
 
 /**
  * A map of targets to wrappers.

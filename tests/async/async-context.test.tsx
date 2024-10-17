@@ -1,8 +1,8 @@
 import { deepStrictEqual, fail, rejects, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watch } from "@mxjp/gluon";
-import { AsyncContext, AsyncError } from "@mxjp/gluon/async";
+import { uncapture, watch } from "rvx";
+import { AsyncContext, AsyncError } from "rvx/async";
 
 import { assertEvents, future } from "../common.js";
 

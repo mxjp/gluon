@@ -1,8 +1,8 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watch } from "@mxjp/gluon";
-import { MemoryRouter } from "@mxjp/gluon/router";
+import { uncapture, watch } from "rvx";
+import { MemoryRouter } from "rvx/router";
 
 import { assertEvents } from "../common.js";
 

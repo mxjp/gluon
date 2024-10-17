@@ -8,7 +8,7 @@ JSX expressions and the element builder API can be used to directly create DOM e
 
 === "No Build"
 	```jsx
-	import { e } from "./gluon.js"; // or "@mxjp/gluon/builder"
+	import { e } from "./rvx.js"; // or "rvx/builder"
 
 	e("div").class("example").append("Hello World!")
 	```
@@ -95,7 +95,7 @@ Note, that the rules specified above apply to all attributes including aria attr
 
 === "JSX"
 	```jsx
-	import { string, optionalString } from "@mxjp/gluon";
+	import { string, optionalString } from "rvx";
 
 	// Convert all values to strings including "null" and "undefined":
 	<div aria-disabled={string(someBooleanExpression)} />
@@ -106,7 +106,7 @@ Note, that the rules specified above apply to all attributes including aria attr
 
 === "No Build"
 	```jsx
-	import { string, optionalString, e } from "./gluon.js";
+	import { string, optionalString, e } from "./rvx.js";
 
 	// Convert all values to strings including "null" and "undefined":
 	e("div").set("aria-disabled", string(someBooleanExpression))
@@ -283,7 +283,7 @@ If objects have a `NODE` symbol property, this node is used instead. This is int
 
 === "JSX"
 	```jsx
-	import { NODE } from "@mxjp/gluon";
+	import { NODE } from "rvx";
 
 	<div>
 		{{ [NODE]: document.createElement("div") }}
@@ -292,7 +292,7 @@ If objects have a `NODE` symbol property, this node is used instead. This is int
 
 === "No Build"
 	```jsx
-	import { NODE, e } from "./gluon.js";
+	import { NODE, e } from "./rvx.js";
 
 	e("div").append(
 		{ [NODE]: document.createElement("div") }
@@ -304,7 +304,7 @@ If objects have a `NODE` symbol property, this node is used instead. This is int
 
 === "JSX"
 	```jsx
-	import { Show } from "@mxjp/gluon";
+	import { Show } from "rvx";
 
 	<div>
 		<Show when={someSignal}>
@@ -315,7 +315,7 @@ If objects have a `NODE` symbol property, this node is used instead. This is int
 
 === "No Build"
 	```jsx
-	import { Show, e } from "./gluon.js";
+	import { Show, e } from "./rvx.js";
 
 	e("div").append(
 		Show({
@@ -342,7 +342,7 @@ Content can be wrapped in arbitrarily nested arrays and JSX fragments.
 	</div>
 	```
 
-	Note, that JSX fragments in gluon return their children as is. The return type of single-child or empty fragments may depend on your JSX transpiler.
+	Note, that JSX fragments in rvx return their children as is. The return type of single-child or empty fragments may depend on your JSX transpiler.
 	```jsx
 	<></> // undefined
 	<>42</> // 42
@@ -366,7 +366,7 @@ The namespace URI for new elements can be [injected](context.md).
 
 === "JSX"
 	```jsx
-	import { Inject, XMLNS, SVG } from "@mxjp/gluon";
+	import { Inject, XMLNS, SVG } from "rvx";
 
 	<Inject key={XMLNS} value={SVG}>
 		{() => <svg viewBox="0 0 100 100">...</svg>}
@@ -375,7 +375,7 @@ The namespace URI for new elements can be [injected](context.md).
 
 === "No Build"
 	```jsx
-	import { inject, XMLNS, SVG } from "./gluon.js";
+	import { inject, XMLNS, SVG } from "./rvx.js";
 
 	inject(XMLNS, SVG, () => {
 		return e("svg").set("viewBox", "0 0 100 100").append(...)

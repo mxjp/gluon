@@ -3,7 +3,7 @@ import { createElement } from "../element-create.js";
 
 export * from "./types.js";
 
-export const Fragment = Symbol.for("gluon:jsx-fragment");
+export const Fragment = Symbol.for("rvx:jsx-fragment");
 
 export function jsx(type: any, props: any, key: any): unknown {
 	if (type === Fragment) {

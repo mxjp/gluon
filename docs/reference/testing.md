@@ -1,9 +1,9 @@
 # Testing
-Testing gluon based applications is usually very simple because all of it's signal based rendering is synchronous. E.g. when updating a signal, all resulting changes are reflected in the DOM immediately:
+Testing rvx based applications is usually very simple because all of it's signal based rendering is synchronous. E.g. when updating a signal, all resulting changes are reflected in the DOM immediately:
 
 === "JSX"
 	```jsx
-	import { sig } from "@mxjp/gluon";
+	import { sig } from "rvx";
 
 	const count = sig(7);
 	const element = <div>Current count: {count}</div> as HTMLDivElement;
@@ -14,7 +14,7 @@ Testing gluon based applications is usually very simple because all of it's sign
 
 === "No Build"
 	```jsx
-	import { sig, e } from "./gluon.js";
+	import { sig, e } from "./rvx.js";
 
 	const count = sig(7);
 	const element = e("div").append("Current count: ", count).elem;
@@ -23,14 +23,14 @@ Testing gluon based applications is usually very simple because all of it's sign
 	assert(element.innerText === "Current count: 42");
 	```
 
-Note, that the `assert` function used on this page are not included in gluon.
+Note, that the `assert` function used on this page are not included in rvx.
 
 ## Synchronous Tests
-Gluon provides a lightweight wrapper for running small synchronous tests that provides a [context](./context.md) and takes care of calling [teardown hooks](./lifecycle.md) after the test.
+Rvx provides a lightweight wrapper for running small synchronous tests that provides a [context](./context.md) and takes care of calling [teardown hooks](./lifecycle.md) after the test.
 
 === "JSX"
 	```jsx
-	import { runTest, querySelector } from "@mxjp/gluon/test";
+	import { runTest, querySelector } from "rvx/test";
 
 	runTest(ctx => {
 		const count = sig(0);
@@ -45,7 +45,7 @@ Gluon provides a lightweight wrapper for running small synchronous tests that pr
 
 === "No Build"
 	```jsx
-	import { runTest, querySelector } from "./gluon.js";
+	import { runTest, querySelector } from "./rvx.js";
 
 	runTest(ctx => {
 		const count = sig(0);
@@ -59,7 +59,7 @@ Gluon provides a lightweight wrapper for running small synchronous tests that pr
 	```
 
 ## Asynchronous Tests
-Almost all gluon APIs rely on the synchronous call stack. E.g. extracting values from the current [context](./context.md) will not work after awaiting something:
+Almost all rvx APIs rely on the synchronous call stack. E.g. extracting values from the current [context](./context.md) will not work after awaiting something:
 
 ```jsx
 inject("foo", "bar", async () => {
@@ -75,9 +75,9 @@ The example below shows a test that asserts that asynchronously loaded content i
 
 === "JSX"
 	```jsx
-	import { mount } from "@mxjp/gluon";
-	import { Async } from "@mxjp/gluon/async";
-	import { runAsyncTest, querySelector } from "@mxjp/gluon/test";
+	import { mount } from "rvx";
+	import { Async } from "rvx/async";
+	import { runAsyncTest, querySelector } from "rvx/test";
 
 	await runAsyncTest(async ({ ctx, asyncCtx, use }) => {
 		const view = use(() => {
@@ -105,7 +105,7 @@ The example below shows a test that asserts that asynchronously loaded content i
 
 === "No Build"
 	```jsx
-	import { mount, Async, runAsyncTest, querySelector, e } from "./gluon.js";
+	import { mount, Async, runAsyncTest, querySelector, e } from "./rvx.js";
 
 	await runAsyncTest(async ({ ctx, asyncCtx, use }) => {
 		const view = use(() => {
@@ -135,7 +135,7 @@ You can watch arbitrary [expressions](./signals.md#expressions) using the `watch
 
 === "JSX"
 	```jsx
-	import { sig, watchFor, isPending } from "@mxjp/gluon";
+	import { sig, watchFor, isPending } from "rvx";
 
 	// Wait for a specific signal value:
 	const count = sig(0);
@@ -151,7 +151,7 @@ You can watch arbitrary [expressions](./signals.md#expressions) using the `watch
 
 === "No Build"
 	```jsx
-	import { sig, watchFor, isPending } from "./gluon.js";
+	import { sig, watchFor, isPending } from "./rvx.js";
 
 	// Wait for a specific signal value:
 	const count = sig(0);
@@ -184,7 +184,7 @@ To catch these cases, you can use the `onTeardownLeak` function once before runn
 
 === "JSX"
 	```jsx
-	import { onTeardownLeak } from "@mxjp/gluon/test";
+	import { onTeardownLeak } from "rvx/test";
 
 	onTeardownLeak(hook => {
 		// "hook" is the teardown hook that is being registered.
@@ -203,7 +203,7 @@ To catch these cases, you can use the `onTeardownLeak` function once before runn
 
 === "No Build"
 	```jsx
-	import { onTeardownLeak } from "./gluon.js";
+	import { onTeardownLeak } from "./rvx.js";
 
 	onTeardownLeak(hook => {
 		// "hook" is the teardown hook that is being registered.
@@ -221,11 +221,11 @@ To catch these cases, you can use the `onTeardownLeak` function once before runn
 	```
 
 ## Concurrency
-It is generally possible to run tests for gluon based applications concurrently. However, using APIs that may interfere with each other such as `Element.focus` can result in flaky tests. To solve this you can use the `exclusive` function to run code in a globally shared queue for a specific purpose:
+It is generally possible to run tests for rvx based applications concurrently. However, using APIs that may interfere with each other such as `Element.focus` can result in flaky tests. To solve this you can use the `exclusive` function to run code in a globally shared queue for a specific purpose:
 
 === "JSX"
 	```jsx
-	import { runAsyncTest, exclusive } from "@mxjp/gluon/test";
+	import { runAsyncTest, exclusive } from "rvx/test";
 
 	const FOCUS_ACTIONS = Symbol("focus actions");
 
@@ -238,7 +238,7 @@ It is generally possible to run tests for gluon based applications concurrently.
 
 === "No Build"
 	```jsx
-	import { runAsyncTest, exclusive } from "./gluon.js";
+	import { runAsyncTest, exclusive } from "./rvx.js";
 
 	const FOCUS_ACTIONS = Symbol("focus actions");
 

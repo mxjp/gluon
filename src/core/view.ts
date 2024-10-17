@@ -149,7 +149,7 @@ export class View {
  *
  * @example
  * ```tsx
- * import { render, viewNodes } from "@mxjp/gluon";
+ * import { render, viewNodes } from "rvx";
  *
  * const view = render(<>
  *   <h1>Hello World!</h1>
@@ -179,7 +179,7 @@ export function * viewNodes(view: View): IterableIterator<Node> {
  *
  * @example
  * ```tsx
- * import { Nest, sig } from "@mxjp/gluon";
+ * import { Nest, sig } from "rvx";
  *
  * const count = sig(0);
  *
@@ -217,7 +217,7 @@ export function Nest(props: {
  *
  * @example
  * ```tsx
- * import { sig, Show } from "@mxjp/gluon";
+ * import { sig, Show } from "rvx";
  *
  * const message = sig<null | string>("Hello World!");
  *
@@ -282,7 +282,7 @@ function insertView(parent: Node, prev: Node, view: View): void {
  *
  * @example
  * ```tsx
- * import { ForUnique, sig } from "@mxjp/gluon";
+ * import { ForUnique, sig } from "rvx";
  *
  * const items = sig([1, 2, 3]);
  *
@@ -431,7 +431,7 @@ export interface IndexForContentFn<T> {
  *
  * @example
  * ```tsx
- * import { IndexFor, sig } from "@mxjp/gluon";
+ * import { IndexFor, sig } from "rvx";
  *
  * const items = sig([1, 2, 3]);
  *
@@ -581,7 +581,7 @@ export function movable(content: unknown): MovableView {
  *
  * @example
  * ```tsx
- * import { sig, Attach } from "@mxjp/gluon";
+ * import { sig, Attach } from "rvx";
  *
  * const showMessage = sig(true);
  *

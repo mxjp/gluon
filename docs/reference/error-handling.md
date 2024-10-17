@@ -39,16 +39,16 @@ Lifecycle hooks are automatically captured in:
 + `watch` (excluding the expression)
 + `watchUpdates` (excluding the expression)
 + `effect`
-+ All render callbacks in gluon's [view implementations](./views/index.md#creating-views).
++ All render callbacks in rvx's [view implementations](./views/index.md#creating-views).
 
 ## Render Errors
-Gluon has no dedicated error handling while rendering. If something in the synchronous render tree fails, the entire tree will fail to render and lifecycle hooks are called as [specified above](#lifecycle-hooks).
+Rvx has no dedicated error handling while rendering. If something in the synchronous render tree fails, the entire tree will fail to render and lifecycle hooks are called as [specified above](#lifecycle-hooks).
 
 If you need some kind of error boundary, you can use a component like in the example below.
 
 === "JSX"
 	```jsx
-	import { isolate } from "@mxjp/gluon";
+	import { isolate } from "rvx";
 
 	function TryRender(props: {
 		onError: (error: unknown) => unknown;
@@ -72,7 +72,7 @@ If you need some kind of error boundary, you can use a component like in the exa
 
 === "No Build"
 	```jsx
-	import { isolate } from "./gluon.js";
+	import { isolate } from "./rvx.js";
 
 	function TryRender(props: {
 		onError: (error: unknown) => unknown;
@@ -96,7 +96,7 @@ If you need some kind of error boundary, you can use a component like in the exa
 	```
 
 ## Error Codes
-To keep the runtime as small as possible, gluon uses the error codes below instead of error messages.
+To keep the runtime as small as possible, rvx uses the error codes below instead of error messages.
 
 ### `G0`
 **Teardown hooks are explicitly not supported in this context and registering them is very likely a mistake.**

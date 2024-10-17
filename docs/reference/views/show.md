@@ -3,7 +3,7 @@ Render [content](../elements.md#content) when an [expression](../signals.md#expr
 
 === "JSX"
 	```jsx
-	import { Show } from "@mxjp/gluon";
+	import { Show } from "rvx";
 
 	<Show when={someCondition}>
 		{() => <>Hello World!</>}
@@ -12,7 +12,7 @@ Render [content](../elements.md#content) when an [expression](../signals.md#expr
 
 === "No Build"
 	```jsx
-	import { Show } from "./gluon.js";
+	import { Show } from "./rvx.js";
 
 	Show({
 		when: someCondition,

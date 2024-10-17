@@ -1,4 +1,4 @@
-import { mount } from "@mxjp/gluon";
+import { mount } from "rvx";
 
 mount(
 	document.body,

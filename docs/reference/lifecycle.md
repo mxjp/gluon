@@ -1,12 +1,12 @@
 # Lifecycle
-Teardown hooks are the only lifecycle hook in gluon. They can be used to run logic when the lifecycle context they have been registered in is disposed.
+Teardown hooks are the only lifecycle hook in rvx. They can be used to run logic when the lifecycle context they have been registered in is disposed.
 
 ## `teardown`
 Register a hook to be called when the current lifecycle is disposed:
 
 === "JSX"
 	```jsx
-	import { teardown } from "@mxjp/gluon";
+	import { teardown } from "rvx";
 
 	const handle = setInterval(() => console.log("ping"), 1000);
 
@@ -17,7 +17,7 @@ Register a hook to be called when the current lifecycle is disposed:
 
 === "No Build"
 	```jsx
-	import { teardown } from "./gluon.js";
+	import { teardown } from "./rvx.js";
 
 	const handle = setInterval(() => console.log("ping"), 1000);
 
@@ -33,7 +33,7 @@ Capture teardown hooks during a function call:
 
 === "JSX"
 	```jsx
-	import { capture, teardown } from "@mxjp/gluon";
+	import { capture, teardown } from "rvx";
 
 	const dispose = capture(() => {
 		teardown(() => { ... });
@@ -44,7 +44,7 @@ Capture teardown hooks during a function call:
 
 === "No Build"
 	```jsx
-	import { capture, teardown } from "./gluon.js";
+	import { capture, teardown } from "./rvx.js";
 
 	const dispose = capture(() => {
 		teardown(() => { ... });
@@ -62,7 +62,7 @@ This is almost the same as `capture` and is meant for things that need to dispos
 
 === "JSX"
 	```jsx
-	import { captureSelf, teardown } from "@mxjp/gluon";
+	import { captureSelf, teardown } from "rvx";
 
 	captureSelf(dispose => {
 		teardown(() => { ... });
@@ -73,7 +73,7 @@ This is almost the same as `capture` and is meant for things that need to dispos
 
 === "No Build"
 	```jsx
-	import { captureSelf, teardown } from "./gluon.js";
+	import { captureSelf, teardown } from "./rvx.js";
 
 	captureSelf(dispose => {
 		teardown(() => { ... });
@@ -93,7 +93,7 @@ To explicitly leak teardown hooks, the `uncapture` function can be used. Code ru
 
 === "JSX"
 	```jsx
-	import { uncapture } from "@mxjp/gluon";
+	import { uncapture } from "rvx";
 
 	uncapture(() => {
 		// This has no effect here:
@@ -103,7 +103,7 @@ To explicitly leak teardown hooks, the `uncapture` function can be used. Code ru
 
 === "No Build"
 	```jsx
-	import { uncapture } from "./gluon.js";
+	import { uncapture } from "./rvx.js";
 
 	uncapture(() => {
 		// This has no effect here:
@@ -116,7 +116,7 @@ There are some places where registering teardown hooks is very likely a mistake.
 
 === "JSX"
 	```jsx
-	import { nocapture } from "@mxjp/gluon";
+	import { nocapture } from "rvx";
 
 	nocapture(() => {
 		// This will throw an error:
@@ -126,7 +126,7 @@ There are some places where registering teardown hooks is very likely a mistake.
 
 === "No Build"
 	```jsx
-	import { nocapture } from "./gluon.js";
+	import { nocapture } from "./rvx.js";
 
 	nocapture(() => {
 		// This will throw an error:
@@ -142,7 +142,7 @@ Run a function within an error isolation boundary.
 
 === "JSX"
 	```jsx
-	import { isolate } from "@mxjp/gluon";
+	import { isolate } from "rvx";
 
 	isolate(() => {
 		teardown(() => doSomeCleanup());
@@ -152,7 +152,7 @@ Run a function within an error isolation boundary.
 
 === "No Build"
 	```jsx
-	import { isolate } from "./gluon.js";
+	import { isolate } from "./rvx.js";
 
 	isolate(() => {
 		teardown(() => doSomeCleanup());
@@ -165,7 +165,7 @@ Calls to `capture`, `captureSelf`, `uncapture`, `nocapture` and `isolate` can be
 
 === "JSX"
 	```jsx
-	import { capture, captureSelf, uncapture, nocapture } from "@mxjp/gluon";
+	import { capture, captureSelf, uncapture, nocapture } from "rvx";
 
 	nocapture(() => {
 		const dispose = capture(() => {
@@ -186,7 +186,7 @@ Calls to `capture`, `captureSelf`, `uncapture`, `nocapture` and `isolate` can be
 
 === "No Build"
 	```jsx
-	import { capture, captureSelf, uncapture, nocapture } from "./gluon.js";
+	import { capture, captureSelf, uncapture, nocapture } from "./rvx.js";
 
 	nocapture(() => {
 		const dispose = capture(() => {

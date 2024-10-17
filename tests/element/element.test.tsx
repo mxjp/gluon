@@ -1,15 +1,15 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { map, nocapture, teardown } from "@mxjp/gluon";
-import { GluonElement, GluonElementOptions } from "@mxjp/gluon/element";
+import { map, nocapture, teardown } from "rvx";
+import { RvxElement, RvxElementOptions } from "rvx/element";
 
 import { assertEvents } from "../common.js";
 
 await test("element/element", async ctx => {
-	let options: GluonElementOptions | undefined;
+	let options: RvxElementOptions | undefined;
 
-	class TestElement extends GluonElement {
+	class TestElement extends RvxElement {
 		static observedAttributes = ["name"];
 
 		events: unknown[] = [];

@@ -5,7 +5,7 @@ The `useAbortController` and `useAbortSignal` functions can be used to abort thi
 
 === "JSX"
 	```jsx
-	import { useAbortSignal } from "@mxjp/gluon/async";
+	import { useAbortSignal } from "rvx/async";
 
 	// Abort a fetch request when disposed:
 	fetch("/info.txt", { signal: useAbortSignal() });
@@ -16,7 +16,7 @@ The `useAbortController` and `useAbortSignal` functions can be used to abort thi
 
 === "No Build"
 	```jsx
-	import { useAbortSignal } from "./gluon.js";
+	import { useAbortSignal } from "./rvx.js";
 
 	// Abort a fetch request when disposed:
 	fetch("/info.txt", { signal: useAbortSignal() });

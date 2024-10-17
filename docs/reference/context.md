@@ -1,14 +1,14 @@
 # Context
 Contexts can be used to implicitly pass static key value pairs along the call stack.
 
-Contexts automatically work with synchronous code & all gluon APIs.
+Contexts automatically work with synchronous code & all rvx APIs.
 
 + The `inject` function runs a callback and provides a single key value pair.
 + The `extract` function gets a value from the current context.
 
 === "JSX"
 	```jsx
-	import { inject, extract } from "@mxjp/gluon";
+	import { inject, extract } from "rvx";
 
 	inject("message", "Hello World!", () => {
 		extract("message"); // "Hello World!"
@@ -18,7 +18,7 @@ Contexts automatically work with synchronous code & all gluon APIs.
 
 === "No Build"
 	```jsx
-	import { inject, extract } from "./gluon.js";
+	import { inject, extract } from "./rvx.js";
 
 	inject("message", "Hello World!", () => {
 		extract("message"); // "Hello World!"
@@ -30,7 +30,7 @@ To inject multiple keys or to delete keys from a context, use `deriveContext`:
 
 === "JSX"
 	```jsx
-	import { deriveContext, extract } from "@mxjp/gluon";
+	import { deriveContext, extract } from "rvx";
 
 	deriveContext(ctx => {
 		ctx.set("message", "Hello World!");
@@ -42,7 +42,7 @@ To inject multiple keys or to delete keys from a context, use `deriveContext`:
 
 === "No Build"
 	```jsx
-	import { deriveContext, extract } from "./gluon.js";
+	import { deriveContext, extract } from "./rvx.js";
 
 	deriveContext(ctx => {
 		ctx.set("message", "Hello World!");
@@ -57,7 +57,7 @@ When rendering content, you can use the `<Inject>` and `<DeriveContext>` compone
 
 === "JSX"
 	```jsx
-	import { Inject, DeriveContext, extract } from "@mxjp/gluon";
+	import { Inject, DeriveContext, extract } from "rvx";
 
 	<Inject key="value" value={42}>
 		{() => <>Value: {extract("value")}</>}
@@ -73,7 +73,7 @@ When rendering content, you can use the `<Inject>` and `<DeriveContext>` compone
 
 === "No Build"
 	```jsx
-	import { inject, deriveContext, extract } from "./gluon.js";
+	import { inject, deriveContext, extract } from "./rvx.js";
 
 	inject("value", 42, () => {
 		return ["Value: ", extract("value")];
@@ -92,7 +92,7 @@ You can use symbols in combination with the `ContextKey` type as keys:
 
 === "JSX"
 	```jsx
-	import { ContextKey, inject, extract } from "@mxjp/gluon";
+	import { ContextKey, inject, extract } from "rvx";
 
 	const MESSAGE = Symbol("message") as ContextKey<string>;
 
@@ -106,9 +106,9 @@ You can use symbols in combination with the `ContextKey` type as keys:
 
 === "No Build"
 	```jsx
-	import { inject, extract } from "./gluon.js";
+	import { inject, extract } from "./rvx.js";
 
-	/** @type {import("./gluon.js").ContextKey<string>} */
+	/** @type {import("./rvx.js").ContextKey<string>} */
 	const MESSAGE = Symbol("message");
 
 	inject(MESSAGE, "Hello World!", () => {
@@ -124,7 +124,7 @@ Since contexts rely on the synchronous call stack, they only work partially with
 
 === "JSX"
 	```jsx
-	import { inject, extract } from "@mxjp/gluon";
+	import { inject, extract } from "rvx";
 
 	inject("message", "Hello World!", async () => {
 		extract("message"); // "Hello World!"
@@ -135,7 +135,7 @@ Since contexts rely on the synchronous call stack, they only work partially with
 
 === "No Build"
 	```jsx
-	import { inject, extract } from "./gluon.js";
+	import { inject, extract } from "./rvx.js";
 
 	inject("message", "Hello World!", async () => {
 		extract("message"); // "Hello World!"
@@ -148,7 +148,7 @@ You can manually pass contexts to somewhere else to fix this:
 
 === "JSX"
 	```jsx
-	import { inject, extract, getContext, runInContext } from "@mxjp/gluon";
+	import { inject, extract, getContext, runInContext } from "rvx";
 
 	inject("message", "Hello World!", async () => {
 		// Get a reference to the current context:
@@ -165,7 +165,7 @@ You can manually pass contexts to somewhere else to fix this:
 
 === "No Build"
 	```jsx
-	import { inject, extract, getContext, runInContext } from "./gluon.js";
+	import { inject, extract, getContext, runInContext } from "./rvx.js";
 
 	inject("message", "Hello World!", async () => {
 		// Get a reference to the current context:

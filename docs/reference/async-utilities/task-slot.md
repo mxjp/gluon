@@ -6,7 +6,7 @@ This is a queue for sequentially running async tasks that can be triggered by bo
 
 === "JSX"
 	```jsx
-	import { TaskSlot } from "@mxjp/gluon/async";
+	import { TaskSlot } from "rvx/async";
 
 	const slot = new TaskSlot();
 
@@ -24,7 +24,7 @@ This is a queue for sequentially running async tasks that can be triggered by bo
 
 === "No Build"
 	```jsx
-	import { TaskSlot } from "./gluon.js";
+	import { TaskSlot } from "./rvx.js";
 
 	const slot = new TaskSlot();
 

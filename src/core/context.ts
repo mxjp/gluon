@@ -6,7 +6,7 @@ import { useStack } from "./internals.js";
  *
  * @example
  * ```ts
- * import { ContextKey } from "@mxjp/gluon";
+ * import { ContextKey } from "rvx";
  *
  * const key = Symbol("example") as SymbolFor<"exampleValue">;
  *
@@ -90,7 +90,7 @@ export function inject<K, R>(key: K, value: ContextValue<K>, fn: () => R): R {
  *
  * @example
  * ```tsx
- * import { Inject, extract } from "@mxjp/gluon";
+ * import { Inject, extract } from "rvx";
  *
  * <Inject key="message" value="Hello World!">
  *   {() => <h1>{extract("message")}</h1>}
@@ -122,7 +122,7 @@ export function deriveContext<R>(fn: (context: Context, parent?: ReadonlyContext
  *
  * @example
  * ```tsx
- * import { DeriveContext, extract } from "@mxjp/gluon";
+ * import { DeriveContext, extract } from "rvx";
  *
  * <DeriveContext>
  *   {context => {

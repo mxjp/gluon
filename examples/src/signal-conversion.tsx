@@ -7,7 +7,7 @@ This example shows a "trim" function that derives a signal to automatically trim
 
 */
 
-import { Signal, sig, watchUpdates } from "@mxjp/gluon";
+import { Signal, sig, watchUpdates } from "rvx";
 
 function trim(source: Signal<string>) {
 	const input = sig(source.value);

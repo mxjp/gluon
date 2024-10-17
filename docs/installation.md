@@ -1,23 +1,23 @@
 # Installation
 
 ## Buildless Options
-Gluon can be used without any build system by directly using one of the es module bundles listed below. Note, that these bundles don't include any JSX related code.
+Rvx can be used without any build system by directly using one of the es module bundles listed below. Note, that these bundles don't include any JSX related code.
 
 | Modules | Human Readable | Minified | Types |
 |-|-|-|-|
-| Core + Builder API | [gluon.js](https://unpkg.com/@mxjp/gluon/dist/gluon.js) | [gluon.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.min.js) | [gluon.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.d.ts) |
-| All | [gluon.all.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.js) | [gluon.all.min.js](https://unpkg.com/@mxjp/gluon/dist/gluon.all.min.js) | [gluon.all.d.ts](https://unpkg.com/@mxjp/gluon/dist/gluon.all.d.ts) |
+| Core + Builder API | [rvx.js](https://unpkg.com/rvx/dist/rvx.js) | [rvx.min.js](https://unpkg.com/rvx/dist/rvx.min.js) | [rvx.d.ts](https://unpkg.com/rvx/dist/rvx.d.ts) |
+| All | [rvx.all.js](https://unpkg.com/rvx/dist/rvx.all.js) | [rvx.all.min.js](https://unpkg.com/rvx/dist/rvx.all.min.js) | [rvx.all.d.ts](https://unpkg.com/rvx/dist/rvx.all.d.ts) |
 
 If none of these fit your needs, you can [create a custom bundle](#custom-bundles).
 
 ## Npm Package
-Gluon is available as an [npm package](https://www.npmjs.com/package/@mxjp/gluon).
+Rvx is available as an [npm package](https://www.npmjs.com/package/rvx).
 ```bash
-npm i @mxjp/gluon
+npm i rvx
 ```
 
 ## JSX
-Gluon provides a react 17 and a legacy JSX runtime.
+Rvx provides a react 17 and a legacy JSX runtime.
 
 ### TypeScript
 To use JSX with typescript, add the following options to your tsconfig:
@@ -25,7 +25,7 @@ To use JSX with typescript, add the following options to your tsconfig:
 {
 	"compilerOptions": {
 		"jsx": "react-jsx",
-		"jsxImportSource": "@mxjp/gluon"
+		"jsxImportSource": "rvx"
 	}
 }
 ```
@@ -41,7 +41,7 @@ If you are using Babel with plain JavaScript, you can use the `@babel/plugin-tra
 			"@babel/plugin-transform-react-jsx",
 			{
 				"runtime": "automatic",
-				"importSource": "@mxjp/gluon"
+				"importSource": "rvx"
 			}
 		]
 	]
@@ -58,7 +58,7 @@ import * as esbuild from "esbuild";
 
 await esbuild.build({
 	jsx: "automatic",
-	jsxImportSource: "@mxjp/gluon",
+	jsxImportSource: "rvx",
 });
 ```
 ```js
@@ -68,7 +68,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
 	esbuild: {
 		jsx: "automatic",
-		jsxImportSource: "@mxjp/gluon",
+		jsxImportSource: "rvx",
 	},
 });
 ```
@@ -76,18 +76,18 @@ export default defineConfig({
 ### Other Build Systems
 Although not documented here, you can also use any other build system that supports JSX.
 
-To use the react 17 runtime (also called "automatic runtime"), use `@mxjp/gluon` as the import source.
+To use the react 17 runtime (also called "automatic runtime"), use `rvx` as the import source.
 
 To use the legacy runtime, you can manually import the `jsx` factory and the `Fragment` factory or automatically inject it using your build tool:
 ```js
-import { jsx, Fragment } from "@mxjp/gluon/jsx";
+import { jsx, Fragment } from "rvx/jsx";
 ```
 
 ### Custom Bundles
 If the bundles above don't fit your needs, you can build a custom bundle that only includes the modules you need:
 ```bash
-git clone https://github.com/mxjp/gluon
-cd gluon
+git clone https://github.com/mxjp/rvx
+cd rvx
 
 npm ci
 node scripts/bundle.js [...args]
@@ -98,8 +98,8 @@ node scripts/bundle.js -m core async -o ./custom
 
 + `--modules | -m <...modules>`
 	+ Specify what modules to include.
-	+ This can be any directory or filename that exists in the [src](https://github.com/mxjp/gluon/tree/main/src) directory without file extension.
+	+ This can be any directory or filename that exists in the [src](https://github.com/mxjp/rvx/tree/main/src) directory without file extension.
 	+ Default is `core`
 + `--output | -o <path>`
 	+ Specify the output path of the bundle without extension.
-	+ Default is `./dist/gluon.custom`
+	+ Default is `./dist/rvx.custom`

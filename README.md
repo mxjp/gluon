@@ -1,10 +1,10 @@
 ![](./docs/assets/banner.svg)
 
-# Gluon
+# Rvx
 This is a signal based frontend framework.
 
 ```jsx
-import { mount, sig } from "@mxjp/gluon";
+import { mount, sig } from "rvx";
 
 const count = sig(0);
 
@@ -16,4 +16,4 @@ mount(
 );
 ```
 
-## [Documentation](https://mxjp.github.io/gluon/)
+## [Documentation](https://mxjp.github.io/rvx/)

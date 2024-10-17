@@ -5,7 +5,7 @@ A simple counter to demonstrate basic signal usage.
 
 */
 
-import { sig } from "@mxjp/gluon";
+import { sig } from "rvx";
 
 export function Example() {
 	const count = sig(0);

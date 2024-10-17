@@ -7,7 +7,7 @@ You can toggle the visibility of the entire view or one of it's children to demo
 
 */
 
-import { Attach, Emitter, Event, View, render, sig } from "@mxjp/gluon";
+import { Attach, Emitter, Event, View, render, sig } from "rvx";
 
 export function Example() {
 	const rotate = new Emitter<[]>();
@@ -48,7 +48,7 @@ function RotateOrder(props: {
 	}
 
 	// Create a new view instance that can
-	// be directly used as content in gluon:
+	// be directly used as content in rvx:
 	// (See the "View" constructor docs for the exact
 	//  requirements of a custom view implementation.)
 	return new View((setBoundary, self) => {

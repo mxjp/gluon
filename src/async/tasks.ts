@@ -139,7 +139,7 @@ export class Tasks {
 /**
  * Context key for the current {@link Tasks} instance.
  */
-export const TASKS = Symbol.for("gluon:tasks") as ContextKey<Tasks>;
+export const TASKS = Symbol.for("rvx:tasks") as ContextKey<Tasks>;
 
 /**
  * Check if there are any pending tasks in the current tasks instance.
@@ -180,7 +180,7 @@ export function isPending(): boolean {
  *
  * @example
  * ```tsx
- * import { inject, TASKS, Tasks, capture, setPending, isPending } from "@mxjp/gluon";
+ * import { inject, TASKS, Tasks, capture, setPending, isPending } from "rvx";
  *
  * inject(TASKS, new Tasks(), () => {
  *   isPending(); // => false

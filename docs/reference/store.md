@@ -5,7 +5,7 @@ The `wrap` function creates a deep reactive wrapper:
 
 === "JSX"
 	```jsx
-	import { wrap } from "@mxjp/gluon/store";
+	import { wrap } from "rvx/store";
 
 	const state = wrap({
 		message: "Hello World!",
@@ -16,7 +16,7 @@ The `wrap` function creates a deep reactive wrapper:
 
 === "No Build"
 	```jsx
-	import { wrap, e } from "./gluon.js";
+	import { wrap, e } from "./rvx.js";
 
 	const state = wrap({
 		message: "Hello World!",
@@ -32,7 +32,7 @@ To update a reactive object, you can directly modify the wrapper.
 
 === "JSX"
 	```jsx
-	import { wrap } from "@mxjp/gluon/store";
+	import { wrap } from "rvx/store";
 
 	const todos = wrap([
 		{ name: "Foo", done: false },
@@ -45,7 +45,7 @@ To update a reactive object, you can directly modify the wrapper.
 
 === "No Build"
 	```jsx
-	import { wrap } from "./gluon.js";
+	import { wrap } from "./rvx.js";
 
 	const todos = wrap([
 		{ name: "Foo", done: false },
@@ -60,7 +60,7 @@ Note, that every individual update is processed immediately. To prevent this, yo
 
 === "JSX"
 	```jsx
-	import { batch } from "@mxjp/gluon";
+	import { batch } from "rvx";
 
 	batch(() => {
 		todos[1].done = true;
@@ -70,7 +70,7 @@ Note, that every individual update is processed immediately. To prevent this, yo
 
 === "No Build"
 	```jsx
-	import { batch } from "./gluon.js";
+	import { batch } from "./rvx.js";
 
 	batch(() => {
 		todos[1].done = true;
@@ -83,7 +83,7 @@ The `reflect` utility can be used to create a [signal](./signals.md) that reflec
 
 === "JSX"
 	```jsx
-	import { reflect, wrap } from "@mxjp/gluon/store";
+	import { reflect, wrap } from "rvx/store";
 
 	const item = wrap({ name: "Foo", done: false });
 
@@ -92,7 +92,7 @@ The `reflect` utility can be used to create a [signal](./signals.md) that reflec
 
 === "No Build"
 	```jsx
-	import { reflect, wrap } from "./gluon.js";
+	import { reflect, wrap } from "./rvx.js";
 
 	const item = wrap({ name: "Foo", done: false });
 
@@ -106,7 +106,7 @@ By default, arbitrary class instances are not reactive unless you specify, how t
 
 === "JSX"
 	```jsx
-	import { wrapInstancesOf } from "@mxjp/gluon/store";
+	import { wrapInstancesOf } from "rvx/store";
 
 	class Example {
 		static {
@@ -123,7 +123,7 @@ By default, arbitrary class instances are not reactive unless you specify, how t
 
 === "No Build"
 	```jsx
-	import { wrapInstancesOf } from "./gluon.js";
+	import { wrapInstancesOf } from "./rvx.js";
 
 	class Example {
 		static {
@@ -143,7 +143,7 @@ Private fields are not reactive. Also, you need to ensure they are accessed thro
 
 === "JSX"
 	```jsx
-	import { wrapInstancesOf, wrap, unwrap } from "@mxjp/gluon/store";
+	import { wrapInstancesOf, wrap, unwrap } from "rvx/store";
 
 	class Example {
 		static {
@@ -172,7 +172,7 @@ Private fields are not reactive. Also, you need to ensure they are accessed thro
 
 === "No Build"
 	```jsx
-	import { wrapInstancesOf, wrap, unwrap } from "./gluon.js";
+	import { wrapInstancesOf, wrap, unwrap } from "./rvx.js";
 
 	class Example {
 		static {

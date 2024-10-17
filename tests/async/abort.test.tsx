@@ -1,8 +1,8 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { capture } from "@mxjp/gluon";
-import { useAbortSignal } from "@mxjp/gluon/async";
+import { capture } from "rvx";
+import { useAbortSignal } from "rvx/async";
 
 await test("async/abort", () => {
 	let signal!: AbortSignal;

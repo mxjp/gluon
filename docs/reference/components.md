@@ -1,5 +1,5 @@
 # Components
-In gluon, components are functions that return any type of [supported content](elements.md#content).
+In rvx, components are functions that return any type of [supported content](elements.md#content).
 
 === "JSX"
 	```jsx
@@ -75,7 +75,7 @@ By default, all component properties are static. To accept reactive inputs, use 
 
 === "JSX"
 	```jsx
-	import { Expression, sig } from "@mxjp/gluon";
+	import { Expression, sig } from "rvx";
 
 	function Counter(props: { value: Expression<number>; }) {
 		return <>Current count: {props.value}</>;
@@ -93,11 +93,11 @@ By default, all component properties are static. To accept reactive inputs, use 
 
 === "No Build"
 	```jsx
-	import { sig } from "./gluon.js";
+	import { sig } from "./rvx.js";
 
 	/**
 	 * @param {object} props
-	 * @param {import("./gluon.js").Expression<number>} props.value
+	 * @param {import("./rvx.js").Expression<number>} props.value
 	 */
 	function Counter(props) {
 		return ["Current count: ", props.value];
@@ -119,7 +119,7 @@ To support data flow in both directions, you can use [signals](signals.md) as pr
 
 === "JSX"
 	```jsx
-	import { Signal, sig } from "@mxjp/gluon";
+	import { Signal, sig } from "rvx";
 
 	function Counter(props: { value: Signal<number>; }) {
 		return <button on:click={() => { props.value.value++ }}>
@@ -133,11 +133,11 @@ To support data flow in both directions, you can use [signals](signals.md) as pr
 
 === "No Build"
 	```jsx
-	import { sig, e } from "./gluon.js";
+	import { sig, e } from "./rvx.js";
 
 	/**
 	 * @param {object} props
-	 * @param {import("./gluon.js").Signal<number>} props.value
+	 * @param {import("./rvx.js").Signal<number>} props.value
 	 */
 	function Counter(props) {
 		return e("button").on("click", () => { props.value.value++ }).append(
@@ -155,7 +155,7 @@ The example below shows a basic text input and a `trim` function for trimming us
 
 === "JSX"
 	```jsx
-	import { Signal, sig, watchUpdates } from "@mxjp/gluon";
+	import { Signal, sig, watchUpdates } from "rvx";
 
 	function TextInput(props: { value: Signal<string>; }) {
 		return <input
@@ -201,11 +201,11 @@ The example below shows a basic text input and a `trim` function for trimming us
 
 === "No Build"
 	```jsx
-	import { sig, watchUpdates, e } from "./gluon.js";
+	import { sig, watchUpdates, e } from "./rvx.js";
 
 	/**
 	 * @param {object} props
-	 * @param {import("./gluon.js").Signal<string>} props.value
+	 * @param {import("./rvx.js").Signal<string>} props.value
 	 */
 	function TextInput(props) {
 		return e("input")
@@ -215,7 +215,7 @@ The example below shows a basic text input and a `trim` function for trimming us
 	}
 
 	/**
-	 * @param {import("./gluon.js").Signal<string>} source
+	 * @param {import("./rvx.js").Signal<string>} source
 	 */
 	function trim(source) {
 		const input = sig(source.value);
@@ -254,7 +254,7 @@ Sometimes it can be useful to forward properties to the root element of a compon
 
 === "JSX"
 	```jsx
-	import { ClassValue, StyleValue } from "@mxjp/gluon";
+	import { ClassValue, StyleValue } from "rvx";
 
 	function Button(props: {
 		class?: ClassValue;
@@ -272,13 +272,13 @@ Sometimes it can be useful to forward properties to the root element of a compon
 
 === "No Build"
 	```jsx
-	import { e } from "./gluon.js";
+	import { e } from "./rvx.js";
 
 	/**
 	 * @param {object} props
-	 * @param {import("./gluon.js").ClassValue} props.class
-	 * @param {import("./gluon.js").StyleValue} props.style
-	 * @param {import("./gluon.js").Expression<string | undefined>} props.id
+	 * @param {import("./rvx.js").ClassValue} props.class
+	 * @param {import("./rvx.js").StyleValue} props.style
+	 * @param {import("./rvx.js").Expression<string | undefined>} props.id
 	 */
 	function Button(props) {
 		return e("button")
@@ -293,7 +293,7 @@ In case of the `class` and `style` attributes, you can use an array as value to 
 
 === "JSX"
 	```jsx
-	import { ClassValue, StyleValue } from "@mxjp/gluon";
+	import { ClassValue, StyleValue } from "rvx";
 
 	function Button(props: {
 		class?: ClassValue;
@@ -310,12 +310,12 @@ In case of the `class` and `style` attributes, you can use an array as value to 
 
 === "No Build"
 	```jsx
-	import { e } from "./gluon.js";
+	import { e } from "./rvx.js";
 
 	/**
 	 * @param {object} props
-	 * @param {import("./gluon.js").ClassValue} props.class
-	 * @param {import("./gluon.js").StyleValue} props.style
+	 * @param {import("./rvx.js").ClassValue} props.class
+	 * @param {import("./rvx.js").StyleValue} props.style
 	 */
 	function Button(props) {
 		return e("button")

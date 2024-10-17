@@ -1,4 +1,4 @@
-import { mount, e } from "./gluon.js";
+import { mount, e } from "./rvx.js";
 
 mount(
 	document.body,

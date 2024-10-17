@@ -3,7 +3,7 @@ Render [content](../elements.md#content) for each unique value in an iterable [e
 
 === "JSX"
 	```jsx
-	import { For } from "@mxjp/gluon";
+	import { For } from "rvx";
 
 	<For each={someIterable}>
 		{value => <li>{value}</li>}
@@ -12,7 +12,7 @@ Render [content](../elements.md#content) for each unique value in an iterable [e
 
 === "No Build"
 	```jsx
-	import { For, e } from "./gluon.js";
+	import { For, e } from "./rvx.js";
 
 	For({
 		each: someIterable,

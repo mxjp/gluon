@@ -1,8 +1,8 @@
 import { deepStrictEqual, notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { For, uncapture, View, watch } from "@mxjp/gluon";
-import { unwrap, wrap, wrapInstancesOf } from "@mxjp/gluon/store";
+import { For, uncapture, View, watch } from "rvx";
+import { unwrap, wrap, wrapInstancesOf } from "rvx/store";
 
 import { assertEvents, text } from "../common.js";
 import { WrapTest } from "./common.js";

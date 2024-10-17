@@ -3,7 +3,7 @@ Render a [component](../components.md) returned from an expression.
 
 === "JSX"
 	```jsx
-	import { Nest, sig } from "@mxjp/gluon";
+	import { Nest, sig } from "rvx";
 
 	const message = sig({ type: "heading", value: "Hello World!" });
 
@@ -20,7 +20,7 @@ Render a [component](../components.md) returned from an expression.
 
 === "No Build"
 	```jsx
-	import { Nest, sig, e } from "./gluon.js";
+	import { Nest, sig, e } from "./rvx.js";
 
 	const message = sig({ type: "heading", value: "Hello World!" });
 

@@ -3,7 +3,7 @@ Attach [content](../elements.md#content) when an [expression](../signals.md#expr
 
 === "JSX"
 	```jsx
-	import { Attach } from "@mxjp/gluon";
+	import { Attach } from "rvx";
 
 	<Attach when={someCondition}>
 		Hello World!
@@ -12,7 +12,7 @@ Attach [content](../elements.md#content) when an [expression](../signals.md#expr
 
 === "No Build"
 	```jsx
-	import { Attach } from "./gluon.js";
+	import { Attach } from "./rvx.js";
 
 	Attach({
 		when: someCondition,

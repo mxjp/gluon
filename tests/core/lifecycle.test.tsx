@@ -1,7 +1,7 @@
 import { fail, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { capture, captureSelf, isolate, teardown, TeardownHook, uncapture } from "@mxjp/gluon";
+import { capture, captureSelf, isolate, teardown, TeardownHook, uncapture } from "rvx";
 
 import { assertEvents, withMsg } from "../common.js";
 

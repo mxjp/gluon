@@ -20,7 +20,7 @@ const args = parseArgs(process.argv.slice(2), {
 });
 
 const modules = args.modules ?? ["core"];
-const output = args.output ?? "./dist/gluon.custom";
+const output = args.output ?? "./dist/rvx.custom";
 
 const optionsHash = createHash("sha256").update(JSON.stringify({
 	modules,

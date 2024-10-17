@@ -1,7 +1,7 @@
 import { deepStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { batch, capture, effect, extract, get, inject, isTracking, map, memo, optionalString, sig, string, teardown, TeardownHook, track, trigger, TriggerPipe, uncapture, untrack, watch, watchUpdates } from "@mxjp/gluon";
+import { batch, capture, effect, extract, get, inject, isTracking, map, memo, optionalString, sig, string, teardown, TeardownHook, track, trigger, TriggerPipe, uncapture, untrack, watch, watchUpdates } from "rvx";
 
 import { assertEvents, lifecycleEvent, withMsg } from "../common.js";
 

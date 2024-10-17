@@ -1,16 +1,16 @@
 /*
 
 # Todo App (Store API)
-This is a basic todo app with browser backed storage using only gluon's store API.
+This is a basic todo app with browser backed storage using only rvx's store API.
 
 Note, that this example doesn't include any storage error handling or validation.
 
 */
 
-import { For, Show, Signal, effect, sig } from "@mxjp/gluon";
-import { reflect, wrap } from "@mxjp/gluon/store";
+import { For, Show, Signal, effect, sig } from "rvx";
+import { reflect, wrap } from "rvx/store";
 
-const STORAGE_KEY = "gluon-examples:todo-app";
+const STORAGE_KEY = "rvx-examples:todo-app";
 
 export function Example() {
 	const name = sig("");

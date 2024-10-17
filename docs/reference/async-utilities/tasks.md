@@ -3,8 +3,8 @@ The task system keeps track of pending tasks in a specific context. This is mean
 
 === "JSX"
 	```jsx
-	import { Inject } from "@mxjp/gluon";
-	import { TASKS, Tasks, isPending, waitFor } from "@mxjp/gluon/async";
+	import { Inject } from "rvx";
+	import { TASKS, Tasks, isPending, waitFor } from "rvx/async";
 
 	<Inject key={TASKS} value={new Tasks()}>
 		{() => <>
@@ -24,7 +24,7 @@ The task system keeps track of pending tasks in a specific context. This is mean
 
 === "No Build"
 	```jsx
-	import { inject, TASKS, Tasks, isPending, waitFor } from "./gluon.js";
+	import { inject, TASKS, Tasks, isPending, waitFor } from "./rvx.js";
 
 	inject(TASKS, new Tasks(), () => [
 		e("button")

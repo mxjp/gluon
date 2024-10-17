@@ -1,12 +1,12 @@
 > This guide assumes that you have basic JavaScript knowledge. If not, [MDN](https://developer.mozilla.org/docs/Web/JavaScript) is a good place to start.
 
 # Introduction
-To develop a gluon application locally, you need a recent version of [NodeJS](https://nodejs.org/) or any other compatible JavaScript runtime.
+To develop a rvx application locally, you need a recent version of [NodeJS](https://nodejs.org/) or any other compatible JavaScript runtime.
 
-You can use the commands below to setup a minimal gluon project using [Vite](https://vitejs.dev/) and [TypeScript](https://www.typescriptlang.org/):
+You can use the commands below to setup a minimal rvx project using [Vite](https://vitejs.dev/) and [TypeScript](https://www.typescriptlang.org/):
 ```bash
-# Create a "my-app" directory from gluon's "vite-ts" template project:
-npx degit mxjp/gluon/templates/vite-ts my-app
+# Create a "my-app" directory from rvx's "vite-ts" template project:
+npx degit mxjp/rvx/templates/vite-ts my-app
 
 # Move into "my-app":
 cd my-app
@@ -21,26 +21,26 @@ npm start
 ## Entry Point
 After setting up the quick start template, you can find the main entry point in `src/main.tsx`:
 ```jsx
-import { mount } from "@mxjp/gluon";
+import { mount } from "rvx";
 
 mount(
 	document.body,
 	<h1>Hello World!</h1>
 );
 ```
-The `<h1>Hello World!</h1>` expression directly creates an element and the `mount` function takes whatever content is supported by gluon and appends it to the document body.
+The `<h1>Hello World!</h1>` expression directly creates an element and the `mount` function takes whatever content is supported by rvx and appends it to the document body.
 
 ## State & Reactivity
 Reactivity is entirely based on signals which are objects that hold an arbitrary value:
 ```jsx
-import { sig } from "@mxjp/gluon";
+import { sig } from "rvx";
 
 // Create a signal with the initial value 0:
 const count = sig(0);
 ```
 When a signal is used directly or it's value is accessed through a function call, the signal can notify it's dependants when the value changes:
 ```jsx
-import { mount, sig } from "@mxjp/gluon";
+import { mount, sig } from "rvx";
 
 const count = sig(0);
 
@@ -55,7 +55,7 @@ mount(
 
 		{/*
 			Using the value directly is not reactive because
-			gluon has no way of re-evaluating the expression:
+			rvx has no way of re-evaluating the expression:
 		*/}
 		Initial count: {count.value}
 	</>
@@ -109,11 +109,11 @@ Attributes prefixed with `on:` are added as event listeners.
 ```
 
 ## Conditional Rendering
-To render conditional or repeated content gluon uses so called **Views** which are sequences of DOM nodes that can change over time.
+To render conditional or repeated content rvx uses so called **Views** which are sequences of DOM nodes that can change over time.
 
 The `Show` component renders content when a condition is met:
 ```jsx
-import { mount, sig, Show } from "@mxjp/gluon";
+import { mount, sig, Show } from "rvx";
 
 const showMessage = sig(false);
 
@@ -133,7 +133,7 @@ mount(
 
 The `For` component repeats content for each unique item in an iterable:
 ```jsx
-import { mount, sig, For } from "@mxjp/gluon";
+import { mount, sig, For } from "rvx";
 
 const values = sig([]);
 
@@ -153,10 +153,10 @@ mount(
 );
 ```
 
-In addition to `Show` and `For`, gluon provides some more view types you can find in the API documentation or you can implement your own views for special use cases.
+In addition to `Show` and `For`, rvx provides some more view types you can find in the API documentation or you can implement your own views for special use cases.
 
 ## Components
-Components in gluon are just functions that return arbitrary content. They are called once when the component is rendered.
+Components in rvx are just functions that return arbitrary content. They are called once when the component is rendered.
 ```jsx
 function Message() {
 	return <h1>Hello World!</h1>;
@@ -178,7 +178,7 @@ function Message(props: { message: string; }) {
 
 To make properties reactive, you can use the `Expression` type which can be a static value, a signal or a function:
 ```jsx
-import { Expression } from "@mxjp/gluon";
+import { Expression } from "rvx";
 
 function Message(props: { message: Expression<string>; }) {
 	return <h1>{props.message}</h1>;
@@ -192,7 +192,7 @@ function Message(props: { message: Expression<string>; }) {
 
 To compute something from an expression value or evaluate it, you can use the `map` and `get` functions:
 ```jsx
-import { Expression, map, get } from "@mxjp/gluon";
+import { Expression, map, get } from "rvx";
 
 function Message(props: { message: Expression<string>; }) {
 	console.log("Initial message:", get(props.message));
@@ -202,7 +202,7 @@ function Message(props: { message: Expression<string>; }) {
 
 To allow components to update a value, you can use the `Signal` type:
 ```jsx
-import { mount, sig, Signal } from "@mxjp/gluon";
+import { mount, sig, Signal } from "rvx";
 
 function TextInput(props: { value: Signal<string>; }) {
 	return <input

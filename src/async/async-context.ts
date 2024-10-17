@@ -99,4 +99,4 @@ export class AsyncError extends Error {
 /**
  * Context key for the current {@link AsyncContext}.
  */
-export const ASYNC = Symbol.for("gluon:async") as ContextKey<AsyncContext>;
+export const ASYNC = Symbol.for("rvx:async") as ContextKey<AsyncContext>;

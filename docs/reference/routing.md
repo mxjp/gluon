@@ -8,8 +8,8 @@ You can either implement your own router using the `Router` interface or use one
 
 === "JSX"
 	```jsx
-	import { Inject } from "@mxjp/gluon";
-	import { ROUTER, HistoryRouter } from "@mxjp/gluon/router";
+	import { Inject } from "rvx";
+	import { ROUTER, HistoryRouter } from "rvx/router";
 
 	<Inject key={ROUTER} value={new HistoryRouter()}>
 		{() => <>
@@ -20,7 +20,7 @@ You can either implement your own router using the `Router` interface or use one
 
 === "No Build"
 	```jsx
-	import { inject, ROUTER, HistoryRouter } from "./gluon.js";
+	import { inject, ROUTER, HistoryRouter } from "./rvx.js";
 
 	inject(ROUTER, new HistoryRouter(), () => [
 		"Everything in here has access to the history router."
@@ -31,8 +31,8 @@ The `Routes` component can be used to render content based on the current path.
 
 === "JSX"
 	```jsx
-	import { Inject } from "@mxjp/gluon";
-	import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
+	import { Inject } from "rvx";
+	import { ROUTER, HistoryRouter, Routes } from "rvx/router";
 
 	<Inject key={ROUTER} value={new HistoryRouter()}>
 		{() => <>
@@ -51,7 +51,7 @@ The `Routes` component can be used to render content based on the current path.
 
 === "No Build"
 	```jsx
-	import { inject, ROUTER, HistoryRouter, Routes } from "./gluon.js";
+	import { inject, ROUTER, HistoryRouter, Routes } from "./rvx.js";
 
 	inject(ROUTER, new HistoryRouter(), () => [
 		Routes({
@@ -99,7 +99,7 @@ Regular expressions are tested against the [normalized](#path-normalization) pat
 ]
 ```
 
-Gluon itself doesn't provide any custom syntax for dynamic routes, but you can use a package like [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) if you need to:
+Rvx itself doesn't provide any custom syntax for dynamic routes, but you can use a package like [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) if you need to:
 ```jsx
 import { pathToRegexp } from "path-to-regexp";
 
@@ -112,7 +112,7 @@ Functions can return an object with the normalized matched path and optional par
 
 === "JSX"
 	```jsx
-	import { normalize } from "@mxjp/gluon/router";
+	import { normalize } from "rvx/router";
 
 	[
 		{
@@ -133,7 +133,7 @@ Functions can return an object with the normalized matched path and optional par
 
 === "No Build"
 	```jsx
-	import { normalize } from "./gluon.js";
+	import { normalize } from "./rvx.js";
 
 	[
 		{
@@ -159,7 +159,7 @@ Below are some examples:
 
 === "JSX"
 	```jsx
-	import { normalize } from "@mxjp/gluon/router";
+	import { normalize } from "rvx/router";
 
 	normalize("") // ""
 	normalize("/") // ""
@@ -173,7 +173,7 @@ Below are some examples:
 
 === "No Build"
 	```jsx
-	import { normalize } from "./gluon.js";
+	import { normalize } from "./rvx.js";
 
 	normalize("") // ""
 	normalize("/") // ""
@@ -192,8 +192,8 @@ Routers implement a **push** function for regular navigation and a **replace** f
 
 === "JSX"
 	```jsx
-	import { extract } from "@mxjp/gluon";
-	import { ROUTER } from "@mxjp/gluon/router";
+	import { extract } from "rvx";
+	import { ROUTER } from "rvx/router";
 
 	function ExamplePage() {
 		const router = extract(ROUTER).root;
@@ -205,7 +205,7 @@ Routers implement a **push** function for regular navigation and a **replace** f
 
 === "No Build"
 	```jsx
-	import { extract, ROUTER, e } from "./gluon.js";
+	import { extract, ROUTER, e } from "./rvx.js";
 
 	function ExamplePage() {
 		const router = extract(ROUTER).root;
@@ -224,8 +224,8 @@ The example below renders text for the paths `/, /foo/bar, /foo/baz`:
 
 === "JSX"
 	```jsx
-	import { Inject, extract } from "@mxjp/gluon";
-	import { ROUTER, HistoryRouter, Routes } from "@mxjp/gluon/router";
+	import { Inject, extract } from "rvx";
+	import { ROUTER, HistoryRouter, Routes } from "rvx/router";
 
 	<Inject key={ROUTER} value={new HistoryRouter()}>
 		{() => <>
@@ -245,7 +245,7 @@ The example below renders text for the paths `/, /foo/bar, /foo/baz`:
 
 === "No Build"
 	```jsx
-	import { inject, extract, ROUTER, HistoryRouter, Routes } from "./gluon.js";
+	import { inject, extract, ROUTER, HistoryRouter, Routes } from "./rvx.js";
 
 	inject(ROUTER, new HistoryRouter(), () => [
 		Routes({
@@ -285,8 +285,8 @@ You can use the [`<Async>`](./async-utilities/async.md) component to dynamically
 	}
 
 	// main.tsx:
-	import { Routes } from "@mxjp/gluon/router";
-	import { Async } from "@mxjp/gluon/async";
+	import { Routes } from "rvx/router";
+	import { Async } from "rvx/async";
 
 	<Routes routes={[
 		{
@@ -306,7 +306,7 @@ You can use the [`<Async>`](./async-utilities/async.md) component to dynamically
 	}
 
 	// main.js:
-	import { Routes, Async } from "./gluon.js";
+	import { Routes, Async } from "./rvx.js";
 
 	Routes({
 		routes: [

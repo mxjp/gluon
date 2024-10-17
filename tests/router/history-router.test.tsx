@@ -1,8 +1,8 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture, watch } from "@mxjp/gluon";
-import { HistoryRouter } from "@mxjp/gluon/router";
+import { uncapture, watch } from "rvx";
+import { HistoryRouter } from "rvx/router";
 
 import { assertEvents } from "../common.js";
 
@@ -74,7 +74,7 @@ await test("router/history router", async ctx => {
 
 		locationPath = "/f";
 		locationSearch = "?test=4";
-		window.dispatchEvent(new CustomEvent("gluon:router:update"));
+		window.dispatchEvent(new CustomEvent("rvx:router:update"));
 		assertEvents(events, [["/f", "test=4"]]);
 	});
 

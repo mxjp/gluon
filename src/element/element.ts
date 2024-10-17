@@ -5,7 +5,7 @@ import { sig, Signal, watchUpdates } from "../core/signals.js";
 export type StartTrigger = "on-connect" | "manual";
 export type DisposeTrigger = "on-disconnect" | "manual";
 
-export interface GluonElementOptions {
+export interface RvxElementOptions {
 	/**
 	 * Shadow root options to use or false to attach content to the element directly.
 	 *
@@ -30,7 +30,7 @@ export interface GluonElementOptions {
 	dispose?: DisposeTrigger;
 }
 
-export abstract class GluonElement extends HTMLElement {
+export abstract class RvxElement extends HTMLElement {
 	static observedAttributes?: string[];
 
 	#signals = new Map<string, Signal<string | null>>();
@@ -39,7 +39,7 @@ export abstract class GluonElement extends HTMLElement {
 	#shadow?: ShadowRoot;
 	#dispose?: TeardownHook;
 
-	constructor(options?: GluonElementOptions) {
+	constructor(options?: RvxElementOptions) {
 		super();
 
 		this.#startTrigger = options?.start ?? "on-connect";

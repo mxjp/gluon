@@ -1,5 +1,5 @@
 # Security
-Gluon itself never evaluates code from strings, but as with any other framework, there are many ways to introduce severe security vulnerabilities into gluon based applications by directly using untrusted input in the wrong places.
+Rvx itself never evaluates code from strings, but as with any other framework, there are many ways to introduce severe security vulnerabilities into rvx based applications by directly using untrusted input in the wrong places.
 
 ## Interpolation
 Interpolation in rendered content is always safe to use.

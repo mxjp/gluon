@@ -3,7 +3,7 @@ This is a utility for watching an expression until it's output satisfies a condi
 
 === "JSX"
 	```jsx
-	import { watchFor } from "@mxjp/gluon/async";
+	import { watchFor } from "rvx/async";
 
 	// Wait for an expression to return a truthy result:
 	await watchFor(() => signal.value > 42);
@@ -14,7 +14,7 @@ This is a utility for watching an expression until it's output satisfies a condi
 
 === "No Build"
 	```jsx
-	import { watchFor } from "./gluon.js";
+	import { watchFor } from "./rvx.js";
 
 	// Wait for an expression to return a truthy result:
 	await watchFor(() => signal.value > 42);

@@ -6,7 +6,7 @@ This shows a minimal [i18next](https://www.i18next.com/) integration.
 */
 
 import i18next from "i18next";
-import { sig } from "@mxjp/gluon";
+import { sig } from "rvx";
 
 await i18next.init({
 	lng: "en",

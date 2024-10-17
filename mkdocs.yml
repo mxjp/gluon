@@ -1,5 +1,5 @@
-site_name: gluon!
-site_url: https://mxjp.github.io/gluon
+site_name: rvx!
+site_url: https://mxjp.github.io/rvx
 theme:
   name: material
   logo: assets/logo.svg
@@ -12,7 +12,7 @@ theme:
   palette:
     scheme: slate
     primary: black
-    accent: green
+    accent: blue
 
 extra:
   generator: false
@@ -30,4 +30,4 @@ markdown_extensions:
         kwds:
           case: lower
 
-repo_url: https://github.com/mxjp/gluon
+repo_url: https://github.com/mxjp/rvx

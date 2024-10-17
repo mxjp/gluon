@@ -1,5 +1,5 @@
 {
-	"name": "gluon-quick-start",
+	"name": "rvx-quick-start",
 	"type": "module",
 	"scripts": {
 		"start": "webpack serve",
@@ -14,6 +14,6 @@
 		"webpack-dev-server": "^5.1.0"
 	},
 	"dependencies": {
-		"@mxjp/gluon": "^16.0.0"
+		"rvx": "^16.0.0"
 	}
 }

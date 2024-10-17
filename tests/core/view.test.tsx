@@ -1,8 +1,8 @@
 import { deepStrictEqual, notStrictEqual, strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "@mxjp/gluon";
-import { wrap } from "@mxjp/gluon/store";
+import { Attach, capture, For, IndexFor, mount, movable, Nest, render, Show, sig, teardown, uncapture, View, watch, watchUpdates } from "rvx";
+import { wrap } from "rvx/store";
 
 import { assertEvents, boundaryEvents, lifecycleEvent, TestView, testView, text, withMsg } from "../common.js";
 

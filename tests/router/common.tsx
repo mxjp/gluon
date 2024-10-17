@@ -1,5 +1,5 @@
-import { batch, sig } from "@mxjp/gluon";
-import { normalize, QueryInit, Router } from "@mxjp/gluon/router";
+import { batch, sig } from "rvx";
+import { normalize, QueryInit, Router } from "rvx/router";
 
 export class TestRouter implements Router {
 	#events: unknown[];

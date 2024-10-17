@@ -1,8 +1,8 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { Inject, uncapture } from "@mxjp/gluon";
-import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
+import { Inject, uncapture } from "rvx";
+import { ASYNC, Async, AsyncContext } from "rvx/async";
 
 import { assertEvents, future, text } from "../common.js";
 

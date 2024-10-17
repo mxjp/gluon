@@ -1,8 +1,8 @@
 import { deepStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { createElement, extract, inject, NODE, sig, StyleMap, uncapture } from "@mxjp/gluon";
-import { e } from "@mxjp/gluon/builder";
+import { createElement, extract, inject, NODE, sig, StyleMap, uncapture } from "rvx";
+import { e } from "rvx/builder";
 
 import { assertEvents } from "../common.js";
 

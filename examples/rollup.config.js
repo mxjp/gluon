@@ -23,7 +23,7 @@ export default defineConfig({
 	external: [],
 	plugins: [
 		{
-			name: "gluon-examples",
+			name: "rvx-examples",
 			resolveId(id) {
 				if (id === "virtual:main") {
 					return id;
@@ -44,9 +44,9 @@ export default defineConfig({
 					}
 
 					return `
-						import { teardown } from "@mxjp/gluon";
-						import { e } from "@mxjp/gluon/builder";
-						import { GluonElement } from "@mxjp/gluon/element";
+						import { teardown } from "rvx";
+						import { e } from "rvx/builder";
+						import { RvxElement } from "rvx/element";
 
 						${imports.join("\n")}
 
@@ -54,20 +54,20 @@ export default defineConfig({
 							${examples.join("\n")}
 						};
 
-						class ExampleElement extends GluonElement {
+						class ExampleElement extends RvxElement {
 							connectedCallback() {
 								super.connectedCallback();
 							}
 
 							render() {
 								return [
-									e("link").set("rel", "stylesheet").set("href", "/gluon/stylesheets/examples.css"),
+									e("link").set("rel", "stylesheet").set("href", "/rvx/stylesheets/examples.css"),
 									examples[this.getAttribute("name")](),
 								];
 							}
 						}
 
-						customElements.define("gluon-example", ExampleElement);
+						customElements.define("rvx-example", ExampleElement);
 					`;
 				}
 			},
@@ -85,8 +85,8 @@ export default defineConfig({
 							code = code.slice(mdComment.index + mdComment[0].length).trim();
 						}
 
-						md += `<script type="module" src="/gluon/examples/bundle.js"></script>\n`;
-						md += `<gluon-example name="${name}"></gluon-example>\n`;
+						md += `<script type="module" src="/rvx/examples/bundle.js"></script>\n`;
+						md += `<rvx-example name="${name}"></rvx-example>\n`;
 						md += `\`\`\`jsx\n${code}\n\`\`\`\n\n`;
 
 						await writeFile(join(outDir, `${name}.md`), md);

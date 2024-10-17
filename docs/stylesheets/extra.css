@@ -13,7 +13,7 @@ pre {
 	max-width: 60rem;
 }
 
-gluon-example {
+rvx-example {
 	display: block;
 	padding: .65rem;
 	border: .1rem dashed var(--md-accent-fg-color);

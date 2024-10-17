@@ -1,4 +1,4 @@
-import { unwrap, wrapInstancesOf } from "@mxjp/gluon/store";
+import { unwrap, wrapInstancesOf } from "rvx/store";
 
 export class WrapTest {
 	static {

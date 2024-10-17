@@ -5,7 +5,7 @@ const dom = new JSDOM(`
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8">
-			<title>gluon!</title>
+			<title>rvx!</title>
 		</head>
 		<body></body>
 	</html>
@@ -29,7 +29,7 @@ for (const key of [
 	(globalThis as any)[key] = dom.window[key];
 }
 
-const { onTeardownLeak } = await import("@mxjp/gluon/test");
+const { onTeardownLeak } = await import("rvx/test");
 
 onTeardownLeak(() => {
 	throw new Error("teardown leak");

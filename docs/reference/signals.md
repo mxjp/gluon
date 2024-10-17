@@ -1,11 +1,11 @@
 # Signals
-In gluon, a `Signal` is an object which holds an arbitrary value and keeps track of things that have accessed that value.
+In rvx, a `Signal` is an object which holds an arbitrary value and keeps track of things that have accessed that value.
 
 To create a signal, you can use the `Signal` constructor or the `sig` shorthand:
 
 === "JSX"
 	```jsx
-	import { Signal, sig } from "@mxjp/gluon";
+	import { Signal, sig } from "rvx";
 
 	// using the constructor:
 	const count = new Signal(42);
@@ -15,7 +15,7 @@ To create a signal, you can use the `Signal` constructor or the `sig` shorthand:
 
 === "No Build"
 	```jsx
-	import { Signal, sig } from "./gluon.js";
+	import { Signal, sig } from "./rvx.js";
 
 	// using the constructor:
 	const count = new Signal(42);
@@ -66,7 +66,7 @@ sig(42, (a, b) => Object.is(a, b));
 ```
 
 ## Expressions
-In gluon, an `Expression` can be a static value, a signal or a function that accesses signals.
+In rvx, an `Expression` can be a static value, a signal or a function that accesses signals.
 ```jsx
 // A static value:
 42;
@@ -81,7 +81,7 @@ Watch an expression and run a callback with it's result.
 
 === "JSX"
 	```jsx
-	import { watch } from "@mxjp/gluon";
+	import { watch } from "rvx";
 
 	watch(count, value => {
 		console.log("Count:", value);
@@ -90,7 +90,7 @@ Watch an expression and run a callback with it's result.
 
 === "No Build"
 	```jsx
-	import { watch } from "./gluon.js";
+	import { watch } from "./rvx.js";
 
 	watch(count, value => {
 		console.log("Count:", value);
@@ -107,7 +107,7 @@ This is the same as [`watch`](#watch), but the initial value is returned instead
 
 === "JSX"
 	```jsx
-	import { watchUpdates } from "@mxjp/gluon";
+	import { watchUpdates } from "rvx";
 
 	const initialCount = watchUpdates(count, value => {
 		console.log("Count:", value);
@@ -116,7 +116,7 @@ This is the same as [`watch`](#watch), but the initial value is returned instead
 
 === "No Build"
 	```jsx
-	import { watchUpdates } from "./gluon.js";
+	import { watchUpdates } from "./rvx.js";
 
 	const initialCount = watchUpdates(count, value => {
 		console.log("Count:", value);
@@ -128,7 +128,7 @@ Run a function and re-run when any accessed signals are updated.
 
 === "JSX"
 	```jsx
-	import { effect } from "@mxjp/gluon";
+	import { effect } from "rvx";
 
 	effect(() => {
 		console.log("Count:", count.value);
@@ -137,7 +137,7 @@ Run a function and re-run when any accessed signals are updated.
 
 === "No Build"
 	```jsx
-	import { effect } from "./gluon.js";
+	import { effect } from "./rvx.js";
 
 	effect(() => {
 		console.log("Count:", count.value);
@@ -163,7 +163,7 @@ Signal updates are always processed immediately. The `batch` function can be use
 
 === "JSX"
 	```jsx
-	import { batch } from "@mxjp/gluon";
+	import { batch } from "rvx";
 
 	const a = sig(1);
 	const b = sig(2);
@@ -176,7 +176,7 @@ Signal updates are always processed immediately. The `batch` function can be use
 
 === "No Build"
 	```jsx
-	import { batch } from "./gluon.js";
+	import { batch } from "./rvx.js";
 
 	const a = sig(1);
 	const b = sig(2);
@@ -194,14 +194,14 @@ Watch an expression and get a function to reactively access it's latest result w
 
 === "JSX"
 	```jsx
-	import { memo } from "@mxjp/gluon";
+	import { memo } from "rvx";
 
 	const getValue = memo(() => a.value * b.value);
 	```
 
 === "No Build"
 	```jsx
-	import { memo } from "./gluon.js";
+	import { memo } from "./rvx.js";
 
 	const getValue = memo(() => a.value * b.value);
 	```
@@ -216,14 +216,14 @@ Signal accesses are tracked in expressions by default. You can use `untrack` to 
 
 === "JSX"
 	```jsx
-	import { track, untrack } from "@mxjp/gluon";
+	import { track, untrack } from "rvx";
 
 	watch(() => a.value * untrack(() => b.value), () => { ... });
 	```
 
 === "No Build"
 	```jsx
-	import { track, untrack } from "./gluon.js";
+	import { track, untrack } from "./rvx.js";
 
 	watch(() => a.value * untrack(() => b.value), () => { ... });
 	```
@@ -233,7 +233,7 @@ Manually evaluate an expression of an unknown type.
 
 === "JSX"
 	```jsx
-	import { get } from "@mxjp/gluon";
+	import { get } from "rvx";
 
 	get(42); // 42
 	get(() => 42); // 42
@@ -242,7 +242,7 @@ Manually evaluate an expression of an unknown type.
 
 === "No Build"
 	```jsx
-	import { get } from "./gluon.js";
+	import { get } from "./rvx.js";
 
 	get(42); // 42
 	get(() => 42); // 42
@@ -254,7 +254,7 @@ Map an expression value while preserving if the expression is static or not.
 
 === "JSX"
 	```jsx
-	import { map } from "@mxjp/gluon";
+	import { map } from "rvx";
 
 	// This immediately computes the value:
 	map(6, value => value * 7);
@@ -265,7 +265,7 @@ Map an expression value while preserving if the expression is static or not.
 
 === "No Build"
 	```jsx
-	import { map } from "./gluon.js";
+	import { map } from "./rvx.js";
 
 	// This immediately computes the value:
 	map(6, value => value * 7);
@@ -281,7 +281,7 @@ When the lifecycle at which the pipe was created is disposed, the callback funct
 
 === "JSX"
 	```jsx
-	import { trigger, sig } from "@mxjp/gluon";
+	import { trigger, sig } from "rvx";
 
 	// Create a new pipe that is bound to the current lifecycle:
 	const pipe = trigger(() => {
@@ -300,7 +300,7 @@ When the lifecycle at which the pipe was created is disposed, the callback funct
 
 === "No Build"
 	```jsx
-	import { trigger, sig } from "./gluon.js";
+	import { trigger, sig } from "./rvx.js";
 
 	// Create a new pipe that is bound to the current lifecycle:
 	const pipe = trigger(() => {
@@ -321,7 +321,7 @@ It is guaranteed that the function is called before any other observers like [`w
 
 === "JSX"
 	```jsx
-	import { trigger, sig, watch } from "@mxjp/gluon";
+	import { trigger, sig, watch } from "rvx";
 
 	const pipe = trigger(() => {
 		console.log("Signal has been updated.");
@@ -340,7 +340,7 @@ It is guaranteed that the function is called before any other observers like [`w
 
 === "No Build"
 	```jsx
-	import { trigger, sig, watch } from "./gluon.js";
+	import { trigger, sig, watch } from "./rvx.js";
 
 	const pipe = trigger(() => {
 		console.log("Signal has been updated.");
@@ -369,7 +369,7 @@ If pipes are nested, the callback for the most inner one is called first. In the
 
 === "JSX"
 	```jsx
-	import { trigger, sig } from "@mxjp/gluon";
+	import { trigger, sig } from "rvx";
 
 	const pipeA = trigger(() => console.log("Pipe A"));
 	const pipeB = trigger(() => console.log("Pipe B"));
@@ -382,7 +382,7 @@ If pipes are nested, the callback for the most inner one is called first. In the
 
 === "No Build"
 	```jsx
-	import { trigger, sig } from "./gluon.js";
+	import { trigger, sig } from "./rvx.js";
 
 	const pipeA = trigger(() => console.log("Pipe A"));
 	const pipeB = trigger(() => console.log("Pipe B"));
@@ -400,7 +400,7 @@ By default, signal updates are processed immediately. If an update causes recurs
 
 === "JSX"
 	```jsx
-	import { sig, watch } from "@mxjp/gluon";
+	import { sig, watch } from "rvx";
 
 	const count = sig(0);
 
@@ -418,7 +418,7 @@ By default, signal updates are processed immediately. If an update causes recurs
 
 === "No Build"
 	```jsx
-	import { sig, watch } from "./gluon.js";
+	import { sig, watch } from "./rvx.js";
 
 	const count = sig(0);
 

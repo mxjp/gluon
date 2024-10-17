@@ -1,8 +1,8 @@
 import { rejects, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { sig } from "@mxjp/gluon";
-import { watchFor } from "@mxjp/gluon/async";
+import { sig } from "rvx";
+import { watchFor } from "rvx/async";
 
 await test("async/wait-for", async ctx => {
 	await ctx.test("static", async () => {

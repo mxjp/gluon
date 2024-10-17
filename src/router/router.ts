@@ -32,8 +32,8 @@ export interface Router {
 	 *
 	 * @example
 	 * ```tsx
-	 * import { extract } from "@mxjp/gluon";
-	 * import { ROUTER } from "@mxjp/gluon/router";
+	 * import { extract } from "rvx";
+	 * import { ROUTER } from "rvx/router";
 	 *
 	 * extract(ROUTER)!.root.push("/home");
 	 * ```
@@ -45,8 +45,8 @@ export interface Router {
 	 *
 	 * @example
 	 * ```tsx
-	 * import { extract } from "@mxjp/gluon";
-	 * import { ROUTER } from "@mxjp/gluon/router";
+	 * import { extract } from "rvx";
+	 * import { ROUTER } from "rvx/router";
 	 *
 	 * extract(ROUTER)!.root.replace("/home");
 	 * ```
@@ -59,4 +59,4 @@ export type QueryInit = ConstructorParameters<typeof URLSearchParams>[0];
 /**
  * Context key for the current {@link Router} instance.
  */
-export const ROUTER = Symbol.for("gluon:router") as ContextKey<Router>;
+export const ROUTER = Symbol.for("rvx:router") as ContextKey<Router>;

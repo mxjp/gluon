@@ -3,7 +3,7 @@ Render [content](../elements.md#content) for each index in an iterable [expressi
 
 === "JSX"
 	```jsx
-	import { IndexFor } from "@mxjp/gluon";
+	import { IndexFor } from "rvx";
 
 	<IndexFor each={someIterable}>
 		{value => <li>{value}</li>}
@@ -12,7 +12,7 @@ Render [content](../elements.md#content) for each index in an iterable [expressi
 
 === "No Build"
 	```jsx
-	import { IndexFor, e } from "./gluon.js";
+	import { IndexFor, e } from "./rvx.js";
 
 	IndexFor({
 		each: someIterable,

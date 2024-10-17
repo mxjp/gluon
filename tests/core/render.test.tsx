@@ -1,7 +1,7 @@
 import { deepStrictEqual, notStrictEqual, strictEqual } from "node:assert";
 import test from "node:test";
 
-import { NODE, render, sig, uncapture, View, viewNodes } from "@mxjp/gluon";
+import { NODE, render, sig, uncapture, View, viewNodes } from "rvx";
 
 import { createText } from "../../dist/es/core/internals.js";
 import { assertEvents, boundaryEvents, testView, text } from "../common.js";

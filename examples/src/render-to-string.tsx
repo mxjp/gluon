@@ -1,12 +1,12 @@
 /*
 
 # Render To String
-This example shows how to render a gluon component to HTML.
+This example shows how to render a rvx component to HTML.
 
 */
 
-import { Inject, captureSelf, render } from "@mxjp/gluon";
-import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
+import { Inject, captureSelf, render } from "rvx";
+import { ASYNC, Async, AsyncContext } from "rvx/async";
 
 async function renderToString(root: () => unknown): Promise<string> {
 	// Capture teardown hooks for disposing after rendering:

@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "node:assert";
 
-import { teardown, View, ViewBoundaryOwner } from "@mxjp/gluon";
+import { teardown, View, ViewBoundaryOwner } from "rvx";
 
 export function assertEvents(events: unknown[], expected: unknown[]): void {
 	deepStrictEqual(events, expected);

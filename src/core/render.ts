@@ -30,7 +30,7 @@ function use(setBoundary: ViewSetBoundaryFn, node: Node): void {
  * + Arbitrarily nested arrays/fragments of content.
  * + DOM nodes. Children will be removed from document fragments.
  * + {@link View Views}.
- * + Anything created with gluons jsx runtime.
+ * + Anything created with rvx's jsx runtime.
  * + Anything else is displayed as text.
  *
  * @param content The content to render.
@@ -38,7 +38,7 @@ function use(setBoundary: ViewSetBoundaryFn, node: Node): void {
  *
  * @example
  * ```tsx
- * import { render, sig } from "@mxjp/gluon";
+ * import { render, sig } from "rvx";
  *
  * // Not displayed:
  * render(null);
@@ -143,7 +143,7 @@ export function render(content: unknown): View {
  *
  * @example
  * ```tsx
- * import { mount } from "@mxjp/gluon";
+ * import { mount } from "rvx";
  *
  * mount(
  *   document.body,
@@ -154,7 +154,7 @@ export function render(content: unknown): View {
  * Since the content is removed when the current lifecycle is disposed, this can also be used to temporarily append
  * content to different elements while some component is rendered:
  * ```tsx
- * import { mount } from "@mxjp/gluon";
+ * import { mount } from "rvx";
  *
  * function Popover(props: { text: unknown, children: unknown }) {
  *   const visible = sig(false);

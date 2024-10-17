@@ -1,8 +1,8 @@
 import { strictEqual } from "node:assert";
 import test from "node:test";
 
-import { uncapture } from "@mxjp/gluon";
-import { TaskSlot } from "@mxjp/gluon/async";
+import { uncapture } from "rvx";
+import { TaskSlot } from "rvx/async";
 
 import { assertEvents } from "../common.js";
 

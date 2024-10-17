@@ -1,5 +1,5 @@
 # Web Components
-Gluon supports using web components just like any other native element.
+Rvx supports using web components just like any other native element.
 
 === "JSX"
 	```jsx
@@ -11,13 +11,13 @@ Gluon supports using web components just like any other native element.
 	e("some-web-component");
 	```
 
-To implement a web component, you can extend the `GluonElement` class which takes care of creating a shadow root and renders content when the element is connected to the document:
+To implement a web component, you can extend the `RvxElement` class which takes care of creating a shadow root and renders content when the element is connected to the document:
 
 === "JSX"
 	```jsx
-	import { GluonElement } from "@mxjp/gluon/element";
+	import { RvxElement } from "rvx/element";
 
-	class ExampleComponent extends GluonElement {
+	class ExampleComponent extends RvxElement {
 		render() {
 			return <h1>Hello World!</h1>;
 		}
@@ -28,9 +28,9 @@ To implement a web component, you can extend the `GluonElement` class which take
 
 === "No Build"
 	```jsx
-	import { GluonElement, e } from "./gluon.js";
+	import { RvxElement, e } from "./rvx.js";
 
-	class ExampleComponent extends GluonElement {
+	class ExampleComponent extends RvxElement {
 		render() {
 			return e("h1").append("Hello World!");
 		}
@@ -44,9 +44,9 @@ The `reflect` function can be used to get a signal that reflects an attribute va
 
 === "JSX"
 	```jsx
-	import { GluonElement } from "@mxjp/gluon/element";
+	import { RvxElement } from "rvx/element";
 
-	class ExampleCounter extends GluonElement {
+	class ExampleCounter extends RvxElement {
 		// Allow this component to detect changes to the "count" attribute:
 		static observedAttributes = ["count"];
 
@@ -81,9 +81,9 @@ The `reflect` function can be used to get a signal that reflects an attribute va
 
 === "No Build"
 	```jsx
-	import { GluonElement, e } from "./gluon.js";
+	import { RvxElement, e } from "./rvx.js";
 
-	class ExampleCounter extends GluonElement {
+	class ExampleCounter extends RvxElement {
 		// Allow this component to detect changes to the "count" attribute:
 		static observedAttributes = ["count"];
 
@@ -123,7 +123,7 @@ Due to it's simple lifecycle system, you can also implement web components manua
 
 === "JSX"
 	```jsx
-	import { mount, capture, teardown, TeardownHook } from "@mxjp/gluon";
+	import { mount, capture, teardown, TeardownHook } from "rvx";
 
 	class ExampleComponent extends HTMLElement {
 		#dispose?: TeardownHook;
@@ -156,7 +156,7 @@ Due to it's simple lifecycle system, you can also implement web components manua
 
 === "No Build"
 	```jsx
-	import { mount, capture, teardown, TeardownHook, e } from "./gluon.js";
+	import { mount, capture, teardown, TeardownHook, e } from "./rvx.js";
 
 	class ExampleComponent extends HTMLElement {
 		#dispose?: TeardownHook;

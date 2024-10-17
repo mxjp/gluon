@@ -83,7 +83,7 @@ export class Signal<T> {
 	 *
 	 * @example
 	 * ```tsx
-	 * import { sig, watch } from "@mxjp/gluon";
+	 * import { sig, watch } from "rvx";
 	 *
 	 * const count = sig(0);
 	 *
@@ -108,7 +108,7 @@ export class Signal<T> {
 	 *
 	 * @example
 	 * ```tsx
-	 * import { sig, watch } from "@mxjp/gluon";
+	 * import { sig, watch } from "rvx";
 	 *
 	 * const items = sig([]);
 	 *
@@ -194,7 +194,7 @@ export function sig<T>(value?: T, equals?: SignalEqualsFn<T> | boolean): Signal<
  *
  * @example
  * ```tsx
- * import { sig, watch } from "@mxjp/gluon";
+ * import { sig, watch } from "rvx";
  *
  * const message = sig("Example");
  *
@@ -268,7 +268,7 @@ const _observer = (hook: NotifyHook) => {
  *
  * @example
  * ```tsx
- * import { sig, watch } from "@mxjp/gluon";
+ * import { sig, watch } from "rvx";
  *
  * const count = sig(0);
  *
@@ -387,7 +387,7 @@ export function effect(fn: () => void): void {
  * @example
  * The example below outputs `5` and `9` once. Without batching the output would be `5, 7, 9`.
  * ```tsx
- * import { batch, sig, watch } from "@mxjp/gluon";
+ * import { batch, sig, watch } from "rvx";
  *
  * const a = sig(2);
  * const b = sig(3);
@@ -434,7 +434,7 @@ export function batch<T>(fn: () => T): T {
  *
  * @example
  * ```tsx
- * import { sig, memo, watch } from "@mxjp/gluon";
+ * import { sig, memo, watch } from "rvx";
  *
  * const count = sig(42);
  *
@@ -461,7 +461,7 @@ export function memo<T>(expr: Expression<T>, equals?: SignalEqualsFn<T> | boolea
  *
  * @example
  * ```tsx
- * import { sig, untrack, watch } from "@mxjp/gluon";
+ * import { sig, untrack, watch } from "rvx";
  *
  * const a = sig(2);
  * const b = sig(3);
@@ -543,7 +543,7 @@ export function trigger(fn: () => void): TriggerPipe {
  *
  * @example
  * ```tsx
- * import { sig, get } from "@mxjp/gluon";
+ * import { sig, get } from "rvx";
  *
  * const count = sig(42);
  *
@@ -569,7 +569,7 @@ export type MapFn<I, O> = (input: I) => O;
  *
  * @example
  * ```tsx
- * import { sig, map, get } from "@mxjp/gluon";
+ * import { sig, map, get } from "rvx";
  *
  * const count = sig(42);
  * const doubleCount = map(count, value => value * 2);
@@ -594,7 +594,7 @@ export function map<I, O>(input: Expression<I>, mapFn: MapFn<I, O>): Expression<
  *
  * @example
  * ```tsx
- * import { string } from "@mxjp/gluon";
+ * import { string } from "rvx";
  *
  * <div some-value={string(true)} />; // <div some-value="true" />
  * <div some-value={string(false)} />; // <div some-value="false" />
@@ -612,7 +612,7 @@ export function string(input: Expression<unknown>): Expression<string> {
  *
  * @example
  * ```tsx
- * import { optionalString } from "@mxjp/gluon";
+ * import { optionalString } from "rvx";
  *
  * <div some-value={optionalString(false)} />; // <div some-value="false" />
  * <div some-value={optionalString(null)} />; // <div />

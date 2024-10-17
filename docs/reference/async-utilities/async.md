@@ -3,7 +3,7 @@ The `<Async>` component is meant for asynchronous rendering. E.g. loading page c
 
 === "JSX"
 	```jsx
-	import { Async } from "@mxjp/gluon/async";
+	import { Async } from "rvx/async";
 
 	// main.tsx:
 	<Async source={() => import("./page")}>
@@ -18,7 +18,7 @@ The `<Async>` component is meant for asynchronous rendering. E.g. loading page c
 
 === "No Build"
 	```jsx
-	import { Async } from "./gluon.js";
+	import { Async } from "./rvx.js";
 
 	// main.js:
 	Async({
@@ -60,8 +60,8 @@ To wait for async parts in a specific context to complete, you can use `AsyncCon
 
 === "JSX"
 	```jsx
-	import { Inject } from "@mxjp/gluon";
-	import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
+	import { Inject } from "rvx";
+	import { ASYNC, Async, AsyncContext } from "rvx/async";
 
 	const ctx = new AsyncContext();
 
@@ -78,7 +78,7 @@ To wait for async parts in a specific context to complete, you can use `AsyncCon
 
 === "No Build"
 	```jsx
-	import { inject, ASYNC, Async, AsyncContext } from "./gluon.js";
+	import { inject, ASYNC, Async, AsyncContext } from "./rvx.js";
 
 	const ctx = new AsyncContext();
 
@@ -98,8 +98,8 @@ When there are multiple async parts in the same place, tracking can be used to h
 
 === "JSX"
 	```jsx
-	import { Inject, sig, movable } from "@mxjp/gluon";
-	import { ASYNC, Async, AsyncContext } from "@mxjp/gluon/async";
+	import { Inject, sig, movable } from "rvx";
+	import { ASYNC, Async, AsyncContext } from "rvx/async";
 
 	const innerCtx = new AsyncContext();
 	const inner = movable(
@@ -119,7 +119,7 @@ When there are multiple async parts in the same place, tracking can be used to h
 
 === "No Build"
 	```jsx
-	import { inject, sig, movable, ASYNC, Async, AsyncContext } from "./gluon.js";
+	import { inject, sig, movable, ASYNC, Async, AsyncContext } from "./rvx.js";
 
 	const innerCtx = new AsyncContext();
 	const inner = movable(inject(ASYNC, innerCtx, () => [

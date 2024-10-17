@@ -1,7 +1,7 @@
 import { strictEqual, throws } from "node:assert";
 import test from "node:test";
 
-import { ContextKey, deriveContext, extract, inject } from "@mxjp/gluon";
+import { ContextKey, deriveContext, extract, inject } from "rvx";
 
 import { withMsg } from "../common.js";
 

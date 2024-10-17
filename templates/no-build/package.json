@@ -1,5 +1,5 @@
 {
-	"name": "gluon-quick-start",
+	"name": "rvx-quick-start",
 	"type": "module",
 	"scripts": {
 		"start": "vite"

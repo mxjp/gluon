@@ -1,13 +1,14 @@
 /*
 
-# Todo App (JSX)
-This is a basic todo app with browser backed storage using only gluon's core features.
+# Todo App (Builder API)
+This is a basic todo app with browser backed storage using only gluon's core features with the builder API.
 
 Note, that this example doesn't include any storage error handling or validation.
 
 */
 
 import { For, Show, Signal, sig, watch } from "@mxjp/gluon";
+import { e } from "@mxjp/gluon/builder";
 
 const STORAGE_KEY = "gluon-examples:todo-app";
 
@@ -47,53 +48,52 @@ export function Example() {
 		}
 	});
 
-	return <div class="column">
-		<div class="row">
-			<TextInput value={name} action={add} />
-			<button on:click={add}>Add</button>
-		</div>
-		<ul>
-			<For each={items}>
-				{item => <li class="row">
-					<TextInput value={item.name} />
-					<Show
-						when={item.done}
-						else={() => <>
-							<button on:click={() => { item.done.value = true }}>Done</button>
-						</>}
-					>
-						{() => <>
-							<button on:click={() => { item.done.value = false }}>Undone</button>
-							<button on:click={() => {
+	return e("div").class("column").append(
+		e("div").class("row").append(
+			TextInput({ value: name, action: add }),
+			e("button").on("click", add).append("Add"),
+		),
+		e("ul").append(
+			For({
+				each: items,
+				children: item => e("li").class("row").append(
+					TextInput({ value: item.name }),
+					Show({
+						when: item.done,
+						children: () => [
+							e("button").on("click", () => { item.done.value = false }).append("Undone"),
+							e("button").on("click", () => {
 								items.update(items => {
 									items.splice(items.indexOf(item), 1);
 								});
-							}}>Remove</button>
-						</>}
-					</Show>
-				</li>}
-			</For>
-		</ul>
-	</div>;
+							}).append("Remove"),
+						],
+						else: () => [
+							e("button").on("click", () => { item.done.value = true }).append("Done"),
+						],
+					})
+				),
+			})
+		),
+	);
 }
 
 function TextInput(props: {
 	value: Signal<string>;
 	action?: () => void;
 }) {
-	return <input
-		type="text"
-		prop:value={props.value}
-		on:input={event => {
+	return e("input")
+		.set("type", "text")
+		.prop("value", props.value)
+		.on("input", event => {
 			props.value.value = (event.target as HTMLInputElement).value;
-		}}
-		on:keydown={event => {
+		})
+		.on("keydown", event => {
 			if (event.key === "Enter" && props.action) {
 				event.preventDefault();
 				props.action();
 			}
-		}}
-	/>;
+		});
 }
 
 interface ItemJson {

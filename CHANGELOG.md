@@ -1,6 +1,6 @@
 # Changelog
 
-## Rvx 2.0 / Gluon 16.0
+## Rvx 16.0 / Gluon 16.0
 + Rebranded **Gluon** to **Rvx**.
 + **Breaking:** Replace `e` function with an element builder API.
 

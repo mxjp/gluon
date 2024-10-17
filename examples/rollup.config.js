@@ -44,7 +44,8 @@ export default defineConfig({
 					}
 
 					return `
-						import { teardown, e } from "@mxjp/gluon";
+						import { teardown } from "@mxjp/gluon";
+						import { e } from "@mxjp/gluon/builder";
 						import { GluonElement } from "@mxjp/gluon/element";
 
 						${imports.join("\n")}
@@ -60,7 +61,7 @@ export default defineConfig({
 
 							render() {
 								return [
-									e("link", { rel: "stylesheet", href: "/gluon/stylesheets/examples.css" }),
+									e("link").set("rel", "stylesheet").set("href", "/gluon/stylesheets/examples.css"),
 									examples[this.getAttribute("name")](),
 								];
 							}

@@ -1,6 +1,6 @@
 ![](./docs/assets/banner.svg)
 
-# Rvx
+# rvx!
 This is a signal based frontend framework.
 
 ```jsx

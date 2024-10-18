@@ -1,13 +1,13 @@
 # Changelog
 
-## Rvx 16.0 / Gluon 16.0
+## 16.0
 + Rebranded **Gluon** to **Rvx**.
 + **Breaking:** Replace `e` function with an element builder API.
 
-## Gluon 15.1
+## 15.1
 + Add new `trigger` API.
 
-## Gluon 15.0
+## 15.0
 + **Breaking:** Remove all shared globals & utilities. This also breaks interoperability with other major versions.
 + **Breaking:** Removed `lazy` and `trigger`.
 + **Breaking:** Removed `sequential` param from `watch`, `watchUpdates` and `effect`. Immediate recusrive side effects are now always unfolded into a sequence.
@@ -17,80 +17,80 @@
 + Improve batch stack memory usage.
 + Improve signal access tracking memory usage & performance.
 
-## Gluon 14.3
+## 14.3
 + Add `isolate` utility.
 
-## Gluon 14.2
+## 14.2
 + Allow arbitrary values as content in the `e()` shorthand.
 
-## Gluon 14.1
+## 14.1
 + Add special `ref` attribute.
 
-## Gluon 14.0
+## 14.0
 + **Breaking:** Regular events are now prefixed with `on:`.
 + **Breaking:** Capturing events prefixed with `$$` have been removed. An object with event listener options can be used instead.
 
-## Gluon 13.0
+## 13.0
 + **Breaking:** Batches now run even if an error is thrown to prevent breaking unrelated signal cycles.
 + **Breaking:** Teardown hooks for the same `capture` or `captureSelf` call are now called in reverse order.
 + **Breaking:** If the function passed to `capture` or `captureSelf` throws an error, teardown hooks are now automatically called in reverse order and the error is re-thrown.
 + **Breaking:** `<For>` and `<IndexFor>` now abort the current update if an error is thrown as if the previous item was the last one and re-throw the error.
 
-## Gluon 12.0
+## 12.0
 + **Breaking:** Public exports have been removed: `appendContent`, `setAttributes`, `createText`.
 
-## Gluon 11.1
+## 11.1
 + **Deprecated:** Public exports will be removed: `appendContent`, `setAttributes`, `createText`.
 + Add `MemoryRouter`.
 
-## Gluon 11.0
+## 11.0
 + **Breaking:** `trigger` argument has been removed from `watch`, `watchUpdates` and `effect`.
 + **Breaking:** Immediate render side effects in `<Nest>`, `<Show>`, `<For>` and `<IndexFor>` are now sequential.
 + Support practically infinite unique ids.
 + Support infinitely chained immediate signal updates.
 + Add `sequential` parameter to `watch` & `effect`.
 
-## Gluon 10.2
+## 10.2
 + Support immediate side effects in `watch` callbacks.
 + Support immediate render side effects in `<Nest>` and `<Show>`.
 
-## Gluon 10.1
+## 10.1
 + Add `RvxElement` as a base for web components.
 + Fix signal equality check of `NaN` values.
 
-## Gluon 10.0
+## 10.0
 + **Breaking:** Remove `trimBase` path utility. Use `relative` instead.
 + **Breaking:** Fix nested routing behavior for history routers with a base path.
 + **Breaking:** Remove previously exported internal `formatPath`.
 + Add `relative` path utility.
 
-## Gluon 9.1
+## 9.1
 + Add `trimBase` router path utility.
 + Add `basePath` option to history router.
 
-## Gluon 9.0
+## 9.0
 + **Breaking:** Using teardown hooks inside expressions now throws an error.
 + **Breaking:** `<For>` and `<IndexFor>` now also re-render when anything that is accessed during iteration is updated.
 + Add `nocapture` utility to explicitly un-support teardown hooks in specific contexts.
 + Add `trigger` parameter to `watch` and `watchUpdates`.
 + Add `effect` utility.
 
-## Gluon 8.0
+## 8.0
 + **Breaking:** Fix nested batch behavior: Updates during batches are now deferred until all current batches are complete.
 
-## Gluon 7.1
+## 7.1
 + Add `Signal.active` property.
 + Add `isTracking` utility.
 
-## Gluon 7.0
+## 7.0
 + **Breaking:** Rewrite route matching for ease of use and better tree shaking:
   + Support arbitrary iterable expressions as routes.
   + Custom route matchers must now return an object with normalized paths.
 
-## Gluon 6.1
+## 6.1
 + Add support for rendering document fragments.
 
-## Gluon 6.0
+## 6.0
 + **Breaking:** Async and router exports have been moved to `rvx/async` and `rvx/router`.
 + **Breaking:** Memos no longer run during batches.
 + **Breaking:** `trigger` argument has been removed from `watch` and `watchUpdates`.
@@ -110,42 +110,42 @@
 + Fix broken query formatting in history and hash router.
 + Fix hash router listening to the wrong events.
 
-## Gluon 5.7
+## 5.7
 + Add `watchUpdates` utility.
 
-## Gluon 5.6
+## 5.6
 + Export `sharedGlobal` and `shareInstanceOf` utilities.
 
-## Gluon 5.5
+## 5.5
 + Add event API.
 
-## Gluon 5.4
+## 5.4
 + Add `Signal.pipe` utility.
 
-## Gluon 5.3
+## 5.3
 + Add `rvx/test` utilities.
 
-## Gluon 5.2
+## 5.2
 + Add `TaskSlot`.
 + Make all internal globals shared between different rvx versions in the same thread.
 + Make instances of `View` and `Signal` recognizable across different rvx versions.
 
-## Gluon 5.1
+## 5.1
 + The following APIs now cause unhandled rejections if an error isn't handled at all:
   + `waitFor(..)` and `Tasks.waitFor(..)`
   + `async(..)` and `<Async>` if there is no rejection callback and no `AsyncContext`.
   + `AsyncContext.track(..)` if the error wasn't handled by an `AsyncContext.complete(..)` call.
 
-## Gluon 5.0
+## 5.0
 + **Breaking:** Restore focus on the last active element by default when there are no more pending tasks.
 + **Breaking:** Rename `map/Map` to `iterUnique/IterUnique`.
 + **Breaking:** Remove `mapper` utility.
 + **Breaking:** Add `map` utility for mapping expression values.
 
-## Gluon 4.1
+## 4.1
 + Add watchable `pending` property to async contexts.
 
-## Gluon 4.0
+## 4.0
 + Add `Tasks.fork` utility.
 + Add `async` and `Async` for asynchronous rendering with a separate tracking system.
 + **Breaking:** Remove class based context keys.
@@ -154,13 +154,13 @@
 + **Breaking:** Renamed `ContextValueFor` to `ContextValue`.
 + **Breaking:** Removed `unwrap` and `Unwrap`. Use `async/Async` instead.
 
-## Gluon 3.2
+## 3.2
 + Add `captureSelf` utility.
 
-## Gluon 3.1
+## 3.1
 + Add `watchFor` utility.
 
-## Gluon 3.0
+## 3.0
 + **Breaking:** Remove `jsx` argument from `createElement` and `setAttributes`.
 + JSX element type is now `unknown`.
 + Support legacy react jsx transform.
@@ -168,19 +168,19 @@
   + Moved JSX runtime modules to `/dist/es/core/jsx/r17.{js,d.ts}`.
   + The React 17 JSX runtime now deletes the `children` property from the `prop` argument before creating an element.
 
-## Gluon 2.4
+## 2.4
 + Add `viewNodes` iterator.
 
-## Gluon 2.3
+## 2.3
 + Use hyphen cased style properties. (Exact behavior was previously unspecified)
 
-## Gluon 2.2
+## 2.2
 + Add manual pending tasks: `Tasks.setPending` and `setPending`.
 
-## Gluon 2.1
+## 2.1
 + Add expression mapping utilities: `mapper`, `string` and `optionalString`.
 
-## Gluon 2.0
+## 2.0
 + Add support for generic boolean attributes.
 + Add utility for phantom typed context key-value pairs.
 + Add value type to XMLNS context key.
@@ -194,15 +194,15 @@
 + **Breaking:** Remove `stylesheet` utility.
 + **Breaking:** Set all attributes except **class** and **style** as attributes by default. To set as properties, prefix attribute names with `prop:`.
 
-## Gluon 1.3
+## 1.3
 + Support context in expressions.
 + Add abort signal utilities.
 + Add pending task tracking.
 + Add unwrap utility.
 
-## Gluon 1.2
+## 1.2
 + Make router available from `rvx`.
 + **Deprecated:** Imports from `rvx/router`.
 
-## Gluon 1.1
+## 1.1
 + Add routing.

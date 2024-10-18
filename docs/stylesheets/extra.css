@@ -18,3 +18,7 @@ rvx-example {
 	padding: .65rem;
 	border: .1rem dashed var(--md-accent-fg-color);
 }
+
+.md-typeset details code {
+	font-size: 1em;
+}

@@ -92,19 +92,14 @@ const NOCAPTURE: TeardownFrame = {
  * @returns The function's return value.
  */
 export function nocapture<T>(fn: () => T): T {
-	TEARDOWN_STACK.push(NOCAPTURE);
-	try {
-		return fn();
-	} finally {
-		TEARDOWN_STACK.pop();
-	}
+	return useStack(TEARDOWN_STACK, NOCAPTURE, fn);
 }
 
 /**
  * Run a function within an error isolation boundary.
  *
  * + If an error is thrown, teardown hooks are immediately called in reverse registration order and the error is re-thrown.
- * + If no error is thrown, this behaves as if teardown hooks were registered in the outer context.
+ * + If no error is thrown, teardown hooks are registered in the outer context.
  *
  * @param fn The function to run.
  * @returns The function's return value.

@@ -55,7 +55,7 @@ In rvx, you directly create real DOM elements which is relatively fast and has a
 Everything in rvx is composable without any restrictions. You can define reactive state anywhere you like and use it anywhere else, dynamically define and pass around components, etc.
 
 ??? note "Example"
-	#### Using state from somewhere else
+	Using state from somewhere else:
 	```jsx
 	const count = sig(0);
 
@@ -69,7 +69,7 @@ Everything in rvx is composable without any restrictions. You can define reactiv
 	<GlobalCounter />
 	```
 
-	#### Dynamically defining a component
+	Dynamically defining a component:
 	```jsx
 	function createHeadingComponent(level: number) {
 		const TagName = `h${level}`;

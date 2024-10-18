@@ -2,6 +2,7 @@
 Routers provide a reactive path and query parameters and allow navigating in their current context.
 
 You can either implement your own router using the `Router` interface or use one of the provided implementations:
+
 + `HistoryRouter` - Uses the location and history API for navigation.
 + `HashRouter` - Uses the location hash.
 + `MemoryRouter` - Keeps it's state in memory instead of the actual browser location. This can be useful for testing purposes.
